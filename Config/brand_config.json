@@ -1,0 +1,43 @@
+{
+  "brand": {
+    "name": "HashSYR24",
+    "name_arabic": "هاشتاق سوريا",
+    "niche": "Syrian News & Daily Utility",
+    "target_audience": "Syrians inside Syria and the global diaspora"
+  },
+  "visual_identity": {
+    "primary_fonts": [
+      "IBM Plex Sans Arabic"
+    ],
+    "colors": {
+      "neutrals": {
+        "pure_white": "#FFFFFF",
+        "light_gray": "#BFB4B7",
+        "dark_gray": "#3E3A3B",
+        "off_black": "#161616"
+      },
+      "primaries": {
+        "deep_pine": "#002D29",
+        "teal": "#56A596"
+      },
+      "accents": {
+        "gold": "#DBBE8F",
+        "crimson": "#C93D57",
+        "maroon": "#4A151E"
+      }
+    }
+  },
+  "tone_of_voice": {
+    "archetype": "The Objective Guardian",
+    "traits": [
+      "Authoritative but Unbiased",
+      "Clear and Concise",
+      "Modern Standard Arabic"
+    ],
+    "restrictions": [
+      "No clickbait",
+      "No emotional manipulation",
+      "Always use standard global months (يناير) instead of Syriac"
+    ]
+  }
+}
