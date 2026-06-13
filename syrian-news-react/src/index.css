@@ -1,0 +1,19 @@
+@import 'tailwindcss';
+
+@theme {
+  --color-brand-dark: #002D29;
+  --color-brand-green: #56A596;
+  --font-arabic: "IBM Plex Sans Arabic", sans-serif;
+}
+
+@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@400;600;700&display=swap');
+
+@utility news-gradient {
+  background: linear-gradient(135deg, #002D29 0%, #03322D 17%, #0D3F3A 36%, #1D564E 55%, #34766B 76%, #519E90 97%, #56A596 100%);
+}
+
+body {
+  font-family: var(--font-arabic);
+  margin: 0;
+  padding: 0;
+}

@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>هاشتاق سوريا | الدليل البصري الاستراتيجي</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- IBM Plex Sans Arabic -->
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        pine: '#002D29', teal: '#56A596',
+                        white: '#FFFFFF', lightGray: '#BFB4B7', darkGray: '#3E3A3B', offBlack: '#161616',
+                        gold: '#DBBE8F', crimson: '#C93D57', maroon: '#4A151E'
+                    },
+                    fontFamily: {
+                        sans: ['IBM Plex Sans Arabic', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body { 
+            font-family: 'IBM Plex Sans Arabic', sans-serif; 
+            -webkit-font-smoothing: antialiased; 
+            margin: 0; padding: 0;
+            overflow: hidden;
+        }
+        /* Custom Scrollbar */
+        .snap-container {
+            height: 100vh;
+            overflow-y: scroll;
+            scroll-snap-type: y mandatory;
+        }
+        .snap-container::-webkit-scrollbar { width: 8px; }
+        .snap-container::-webkit-scrollbar-track { background: #161616; }
+        .snap-container::-webkit-scrollbar-thumb { background: #3E3A3B; border-radius: 4px; }
+        
+        .slide {
+            scroll-snap-align: start;
+            min-height: 100vh;
+            width: 100vw;
+            position: relative;
+        }
+        
+        /* Graphic Devices (Curves like the PDF) */
+        .curve-tl { border-top-left-radius: 50%; }
+        .curve-tr { border-top-right-radius: 50%; }
+        .curve-bl { border-bottom-left-radius: 50%; }
+        .curve-br { border-bottom-right-radius: 50%; }
+
+        /* Misuse Filters */
+        .misuse-stretch { transform: scaleX(1.5); }
+        .misuse-squeeze { transform: scaleY(0.5); }
+        .misuse-rotate { transform: rotate(15deg); }
+        .misuse-shadow { filter: drop-shadow(0 10px 10px rgba(0,0,0,0.5)); }
+        
+    </style>
+</head>
+<body class="bg-offBlack text-white">
+
+    <div class="snap-container">
+
+        <!-- ================= SLIDE 1: COVER ================= -->
+        <section class="slide bg-offBlack flex">
+            <!-- Background Graphic Device -->
+            <div class="absolute inset-0 flex">
+                <div class="w-1/3 h-full bg-gradient-to-br from-pine to-teal curve-br opacity-90"></div>
+                <div class="w-2/3 h-full bg-gradient-to-tl from-teal to-pine curve-tl opacity-90 ml-auto"></div>
+            </div>
+            
+            <div class="relative z-10 container mx-auto px-12 flex flex-col justify-center h-full">
+                <div class="flex justify-between items-end">
+                    <div>
+                        <h1 class="text-7xl font-bold text-white mb-4 tracking-tight">الدليل البصري</h1>
+                        <p class="text-2xl text-white opacity-80 font-light">هاشتاق سوريا (HashSYR24)</p>
+                    </div>
+                    <div class="text-right">
+                        <p class="text-xl text-white opacity-60">الإصدار 3.0</p>
+                        <p class="text-lg text-white opacity-60">2026</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ================= SLIDE 2: INDEX ================= -->
+        <section class="slide bg-white text-offBlack flex items-center">
+            <div class="container mx-auto px-12 flex">
+                <div class="w-1/2 flex items-center justify-center">
+                    <h2 class="text-6xl font-light text-teal">الفهرس</h2>
+                </div>
+                <div class="w-1/2 bg-teal rounded-tl-[10rem] p-24 text-white">
+                    <ul class="text-3xl space-y-8 font-light">
+                        <li class="flex gap-6"><span class="opacity-50 w-12">01</span> <span>أساسيات العلامة التجارية</span></li>
+                        <li class="flex gap-6"><span class="opacity-50 w-12">02</span> <span>الشعار والهوية</span></li>
+                        <li class="flex gap-6"><span class="opacity-50 w-12">03</span> <span>المظهر والانطباع (الألوان)</span></li>
+                        <li class="flex gap-6"><span class="opacity-50 w-12">04</span> <span>الطباعة</span></li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <!-- ================= SLIDE 3: INTRO 01 ================= -->
+        <section class="slide bg-gradient-to-br from-pine to-offBlack flex items-center justify-center">
+            <h2 class="text-8xl font-light text-white tracking-widest flex gap-8">
+                <span class="opacity-50">01</span>
+                <span>أساسيات العلامة</span>
+            </h2>
+        </section>
+
+        <!-- ================= SLIDE 4: BRAND FOUNDATION ================= -->
+        <section class="slide bg-white flex items-center">
+            <div class="w-1/3 h-full bg-teal curve-br"></div>
+            <div class="w-2/3 h-full flex flex-col justify-center px-24">
+                <p class="text-2xl text-darkGray mb-12 font-light">في عالم مليء بالضجيج، الوضوح هو عمل إبداعي.</p>
+                <h2 class="text-4xl leading-snug font-bold text-pine uppercase mb-8">
+                    في هاشتاق سوريا،<br>
+                    نحن لا نؤمن بالحديث الأكثر — <br>
+                    <span class="text-teal">بل نؤمن بالحديث الأصوب.</span>
+                </h2>
+                <p class="text-xl text-darkGray leading-relaxed max-w-2xl font-light">
+                    نحن "الحارس الموضوعي". نحول الأخبار المعقدة إلى رسائل واضحة وموثوقة من خلال تفكير استراتيجي وإبداع هادف. لأن التواصل عندما يكون واضحاً، يصبح التأثير حتمياً.
+                </p>
+            </div>
+        </section>
+
+        <!-- ================= SLIDE 5: INTRO 02 ================= -->
+        <section class="slide bg-gradient-to-tl from-teal to-pine flex items-center justify-center">
+            <h2 class="text-8xl font-light text-white tracking-widest flex gap-8">
+                <span class="opacity-50">02</span>
+                <span>الشعار</span>
+            </h2>
+        </section>
+
+        <!-- ================= SLIDE 6: MAIN LOGO ================= -->
+        <section class="slide bg-white flex flex-col items-center justify-center relative">
+            <div class="absolute top-12 left-12 text-pine font-bold text-xl">الشعار الأساسي</div>
+            <img src="./logo-main.png" alt="Main Logo" class="max-w-3xl">
+            <div class="absolute bottom-12 text-center w-full">
+                <p class="text-darkGray text-lg">هذه هي النسخة الأساسية من الشعار.<br>يجب إعطاؤها الأولوية في كافة الاستخدامات كلما أمكن ذلك.</p>
+            </div>
+        </section>
+
+        <!-- ================= SLIDE 7: LOGO CLEAR SPACE ================= -->
+        <section class="slide bg-white flex items-center px-24">
+            <div class="w-1/3">
+                <h3 class="text-3xl font-bold text-pine mb-6">المساحة الآمنة (Clear Space)</h3>
+                <p class="text-darkGray text-lg leading-relaxed">
+                    جزء أساسي من الحفاظ على مظهر متناسق لشعارنا هو ترك مساحة فارغة واضحة حوله تفصله عن أي نصوص أو رسومات أو عناصر بصرية أخرى.<br><br>
+                    المساحة الآمنة الموصى بها تعادل نصف عرض الشعار تقريباً.
+                </p>
+            </div>
+            <div class="w-2/3 flex justify-center items-center">
+                <div class="relative p-16 border border-dashed border-lightGray inline-block">
+                    <!-- Safe Area Indicator -->
+                    <div class="absolute top-0 left-0 w-full h-full border-[12px] border-teal opacity-10"></div>
+                    <img src="./logo-main.png" alt="Logo Clear Space" class="h-24">
+                </div>
+            </div>
+        </section>
+
+        <!-- ================= SLIDE 8: LOGO MISUSE ================= -->
+        <section class="slide bg-white p-12">
+            <h3 class="text-3xl font-bold text-pine mb-2">الاستخدام الخاطئ (Misuse)</h3>
+            <p class="text-darkGray mb-12">تجنب الاستخدامات الخاطئة التالية للحفاظ على وضوح الشعار وتناسقه.</p>
+            
+            <div class="grid grid-cols-3 grid-rows-2 gap-8 h-3/4">
+                <div class="bg-gray-100 flex justify-center items-center relative overflow-hidden group">
+                    <span class="absolute top-4 left-4 bg-offBlack text-white w-6 h-6 flex items-center justify-center rounded-full text-xs">1</span>
+                    <img src="./logo-main.png" class="h-16 misuse-stretch transition group-hover:scale-100">
+                    <p class="absolute bottom-4 text-xs text-crimson font-bold">لا تقم بتمطيط الشعار</p>
+                </div>
+                <div class="bg-gray-100 flex justify-center items-center relative overflow-hidden group">
+                    <span class="absolute top-4 left-4 bg-offBlack text-white w-6 h-6 flex items-center justify-center rounded-full text-xs">2</span>
+                    <img src="./logo-main.png" class="h-16 misuse-squeeze transition group-hover:scale-100">
+                    <p class="absolute bottom-4 text-xs text-crimson font-bold">لا تقم بضغط الشعار</p>
+                </div>
+                <div class="bg-gray-100 flex justify-center items-center relative overflow-hidden group">
+                    <span class="absolute top-4 left-4 bg-offBlack text-white w-6 h-6 flex items-center justify-center rounded-full text-xs">3</span>
+                    <img src="./logo-main.png" class="h-16 misuse-rotate transition group-hover:rotate-0">
+                    <p class="absolute bottom-4 text-xs text-crimson font-bold">لا تقم بتدوير الشعار</p>
+                </div>
+                <div class="bg-gray-100 flex justify-center items-center relative overflow-hidden group">
+                    <span class="absolute top-4 left-4 bg-offBlack text-white w-6 h-6 flex items-center justify-center rounded-full text-xs">4</span>
+                    <img src="./logo-main.png" class="h-16 misuse-shadow transition group-hover:drop-shadow-none">
+                    <p class="absolute bottom-4 text-xs text-crimson font-bold">لا تضف ظلالاً للشعار</p>
+                </div>
+                <div class="bg-pine flex justify-center items-center relative overflow-hidden group">
+                    <span class="absolute top-4 left-4 bg-white text-offBlack w-6 h-6 flex items-center justify-center rounded-full text-xs">5</span>
+                    <img src="./logo-main.png" class="h-16">
+                    <p class="absolute bottom-4 text-xs text-gold font-bold">لا تستخدم الشعار الملون على خلفية داكنة (استخدم الأبيض)</p>
+                </div>
+                <div class="bg-gray-100 flex justify-center items-center relative overflow-hidden">
+                    <span class="absolute top-4 left-4 bg-offBlack text-white w-6 h-6 flex items-center justify-center rounded-full text-xs">6</span>
+                    <img src="./logo-variations.png" class="h-32 object-cover">
+                    <p class="absolute bottom-4 text-xs text-crimson font-bold">التزم بالنسخ المعتمدة فقط</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- ================= SLIDE 9: INTRO 03 ================= -->
+        <section class="slide bg-gradient-to-br from-pine to-offBlack flex items-center justify-center">
+            <h2 class="text-8xl font-light text-white tracking-widest flex gap-8">
+                <span class="opacity-50">03</span>
+                <span>المظهر والانطباع</span>
+            </h2>
+        </section>
+
+        <!-- ================= SLIDE 10: PRIMARY COLORS ================= -->
+        <section class="slide bg-white flex">
+            <div class="w-1/3 flex items-center px-12">
+                <h2 class="text-6xl font-bold text-pine tracking-tight">الألوان الأساسية</h2>
+            </div>
+            <div class="w-2/3 flex">
+                <div class="w-1/2 bg-pine text-white flex flex-col justify-end p-12">
+                    <h3 class="text-4xl font-bold mb-8">Deep Pine</h3>
+                    <div class="text-sm font-mono opacity-70 space-y-1">
+                        <p>HEX #002D29</p>
+                        <p>RGB 0, 45, 41</p>
+                    </div>
+                </div>
+                <div class="w-1/2 bg-teal text-white flex flex-col justify-end p-12">
+                    <h3 class="text-4xl font-bold mb-8">Teal</h3>
+                    <div class="text-sm font-mono opacity-70 space-y-1">
+                        <p>HEX #56A596</p>
+                        <p>RGB 86, 165, 150</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ================= SLIDE 11: SECONDARY COLORS ================= -->
+        <section class="slide bg-white flex flex-col">
+            <div class="p-12">
+                <h2 class="text-5xl font-bold text-pine tracking-tight">الألوان المحايدة والتحذيرية</h2>
+            </div>
+            <div class="flex-1 flex w-full">
+                <div class="flex-1 bg-white border border-lightGray flex flex-col justify-end p-8">
+                    <span class="text-2xl font-bold text-offBlack mb-4">White</span>
+                    <span class="font-mono text-sm text-darkGray">#FFFFFF</span>
+                </div>
+                <div class="flex-1 bg-lightGray flex flex-col justify-end p-8">
+                    <span class="text-2xl font-bold text-offBlack mb-4">Light Gray</span>
+                    <span class="font-mono text-sm text-darkGray">#BFB4B7</span>
+                </div>
+                <div class="flex-1 bg-darkGray flex flex-col justify-end p-8 text-white">
+                    <span class="text-2xl font-bold mb-4">Dark Gray</span>
+                    <span class="font-mono text-sm opacity-70">#3E3A3B</span>
+                </div>
+                <div class="flex-1 bg-offBlack flex flex-col justify-end p-8 text-white">
+                    <span class="text-2xl font-bold mb-4">Off Black</span>
+                    <span class="font-mono text-sm opacity-70">#161616</span>
+                </div>
+                <div class="flex-1 bg-gold flex flex-col justify-end p-8 text-offBlack">
+                    <span class="text-2xl font-bold mb-4">Gold</span>
+                    <span class="font-mono text-sm opacity-70">#DBBE8F</span>
+                </div>
+                <div class="flex-1 bg-crimson flex flex-col justify-end p-8 text-white">
+                    <span class="text-2xl font-bold mb-4">Crimson</span>
+                    <span class="font-mono text-sm opacity-70">#C93D57</span>
+                </div>
+                <div class="flex-1 bg-maroon flex flex-col justify-end p-8 text-white">
+                    <span class="text-2xl font-bold mb-4">Maroon</span>
+                    <span class="font-mono text-sm opacity-70">#4A151E</span>
+                </div>
+            </div>
+        </section>
+
+        <!-- ================= SLIDE 12: TYPOGRAPHY ================= -->
+        <section class="slide bg-white flex">
+            <div class="w-1/4 bg-teal flex items-end p-12 curve-tr text-white">
+                <h2 class="text-4xl font-bold transform -rotate-90 origin-bottom-left absolute bottom-12 left-12 whitespace-nowrap">الطباعة (Typography)</h2>
+                <div class="text-6xl font-bold absolute top-12 left-12">IBM Plex</div>
+            </div>
+            <div class="w-3/4 flex flex-col justify-center p-24 text-pine bg-gradient-to-r from-white to-gray-50">
+                <h1 class="text-8xl font-bold mb-8">حلول التواصل</h1>
+                <h2 class="text-6xl font-semibold mb-8 text-teal">هاشتاق سوريا</h2>
+                <h3 class="text-4xl font-medium mb-8 text-darkGray">التغطية بموضوعية</h3>
+                <p class="text-2xl font-light leading-relaxed text-offBlack">
+                    يعتمد "هاشتاق سوريا" على خط IBM Plex Sans Arabic بشكل أساسي. يتميز هذا الخط بقدرته على نقل المعلومات بوضوح تام، مقدماً تجربة قراءة مريحة بصرياً تعكس قيم علامتنا في نقل الأخبار بموضوعية واحترافية عالية.
+                </p>
+            </div>
+        </section>
+
+        <!-- ================= SLIDE 13: OUTRO ================= -->
+        <section class="slide bg-offBlack flex items-center justify-center relative overflow-hidden">
+            <!-- Background Graphic Device -->
+            <div class="absolute inset-0 flex justify-center items-center opacity-20 pointer-events-none">
+                <div class="w-96 h-96 bg-pine rounded-full filter blur-3xl absolute -left-20"></div>
+                <div class="w-96 h-96 bg-teal rounded-full filter blur-3xl absolute -right-20"></div>
+            </div>
+            
+            <h2 class="text-6xl font-light text-white z-10 tracking-widest">شكراً لكم</h2>
+        </section>
+
+    </div>
+
+</body>
+</html>

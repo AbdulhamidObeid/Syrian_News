@@ -1,0 +1,93 @@
+<h2>Bento Layout Mockup</h2>
+<p class="subtitle">Here is a wireframe representation of how the grid will work across both sizes. Note how the elements interlock into a cohesive shape rather than just floating freely.</p>
+
+<div class="split" style="gap: 2rem;">
+  <div class="mockup" style="flex: 1;">
+    <div class="mockup-header">1080x1350 (Feed Post)</div>
+    <div class="mockup-body" style="background: #111; padding: 20px; aspect-ratio: 4/5; display: flex; flex-direction: column; justify-content: flex-end;">
+      <!-- Safe zone area at the bottom -->
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+        <!-- Card 1: Headline -->
+        <div style="grid-column: span 2; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); border-radius: 12px; padding: 20px; backdrop-filter: blur(10px);">
+          <div style="width: 40%; height: 12px; background: rgba(255,255,255,0.5); border-radius: 6px; margin-bottom: 12px;"></div>
+          <div style="width: 80%; height: 24px; background: white; border-radius: 6px; margin-bottom: 8px;"></div>
+          <div style="width: 60%; height: 24px; background: white; border-radius: 6px;"></div>
+        </div>
+        <!-- Card 2: Bullet 1 -->
+        <div style="background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); border-radius: 12px; padding: 16px; backdrop-filter: blur(10px);">
+          <div style="width: 24px; height: 24px; border-radius: 8px; background: #22c55e; margin-bottom: 12px;"></div>
+          <div style="width: 90%; height: 8px; background: rgba(255,255,255,0.8); border-radius: 4px; margin-bottom: 6px;"></div>
+          <div style="width: 70%; height: 8px; background: rgba(255,255,255,0.8); border-radius: 4px;"></div>
+        </div>
+        <!-- Card 3: Bullet 2 -->
+        <div style="background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); border-radius: 12px; padding: 16px; backdrop-filter: blur(10px);">
+          <div style="width: 24px; height: 24px; border-radius: 8px; background: #22c55e; margin-bottom: 12px;"></div>
+          <div style="width: 85%; height: 8px; background: rgba(255,255,255,0.8); border-radius: 4px; margin-bottom: 6px;"></div>
+          <div style="width: 60%; height: 8px; background: rgba(255,255,255,0.8); border-radius: 4px;"></div>
+        </div>
+        <!-- Card 4: Bullet 3 -->
+        <div style="grid-column: span 2; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); border-radius: 12px; padding: 16px; backdrop-filter: blur(10px); display: flex; align-items: center; gap: 12px;">
+          <div style="width: 24px; height: 24px; border-radius: 8px; background: #22c55e; flex-shrink: 0;"></div>
+          <div style="flex: 1;">
+            <div style="width: 90%; height: 8px; background: rgba(255,255,255,0.8); border-radius: 4px; margin-bottom: 6px;"></div>
+            <div style="width: 50%; height: 8px; background: rgba(255,255,255,0.8); border-radius: 4px;"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="mockup" style="flex: 1;">
+    <div class="mockup-header">1080x1920 (Story/Reel)</div>
+    <div class="mockup-body" style="background: #111; padding: 20px; aspect-ratio: 9/16; display: flex; flex-direction: column; justify-content: flex-end;">
+      <!-- Safe zone area -->
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+        <!-- Card 1: Headline -->
+        <div style="grid-column: span 2; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); border-radius: 16px; padding: 32px; backdrop-filter: blur(10px);">
+          <div style="width: 40%; height: 16px; background: rgba(255,255,255,0.5); border-radius: 8px; margin-bottom: 20px;"></div>
+          <div style="width: 80%; height: 32px; background: white; border-radius: 8px; margin-bottom: 12px;"></div>
+          <div style="width: 60%; height: 32px; background: white; border-radius: 8px;"></div>
+        </div>
+        <!-- Card 2: Bullet 1 -->
+        <div style="background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); border-radius: 16px; padding: 24px; backdrop-filter: blur(10px); min-height: 140px;">
+          <div style="width: 32px; height: 32px; border-radius: 10px; background: #22c55e; margin-bottom: 16px;"></div>
+          <div style="width: 90%; height: 10px; background: rgba(255,255,255,0.8); border-radius: 5px; margin-bottom: 8px;"></div>
+          <div style="width: 80%; height: 10px; background: rgba(255,255,255,0.8); border-radius: 5px; margin-bottom: 8px;"></div>
+          <div style="width: 60%; height: 10px; background: rgba(255,255,255,0.8); border-radius: 5px;"></div>
+        </div>
+        <!-- Card 3: Bullet 2 -->
+        <div style="background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); border-radius: 16px; padding: 24px; backdrop-filter: blur(10px); min-height: 140px;">
+          <div style="width: 32px; height: 32px; border-radius: 10px; background: #22c55e; margin-bottom: 16px;"></div>
+          <div style="width: 85%; height: 10px; background: rgba(255,255,255,0.8); border-radius: 5px; margin-bottom: 8px;"></div>
+          <div style="width: 90%; height: 10px; background: rgba(255,255,255,0.8); border-radius: 5px; margin-bottom: 8px;"></div>
+          <div style="width: 50%; height: 10px; background: rgba(255,255,255,0.8); border-radius: 5px;"></div>
+        </div>
+        <!-- Card 4: Bullet 3 -->
+        <div style="grid-column: span 2; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); border-radius: 16px; padding: 24px; backdrop-filter: blur(10px); display: flex; align-items: flex-start; gap: 16px;">
+          <div style="width: 32px; height: 32px; border-radius: 10px; background: #22c55e; flex-shrink: 0;"></div>
+          <div style="flex: 1;">
+            <div style="width: 90%; height: 10px; background: rgba(255,255,255,0.8); border-radius: 5px; margin-bottom: 8px;"></div>
+            <div style="width: 70%; height: 10px; background: rgba(255,255,255,0.8); border-radius: 5px;"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="options" style="margin-top: 2rem;">
+  <div class="option" data-choice="approve" onclick="toggleSelect(this)">
+    <div class="letter">👍</div>
+    <div class="content">
+      <h3>Approve Bento Layout</h3>
+      <p>This structure looks great, let's implement it in the template engine.</p>
+    </div>
+  </div>
+  <div class="option" data-choice="reject" onclick="toggleSelect(this)">
+    <div class="letter">👎</div>
+    <div class="content">
+      <h3>Needs Changes</h3>
+      <p>I don't like this structure, let's try something else.</p>
+    </div>
+  </div>
+</div>

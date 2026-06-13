@@ -1,0 +1,28 @@
+<h2>Which structural direction should we take for the UI?</h2>
+<p class="subtitle">The core issue seems to be that stacking glowing boxes still feels rigid. How should we treat the layout architecture?</p>
+
+<div class="options">
+  <div class="option" data-choice="a" onclick="toggleSelect(this)">
+    <div class="letter">A</div>
+    <div class="content">
+      <h3>Editorial Glass Pane</h3>
+      <p>A full-width frosted glass sheet (Apple style) that anchors to the bottom of the safe zone and blurs the background image beneath it. The headline and text live cleanly inside this pane. This feels premium, magazine-like, and removes the "floating boxes" look.</p>
+    </div>
+  </div>
+  
+  <div class="option" data-choice="b" onclick="toggleSelect(this)">
+    <div class="letter">B</div>
+    <div class="content">
+      <h3>Asymmetric Typography Focus</h3>
+      <p>No more background boxes at all. We use a subtle dark gradient over the bottom half of the image, and rely entirely on massive, beautiful typography directly on the background. Bullets become clean lines with subtle glowing icons. Very cinematic and raw.</p>
+    </div>
+  </div>
+  
+  <div class="option" data-choice="c" onclick="toggleSelect(this)">
+    <div class="letter">C</div>
+    <div class="content">
+      <h3>The "Bento Box" Magazine Layout</h3>
+      <p>We divide the safe zone into a grid of distinct cards with different sizes (Bento Grid). One large card for the main image/video, one card for the headline, and a side-card for the bullet points. Very structured, dense, and "Stitch" like.</p>
+    </div>
+  </div>
+</div>
