@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pillar: Did You Know — هل تعلم؟</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: { extend: { fontFamily: { sans: ['IBM Plex Sans Arabic', 'sans-serif'] } } }
+        }
+    </script>
+    <style>
+        body, html {
+            margin: 0; padding: 0; width: 1080px; height: 1350px; overflow: hidden;
+            background-color: transparent;
+            background-image: url('file:///Users/obeid/Desktop/Antigravity-Hub/Projects/Syrian_News/Assets/Templates/1080x1350_white.jpg');
+            background-size: cover; background-position: center;
+        }
+        #content-sandbox {
+            position: absolute;
+            left: 116px; top: 206px; width: 847px; height: 978px;
+        }
+        .fact-card {
+            background: rgba(255,255,255,0.6);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(0,0,0,0.08);
+            border-radius: 24px;
+            padding: 40px 32px;
+        }
+        .pillar-badge {
+            background: #002D29;
+            color: #DBBE8F;
+            padding: 8px 24px;
+            border-radius: 999px;
+            font-size: 22px;
+            font-weight: 600;
+            letter-spacing: 0.05em;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+        }
+    </style>
+</head>
+<body class="antialiased">
+    <div id="content-sandbox" dir="rtl" class="flex flex-col justify-between" style="gap: 28px;">
+        
+        <!-- Pillar Badge -->
+        <div class="w-full flex justify-center">
+            <div class="pillar-badge">
+                <span>💡</span>
+                <span>هل تعلم؟</span>
+            </div>
+        </div>
+
+        <!-- Hero Image -->
+        <div class="w-full relative overflow-hidden rounded-[1.5rem] border border-black/10 flex-1" style="min-height: 35%;">
+            <img src="__MAIN_IMAGE_URL__" class="absolute inset-0 w-full h-full object-cover" />
+            <div class="absolute inset-0 ring-1 ring-inset ring-black/10 rounded-[1.5rem]"></div>
+        </div>
+
+        <!-- Fact Card -->
+        <div class="w-full fact-card">
+            <h2 class="text-slate-900 text-center text-4xl font-bold leading-[1.4] mb-4">__MAIN_HEADLINE__</h2>
+            <p class="text-slate-700 text-center text-2xl leading-[1.6]">__FACT_BODY__</p>
+        </div>
+
+        <!-- Source attribution -->
+        <div class="w-full text-center text-lg text-slate-400">__SOURCE_TEXT__</div>
+    </div>
+</body>
+</html>

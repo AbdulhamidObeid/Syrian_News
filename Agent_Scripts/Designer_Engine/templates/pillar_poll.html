@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pillar: Poll — رأيك يهمنا</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: { extend: { fontFamily: { sans: ['IBM Plex Sans Arabic', 'sans-serif'] } } }
+        }
+    </script>
+    <style>
+        body, html {
+            margin: 0; padding: 0; width: 1080px; height: 1350px; overflow: hidden;
+            background-color: transparent;
+            background-image: url('file:///Users/obeid/Desktop/Antigravity-Hub/Projects/Syrian_News/Assets/Templates/1080x1350_white.jpg');
+            background-size: cover; background-position: center;
+        }
+        #content-sandbox {
+            position: absolute;
+            left: 116px; top: 206px; width: 847px; height: 978px;
+        }
+        .poll-badge {
+            background: #C93D57;
+            color: #FFFFFF;
+            padding: 10px 28px;
+            border-radius: 999px;
+            font-size: 22px;
+            font-weight: 700;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .poll-option {
+            background: rgba(255,255,255,0.6);
+            backdrop-filter: blur(20px);
+            border: 2px solid rgba(0,0,0,0.06);
+            border-radius: 20px;
+            padding: 28px 24px;
+            text-align: center;
+            font-size: 26px;
+            font-weight: 600;
+            color: #161616;
+            transition: all 0.2s ease;
+        }
+        .poll-option .option-label {
+            font-size: 18px;
+            font-weight: 700;
+            color: #56A596;
+            margin-bottom: 8px;
+            display: block;
+        }
+        .question-text {
+            font-size: 40px;
+            font-weight: 700;
+            color: #161616;
+            line-height: 1.4;
+            text-align: center;
+        }
+        .cta-text {
+            font-size: 22px;
+            color: #56A596;
+            font-weight: 600;
+            text-align: center;
+        }
+    </style>
+</head>
+<body class="antialiased">
+    <div id="content-sandbox" dir="rtl" class="flex flex-col justify-between items-center" style="gap: 28px;">
+        
+        <!-- Poll Badge -->
+        <div class="poll-badge">
+            <span>🗳️</span>
+            <span>رأيك يهمنا</span>
+        </div>
+
+        <!-- Question -->
+        <div class="w-full flex-1 flex items-center justify-center px-4">
+            <div class="question-text">__POLL_QUESTION__</div>
+        </div>
+
+        <!-- Options Grid -->
+        <div class="w-full grid grid-cols-2 gap-4">
+            <div class="poll-option">
+                <span class="option-label">أ</span>
+                __OPTION_A__
+            </div>
+            <div class="poll-option">
+                <span class="option-label">ب</span>
+                __OPTION_B__
+            </div>
+            <div class="poll-option">
+                <span class="option-label">ج</span>
+                __OPTION_C__
+            </div>
+            <div class="poll-option">
+                <span class="option-label">د</span>
+                __OPTION_D__
+            </div>
+        </div>
+
+        <!-- CTA -->
+        <div class="cta-text">شاركنا رأيك في التعليقات 👇</div>
+    </div>
+</body>
+</html>

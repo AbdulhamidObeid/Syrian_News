@@ -96,8 +96,17 @@ async function runScout() {
                 try {
                     const feed = await parser.parseURL(source.url);
                     
-                    // Take top 10 items from each feed to prevent overload
-                    const items = feed.items.slice(0, 10);
+                    // Take top 20 items from each feed for higher volume
+                    let items = feed.items.slice(0, 20);
+                    
+                    // Apply keyword filter for international sources
+                    if (source.filter_keywords && source.filter_keywords.length > 0) {
+                        items = items.filter(item => {
+                            const text = (item.title || '') + ' ' + (item.contentSnippet || item.content || '');
+                            return source.filter_keywords.some(kw => text.includes(kw));
+                        });
+                        console.log(`  🔍 Keyword filter applied: ${items.length} items match Syria/World Cup keywords`);
+                    }
                     
                     let newItemsAdded = 0;
 
@@ -129,6 +138,7 @@ async function runScout() {
             }
         }
     }
+
 
     // 4. Save results
     if (fetchedArticles.length > 0) {

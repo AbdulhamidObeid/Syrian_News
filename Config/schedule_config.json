@@ -1,45 +1,84 @@
 {
   "timezone": "Asia/Damascus",
-  "posting_slots": [
-    { "time": "08:00", "label": "Morning" },
-    { "time": "10:30", "label": "Mid-Morning" },
-    { "time": "13:00", "label": "Lunch" },
-    { "time": "15:30", "label": "Afternoon" },
-    { "time": "18:00", "label": "Evening" },
-    { "time": "20:00", "label": "Prime" },
-    { "time": "22:00", "label": "Late Night" }
-  ],
-  "daily_quota": 7,
-  "news_memory_ttl_hours": 24,
+  "mode": "aggressive_growth",
+  "description": "24/7 always-on engine. No fixed slots — posts immediately when quality content is available. Respects minimum gap between posts to avoid spamming.",
+  
+  "posting_rules": {
+    "min_gap_minutes": 45,
+    "max_posts_per_day": 12,
+    "prime_hours": { "start": "07:00", "end": "23:00" },
+    "off_hours_allowed": false,
+    "burst_limit": 2,
+    "burst_window_minutes": 60
+  },
+
   "routine_posts": {
-    "description": "Fixed daily utility carousel (weather, gold/currency, fuel). Bypasses general news quota.",
     "enabled": true,
-    "time": "09:00",
-    "format": "carousel",
-    "slides": [
+    "morning": {
+      "time": "07:30",
+      "window_minutes": 30,
+      "format": "carousel",
+      "slides": [
+        { "type": "weather", "name_arabic": "الطقس" },
+        { "type": "economy_gold", "name_arabic": "أسعار الذهب والعملات" },
+        { "type": "utility_fuel", "name_arabic": "أسعار المحروقات" }
+      ]
+    },
+    "evening": {
+      "time": "19:00",
+      "window_minutes": 30,
+      "format": "carousel",
+      "slides": [
+        { "type": "economy_gold", "name_arabic": "تحديث مسائي — أسعار الذهب والعملات" },
+        { "type": "utility_fuel", "name_arabic": "تحديث المحروقات" }
+      ]
+    }
+  },
+
+  "content_pillars": {
+    "enabled": true,
+    "pillars": [
       {
-        "type": "weather",
-        "name_arabic": "الطقس",
-        "data_source": "manual_or_scrape"
+        "id": "did_you_know",
+        "name_arabic": "هل تعلم؟",
+        "frequency": "daily",
+        "preferred_time": "12:00",
+        "description": "Interesting facts about Syria — history, geography, culture, landmarks. Uses white template.",
+        "template": "pillar_didyouknow"
       },
       {
-        "type": "economy_gold",
-        "name_arabic": "أسعار الذهب والعملات",
-        "data_source": "manual_or_scrape"
+        "id": "world_cup",
+        "name_arabic": "مونديال 2026",
+        "frequency": "event_based",
+        "description": "World Cup 2026 match results, schedules, standings, and highlights. Active during tournament only.",
+        "template": "pillar_worldcup"
       },
       {
-        "type": "utility_fuel",
-        "name_arabic": "أسعار المحروقات",
-        "data_source": "manual_or_scrape"
+        "id": "poll_opinion",
+        "name_arabic": "رأيك يهمنا",
+        "frequency": "every_2_days",
+        "preferred_time": "20:00",
+        "description": "Engagement polls and opinion questions about current Syrian issues. Drives comments and shares.",
+        "template": "pillar_poll"
+      },
+      {
+        "id": "infographic",
+        "name_arabic": "إنفوغرافيك",
+        "frequency": "every_3_days",
+        "preferred_time": "15:00",
+        "description": "Data-driven infographics about Syrian economy, population, reconstruction, etc.",
+        "template": "pillar_infographic"
       }
     ]
   },
+
   "urgent_override": {
-    "description": "Immediate override for breaking news. Bypasses quota and schedule.",
-    "keywords": ["عاجل", "مرسوم", "قرار رئاسي", "انفجار", "عقوبات", "زلزال", "breaking"],
+    "description": "Immediate override for breaking news. Bypasses all limits.",
+    "keywords": ["عاجل", "مرسوم", "قرار رئاسي", "انفجار", "عقوبات", "زلزال", "breaking", "خبر عاجل"],
     "template": "1080x1350_urgent",
     "enabled": true
   },
+
   "platform_distribution": {
     "default": ["facebook", "x", "instagram", "tiktok", "telegram"],
     "tiktok_format": "mp4",
@@ -47,5 +86,8 @@
     "tiktok_single_duration_seconds": 5,
     "image_format": "png",
     "image_dimensions": "1080x1350"
-  }
+  },
+
+  "cycle_interval_minutes": 15,
+  "news_memory_ttl_hours": 24
 }

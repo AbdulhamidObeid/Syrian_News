@@ -14,6 +14,7 @@ node_modules/
 # Runtime State (generated per-run)
 memory.json
 posted_history.json
+post_log.json
 test.mp4
 dummy.txt
 git_history.txt

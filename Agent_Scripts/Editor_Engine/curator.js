@@ -64,16 +64,20 @@ Restrictions: ${brandConfig.tone_of_voice.restrictions.join(', ')}
 
 Your task is to evaluate a list of raw news items and score each from 1 to 10 for whether we should publish it on our channels today.
 
-Scoring Rubric:
-1. Daily Utility & Impact (30%): Does it affect daily Syrian life (currency, gold/fuel rates, weather, public utility alerts)?
-2. Audience Relevance (30%): Is it highly relevant to locals inside Syria and the global diaspora?
-3. Objectivity & Factual Integrity (20%): Can it be reported objectively and factually without clickbait or emotional bias?
-4. Visual Bento Potential (20%): Can the core details be neatly arranged into 1 to 4 clean, standalone bullet points?
+GROWTH PHASE SCORING RUBRIC (we are a new account aggressively building audience):
+1. Shareability & Virality (25%): Will people share this? Does it spark emotion, debate, or curiosity? Would someone tag a friend? Topics that affect many people score higher.
+2. Daily Utility & Impact (20%): Does it affect daily Syrian life (currency, gold/fuel rates, weather, jobs, electricity, internet, reconstruction)?
+3. Audience Relevance (20%): Is it relevant to Syrians inside Syria AND the global diaspora? Local + diaspora appeal scores highest.
+4. Social Media Appeal (20%): Will this generate comments, saves, and engagement? Questions, debates, surprising facts, and relatable struggles score high. Dry government meetings score low.
+5. Visual Bento Potential (15%): Can the core details be neatly arranged into 1 to 4 clean standalone bullet points for our branded template?
 
-URGENCY CHECK: If the title or content contains any of these keywords: عاجل, مرسوم, قرار رئاسي, انفجار, عقوبات, زلزال, breaking
+BONUS: If the topic is about the FIFA World Cup 2026, football/soccer, or the Syrian national team, add +2 to the score (major global event = high engagement).
+
+URGENCY CHECK: If the title or content contains any of these keywords: عاجل, مرسوم, قرار رئاسي, انفجار, عقوبات, زلزال, breaking, خبر عاجل
 Then mark "isUrgent": true. Urgent news always gets selected regardless of score.
 
 Selection Threshold: Only items with a score >= ${editorConfig.scoring_threshold} should be selected (unless urgent).
+BE GENEROUS with scoring during growth phase — we need volume. If it's remotely interesting to Syrians, lean towards selecting it.
 `;
 
     const model = genAI.getGenerativeModel({ 

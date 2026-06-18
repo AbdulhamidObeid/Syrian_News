@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pillar: World Cup 2026 — مونديال 2026</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: { extend: { fontFamily: { sans: ['IBM Plex Sans Arabic', 'sans-serif'] } } }
+        }
+    </script>
+    <style>
+        body, html {
+            margin: 0; padding: 0; width: 1080px; height: 1350px; overflow: hidden;
+            background-color: transparent;
+            background-image: url('file:///Users/obeid/Desktop/Antigravity-Hub/Projects/Syrian_News/Assets/Templates/1080x1350_white.jpg');
+            background-size: cover; background-position: center;
+        }
+        #content-sandbox {
+            position: absolute;
+            left: 116px; top: 206px; width: 847px; height: 978px;
+        }
+        .wc-badge {
+            background: linear-gradient(135deg, #1a1a2e, #16213e);
+            color: #DBBE8F;
+            padding: 10px 28px;
+            border-radius: 999px;
+            font-size: 22px;
+            font-weight: 700;
+            letter-spacing: 0.04em;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.15);
+        }
+        .score-card {
+            background: rgba(255,255,255,0.7);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(0,0,0,0.08);
+            border-radius: 24px;
+            padding: 32px 28px;
+        }
+        .score-display {
+            font-size: 80px;
+            font-weight: 800;
+            color: #1a1a2e;
+            line-height: 1;
+            letter-spacing: -0.03em;
+        }
+        .team-name {
+            font-size: 32px;
+            font-weight: 700;
+            color: #161616;
+        }
+        .vs-divider {
+            font-size: 28px;
+            font-weight: 600;
+            color: #C93D57;
+        }
+        .match-info {
+            font-size: 20px;
+            color: #666;
+            font-weight: 500;
+        }
+    </style>
+</head>
+<body class="antialiased">
+    <div id="content-sandbox" dir="rtl" class="flex flex-col justify-between items-center" style="gap: 24px;">
+        
+        <!-- World Cup Badge -->
+        <div class="wc-badge">
+            <span>⚽</span>
+            <span>مونديال 2026</span>
+        </div>
+
+        <!-- Match Header -->
+        <div class="w-full text-center">
+            <h2 class="text-slate-900 text-4xl font-bold leading-[1.3]">__MAIN_HEADLINE__</h2>
+        </div>
+
+        <!-- Hero Image (match photo / flag composition) -->
+        <div class="w-full relative overflow-hidden rounded-[1.5rem] border border-black/10 flex-1" style="min-height: 30%;">
+            <img src="__MAIN_IMAGE_URL__" class="absolute inset-0 w-full h-full object-cover" />
+            <div class="absolute inset-0 ring-1 ring-inset ring-black/10 rounded-[1.5rem]"></div>
+        </div>
+
+        <!-- Score / Details Card -->
+        <div class="w-full score-card">
+            <div class="flex items-center justify-center gap-6 mb-4">
+                <div class="text-center">
+                    <div class="team-name">__TEAM_1__</div>
+                    <div class="score-display">__SCORE_1__</div>
+                </div>
+                <div class="vs-divider">—</div>
+                <div class="text-center">
+                    <div class="team-name">__TEAM_2__</div>
+                    <div class="score-display">__SCORE_2__</div>
+                </div>
+            </div>
+            <div class="text-center match-info">__MATCH_INFO__</div>
+        </div>
+
+        <!-- Bullet Points -->
+        <div class="w-[90%] flex-none" id="bento-container">
+            __BULLETS_HTML__
+        </div>
+    </div>
+</body>
+</html>

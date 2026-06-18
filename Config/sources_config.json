@@ -7,12 +7,6 @@
       "reliability": "high"
     },
     {
-      "name": "Syria Steps",
-      "url": "http://www.syriasteps.com/",
-      "type": "html",
-      "reliability": "medium"
-    },
-    {
       "name": "SANA Economy",
       "url": "https://sana.sy/category/economy/feed",
       "type": "rss",
@@ -27,27 +21,51 @@
       "reliability": "high"
     },
     {
-      "name": "Sham FM",
-      "url": "https://www.facebook.com/radioshamfm",
-      "type": "social",
-      "platform": "facebook",
+      "name": "SANA General",
+      "url": "https://sana.sy/feed",
+      "type": "rss",
       "reliability": "high"
-    }
-  ],
-  "sports": [
+    },
     {
-      "name": "Kooora Syria",
-      "url": "https://www.kooora.com/rss/?c=155",
+      "name": "Enab Baladi",
+      "url": "https://www.enabbaladi.net/feed",
+      "type": "rss",
+      "reliability": "high"
+    },
+    {
+      "name": "Syria TV",
+      "url": "https://www.syria.tv/rss",
+      "type": "rss",
+      "reliability": "high"
+    },
+    {
+      "name": "Syria Direct",
+      "url": "https://syriadirect.org/feed/",
       "type": "rss",
       "reliability": "high"
     }
   ],
-  "weather_utility": [
+  "international": [
     {
-      "name": "Syrian Meteorology",
-      "url": "https://www.facebook.com/syrian.meteorological.dept",
-      "type": "social",
-      "platform": "facebook",
+      "name": "RT Arabic",
+      "url": "https://arabic.rt.com/rss/",
+      "type": "rss",
+      "reliability": "high",
+      "filter_keywords": ["سوريا", "دمشق", "حلب", "إدلب", "سورية", "سوري", "مونديال", "كأس العالم"]
+    },
+    {
+      "name": "BBC Arabic",
+      "url": "https://feeds.bbci.co.uk/arabic/rss.xml",
+      "type": "rss",
+      "reliability": "high",
+      "filter_keywords": ["سوريا", "دمشق", "حلب", "إدلب", "سورية", "سوري", "مونديال", "كأس العالم"]
+    }
+  ],
+  "technology": [
+    {
+      "name": "B2B Syria Technology",
+      "url": "https://b2b-sy.com/news/technology/rss",
+      "type": "rss",
       "reliability": "high"
     }
   ]
