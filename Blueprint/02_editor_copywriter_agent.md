@@ -33,13 +33,20 @@ Decide on the headline length and formatting to tell the design agent which vari
         Line 1: `البنك المركزي يعلن عن`
         Line 2: `حزمة قرارات مالية جديدة`
 
-### C. Bento Layout Points (1 to 4 Points)
-Depending on information depth and layout density, output points to match the grid archetype:
+### C. Layout & Carousel Rules
+Depending on information depth and layout density, output points to match the grid archetype. If the topic is complex, educational, or a "Top 5" list, you MUST structure it as a Carousel.
+
 *   **1 Point (1-box):** Write a single, concise paragraph / sentence (no bullets, numbers, or dots).
 *   **2 Points (2-stack / 2-side):** Write exactly 2 distinct sentences/points.
 *   **3 Points (3-stack / 3-mixed-top / 3-mixed-bottom):** Write exactly 3 distinct points.
     *   *CRITICAL Constraint for `3-stack`:* Keep bullet points to **7-8 words maximum** (must fit on a single line) to prevent empty space on the left side of the layout.
 *   **4 Points (4-grid):** Write exactly 4 distinct points.
+
+#### 🎠 Carousel Structure (For Deep Dives & Educational Posts)
+If generating a Carousel, the payload must be an array of slides. The Designer Agent will use the `1080x1350` aspect ratio for ALL slides (which is natively supported and highly recommended by Instagram and Facebook).
+*   **Slide 1 (The Hook):** Must use `T2` headline style. A highly engaging, click-worthy hook title with an image.
+*   **Slides 2 to X (The Body):** Break the content into readable chunks using `1-box` or `2-stack` layouts.
+*   **Final Slide (The CTA):** Every carousel must end with a Call-To-Action slide. Text must say something like "تابعنا للمزيد من التحليلات" (Follow us for more analysis) alongside a beautifully designed pointing finger icon pressing a Follow button in our brand colors.
 
 ---
 
@@ -49,6 +56,7 @@ When generating the final text output payload for the Designer Agent, format it 
 {
   "contentType": "green | white | black | urgent",
   "headlineStyle": "T1 | T2",
+  "subHeadline": "Arabic topic tag (e.g. اقتصاد, طقس, رياضة)",
   "headline": {
     "line1": "...",
     "line2": "..."
@@ -57,8 +65,9 @@ When generating the final text output payload for the Designer Agent, format it 
     "point 1 text...",
     "point 2 text..."
   ],
-  "imageUrl": "..."
+  "imageUrl": "Original news image URL (for reference/preset), or fallback placeholder.",
+  "imageStrategy": "preset | generate | reference | template",
+  "imagePrompt": "Visual description in English for the generation model. If 'reference', describe how to recreate the original image in high quality without watermarks, slightly changing pose/angle while retaining details. If 'generate', describe a realistic scene related to the news, connecting it to Syria."
 }
 ```
 The Designer Agent will read this payload, select the corresponding template and layout structure, apply the `primary_fonts` and `colors` from the config, and render the graphic.
-

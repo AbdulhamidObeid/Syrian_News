@@ -1,0 +1,51 @@
+{
+  "timezone": "Asia/Damascus",
+  "posting_slots": [
+    { "time": "08:00", "label": "Morning" },
+    { "time": "10:30", "label": "Mid-Morning" },
+    { "time": "13:00", "label": "Lunch" },
+    { "time": "15:30", "label": "Afternoon" },
+    { "time": "18:00", "label": "Evening" },
+    { "time": "20:00", "label": "Prime" },
+    { "time": "22:00", "label": "Late Night" }
+  ],
+  "daily_quota": 7,
+  "news_memory_ttl_hours": 24,
+  "routine_posts": {
+    "description": "Fixed daily utility carousel (weather, gold/currency, fuel). Bypasses general news quota.",
+    "enabled": true,
+    "time": "09:00",
+    "format": "carousel",
+    "slides": [
+      {
+        "type": "weather",
+        "name_arabic": "الطقس",
+        "data_source": "manual_or_scrape"
+      },
+      {
+        "type": "economy_gold",
+        "name_arabic": "أسعار الذهب والعملات",
+        "data_source": "manual_or_scrape"
+      },
+      {
+        "type": "utility_fuel",
+        "name_arabic": "أسعار المحروقات",
+        "data_source": "manual_or_scrape"
+      }
+    ]
+  },
+  "urgent_override": {
+    "description": "Immediate override for breaking news. Bypasses quota and schedule.",
+    "keywords": ["عاجل", "مرسوم", "قرار رئاسي", "انفجار", "عقوبات", "زلزال", "breaking"],
+    "template": "1080x1350_urgent",
+    "enabled": true
+  },
+  "platform_distribution": {
+    "default": ["facebook", "x", "instagram", "tiktok", "telegram"],
+    "tiktok_format": "mp4",
+    "tiktok_slide_duration_seconds": 3.5,
+    "tiktok_single_duration_seconds": 5,
+    "image_format": "png",
+    "image_dimensions": "1080x1350"
+  }
+}

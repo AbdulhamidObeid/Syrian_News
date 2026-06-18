@@ -1,0 +1,54 @@
+{
+  "economy": [
+    {
+      "name": "B2B Syria",
+      "url": "https://b2b-sy.com/rss",
+      "type": "rss",
+      "reliability": "high"
+    },
+    {
+      "name": "Syria Steps",
+      "url": "http://www.syriasteps.com/",
+      "type": "html",
+      "reliability": "medium"
+    },
+    {
+      "name": "SANA Economy",
+      "url": "https://sana.sy/category/economy/feed",
+      "type": "rss",
+      "reliability": "high"
+    }
+  ],
+  "general_news": [
+    {
+      "name": "Al-Watan Online",
+      "url": "https://alwatan.sy/feed",
+      "type": "rss",
+      "reliability": "high"
+    },
+    {
+      "name": "Sham FM",
+      "url": "https://www.facebook.com/radioshamfm",
+      "type": "social",
+      "platform": "facebook",
+      "reliability": "high"
+    }
+  ],
+  "sports": [
+    {
+      "name": "Kooora Syria",
+      "url": "https://www.kooora.com/rss/?c=155",
+      "type": "rss",
+      "reliability": "high"
+    }
+  ],
+  "weather_utility": [
+    {
+      "name": "Syrian Meteorology",
+      "url": "https://www.facebook.com/syrian.meteorological.dept",
+      "type": "social",
+      "platform": "facebook",
+      "reliability": "high"
+    }
+  ]
+}

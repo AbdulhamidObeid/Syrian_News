@@ -1,0 +1,25 @@
+{
+  "name": "syrian-news-automation",
+  "version": "2.0.0",
+  "description": "Modular multi-agent newsroom pipeline — HashSYR24",
+  "main": "run_pipeline.js",
+  "scripts": {
+    "start": "node run_pipeline.js",
+    "run-now": "node run_pipeline.js --run-now",
+    "scout": "node Agent_Scripts/Scout_Engine/scout.js",
+    "curate": "node Agent_Scripts/Editor_Engine/curator.js",
+    "health": "node Agent_Scripts/health_check.js"
+  },
+  "dependencies": {
+    "@google/generative-ai": "^0.21.0",
+    "axios": "^1.18.0",
+    "dotenv": "^16.6.1",
+    "form-data": "^4.0.6",
+    "node-telegram-bot-api": "^1.1.0",
+    "puppeteer": "^25.1.0",
+    "puppeteer-extra": "^3.3.6",
+    "puppeteer-extra-plugin-stealth": "^2.11.2",
+    "rss-parser": "^3.13.0",
+    "telegraf": "^4.16.3"
+  }
+}

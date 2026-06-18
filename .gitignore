@@ -1,4 +1,41 @@
+# Dependencies
+node_modules/
+
+# Environment & Secrets
+.env
+
+# OS Files
+.DS_Store
+
+# Adobe / Binary Assets
 *.ai
 *.tmp
-node_modules/
-.DS_Store
+
+# Runtime State (generated per-run)
+memory.json
+posted_history.json
+test.mp4
+dummy.txt
+git_history.txt
+
+# Agent Working Directories
+Agent_Scripts/Designer_Engine/output/
+Agent_Scripts/Designer_Engine/copy_input/
+Agent_Scripts/Designer_Engine/temp_run/
+Agent_Scripts/Scout_Engine/feed.json
+Agent_Scripts/Scout_Engine/temp_feed.json
+Agent_Scripts/Scout_Engine/feed_history.json
+
+# IDE / Tool metadata
+.superpowers/
+
+# Chrome Browser Profile (contains cookies, sessions, cache — NEVER commit)
+BotProfile/
+
+# Archive (old files, not needed in repo)
+Archive/
+
+# Dashboard build artifacts (keep source, ignore build)
+Dashboard/app/node_modules/
+Dashboard/app/dist/
+Dashboard/stitch_design_system.md

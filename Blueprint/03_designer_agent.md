@@ -56,7 +56,13 @@ Count the elements in `points` to determine the layout:
 *   **4 points** -> Load the `4-grid` layout.
 
 
-## 5. Dynamic Flexbox & Typography Boundaries
+## 5. Carousel Structure & Output
+When the Copywriter outputs an array of slides for an educational "Deep Dive" or "Top 5" list, the Designer must render them as a Carousel using the `1080x1350` grid.
+*   **Slide 1 (The Hook):** Render a large T2 Headline and the Main Image.
+*   **Slides 2 to X (The Body):** Render the textual content using the `1-box` or `2-stack` layouts based on the points.
+*   **Final Slide (The CTA):** Render a Call-To-Action slide featuring the text "تابعنا للمزيد من التحليلات" (Follow us for more analysis) alongside a beautifully designed hand/finger icon pressing a Follow button styled in our brand colors.
+
+## 6. Dynamic Flexbox & Typography Boundaries
 To guarantee that the text never overflows the safe zones, utilize the Absorptive Layout approach:
 *   **Headline Limits:** The Headline can be maximum 2 lines (1 line if 3-4 words). If it exceeds 2 lines at minimum scaling, the copy MUST be rejected back to the writing agent.
 *   **Image Boundaries:** The Image Zone (`Middle Zone`) must strictly enforce `min-height: 40%`. The image is the dynamically expanding element! If there is empty space, the image expands to fill it.
@@ -71,3 +77,22 @@ Before generating an image or HTML template, verify:
 1. Is the text fully inside the coordinates from `designer_config.json`?
 2. Are the colors perfectly matching `brand_config.json`?
 3. Have you applied the correct layout rules for the requested aspect ratio?
+
+## 8. Browser-Based Unlimited Image Generation (Free Mode)
+To bypass credit consumption and ensure free, unlimited generation, visual generation agents must automate Higgsfield via the user's active, pre-authenticated browser session instead of CLI/API keys:
+
+**CRITICAL PREREQUISITE**: You MUST use the `antigravity-browser-profile`. NEVER launch a temporary or blank Chrome profile.
+Before running Puppeteer scripts, ensure Chrome is launched via:
+`/Applications/Google\ Chrome.app/Contents/MacOS/Google\ Chrome --remote-debugging-port=9222 --user-data-dir="/Users/obeid/.gemini/antigravity-browser-profile"`
+
+1. **Connection**: Connect Puppeteer to the open Chrome instance on `http://127.0.0.1:9222`.
+2. **Page Search**: Locate the tab with URL containing `higgsfield.ai/ai/image`.
+3. **Prompt Input**: Target the contenteditable `DIV` with `id="hf:tour-image-prompt"`. Set its `innerText` to the generation prompt, and dispatch the React `'input'` event.
+4. **Image Upload (Reference Mode)**: For reference-guided generations, upload the local downloaded reference image file path directly to the hidden input `input#image-form-reference`.
+5. **Config & Options Verification**:
+   - Check `button[role="switch"]`. If the `aria-checked` attribute is not `'true'`, click it to turn **Unlimited toggle ON**.
+   - Ensure the aspect ratio button is clicked to select `4:5` (or `4:3` as secondary) and the resolution button is clicked to select `2K`.
+6. **Submission**: Click the submit button `button#hf:image-form-submit` (which changes its text to "Unlimited" when the toggle is ON).
+7. **Polling & Extraction**: Find the first `img[alt="image generation"]` in the DOM before submit. After submit, poll every 3 seconds for the first image card's `src` to change from the previous source and resolve to a valid `cloudfront.net` or `higgs.ai` image URL.
+8. **Robust Fallback**: If browser automation fails or times out, immediately fall back to the original `imageUrl` from the curate feed, download it, and use it as the main post image to prevent pipeline blockage.
+

@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Carousel Body Template</title>
+    <!-- Simple full-text template with no boxes -->
+    <meta id="bullet-template-dots" content="PGRpdiBjbGFzcz0idy1mdWxsIGZsZXggZmxleC1jb2wganVzdGlmeS1jZW50ZXIgaXRlbXMtY2VudGVyIj48ZGl2IGNsYXNzPSJidWxsZXQtdGV4dCB3LWZ1bGwgdGV4dC1zbGF0ZS05MDAgbGVhZGluZy1bMS42XSB0ZXh0LWNlbnRlciBmb250LW1lZGl1bSIgZGlyPSJydGwiPl9fQlVMTEVUX1RFWFRfXzwvZGl2PjwvZGl2Pg==">
+    
+    <!-- Official Font: IBM Plex Sans Arabic -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/textfit/2.4.0/textFit.min.js"></script>
+    <script>
+        tailwind.config = {
+            theme: { extend: { fontFamily: { sans: ['IBM Plex Sans Arabic', 'sans-serif'] } } }
+        }
+    </script>
+    <style>
+        body, html {
+            margin: 0; padding: 0; width: 1080px; height: 1350px; overflow: hidden;
+            background-color: transparent;
+            background-image: url('file:///Users/obeid/Desktop/Antigravity-Hub/Projects/Syrian_News/Assets/Templates/1080x1350_white.jpg');
+            background-size: cover; background-position: center;
+        }
+
+        #content-sandbox {
+            position: absolute;
+            left: 116.564345319945px; top: 206.76266963083003px; width: 846.871309360111px; height: 977.660305721281px;
+        }
+    </style>
+</head>
+<body class="antialiased">
+    <div id="content-sandbox" dir="rtl" class="flex flex-col justify-start" style="gap: 32px;">
+        
+        <!-- Text Content Container (Flex-1 absorbs ALL space since there's no subheadline zone) -->
+        <div class="w-full relative flex-1 flex flex-col justify-center items-center px-4" id="bento-container">
+            __BULLETS_HTML__
+        </div>
+
+    </div>
+</body>
+</html>

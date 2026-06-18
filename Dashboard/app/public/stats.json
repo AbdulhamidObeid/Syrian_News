@@ -1,0 +1,39 @@
+{
+  "lastUpdated": "2026-06-17T20:49:03.672Z",
+  "platforms": {
+    "facebook": {
+      "followers": 1,
+      "weeklyGrowth": 0,
+      "connected": true
+    },
+    "instagram": {
+      "followers": 0,
+      "weeklyGrowth": 0,
+      "connected": true
+    },
+    "telegram": {
+      "followers": 2,
+      "weeklyGrowth": 0,
+      "connected": true
+    },
+    "x": {
+      "followers": 0,
+      "weeklyGrowth": 0,
+      "connected": true
+    },
+    "tiktok": {
+      "followers": 0,
+      "weeklyGrowth": 0,
+      "connected": true
+    }
+  },
+  "kpis": {
+    "totalAudience": 3,
+    "postsPublished": 1,
+    "pendingInMemory": 6
+  },
+  "pipeline": {
+    "lastRun": "2026-06-17T17:15:09.202Z",
+    "status": "operational"
+  }
+}

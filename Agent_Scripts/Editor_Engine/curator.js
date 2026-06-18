@@ -1,0 +1,428 @@
+/**
+ * curator.js
+ * 
+ * Editor & Copywriting Orchestrator.
+ * Integrates with Google Gemini API to dynamically curate, score, and rewrite 
+ * news items into visually constrained bento copy payloads.
+ * 
+ * Modularly loads configuration and guidelines from:
+ * - /Config/brand_config.json
+ * - /Config/editor_config.json
+ * - /Blueprint/02_editor_copywriter_agent.md
+ */
+
+const fs = require('fs');
+const path = require('path');
+const { GoogleGenerativeAI } = require('@google/generative-ai');
+require('dotenv').config({ path: path.join(__dirname, '../../.env') });
+
+const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+
+// Load Configuration and Blueprints
+const brandConfigPath = path.join(__dirname, '../../Config/brand_config.json');
+const editorConfigPath = path.join(__dirname, '../../Config/editor_config.json');
+const blueprintPath = path.join(__dirname, '../../Blueprint/02_editor_copywriter_agent.md');
+
+if (!fs.existsSync(brandConfigPath)) {
+    console.error(`❌ Error: Brand config missing at ${brandConfigPath}`);
+    process.exit(1);
+}
+if (!fs.existsSync(editorConfigPath)) {
+    console.error(`❌ Error: Editor config missing at ${editorConfigPath}`);
+    process.exit(1);
+}
+if (!fs.existsSync(blueprintPath)) {
+    console.error(`❌ Error: Blueprint file missing at ${blueprintPath}`);
+    process.exit(1);
+}
+
+const brandConfig = JSON.parse(fs.readFileSync(brandConfigPath, 'utf8'));
+const editorConfig = JSON.parse(fs.readFileSync(editorConfigPath, 'utf8'));
+const copywritingGuidelines = fs.readFileSync(blueprintPath, 'utf8');
+
+// Initialize Gemini Client
+const apiKey = process.env.GEMINI_API_KEY;
+if (!apiKey) {
+    console.error("❌ Error: GEMINI_API_KEY not found in environment or .env file.");
+    process.exit(1);
+}
+const genAI = new GoogleGenerativeAI(apiKey);
+
+/**
+ * Phase 1: Score raw feed items to filter high-value candidates
+ */
+async function scoreNewsFeed(rawItems) {
+    console.log(`\n--- Phase 1: Curation Scoring (${rawItems.length} items) ---`);
+    const modelName = editorConfig.fast_model || 'gemini-2.5-flash';
+
+    const systemInstruction = `
+You are the Chief Editor for ${brandConfig.brand.name_arabic} (${brandConfig.brand.name}).
+Niche: ${brandConfig.brand.niche}
+Target Audience: ${brandConfig.brand.target_audience}
+Tone: ${brandConfig.tone_of_voice.archetype} (${brandConfig.tone_of_voice.traits.join(', ')})
+Restrictions: ${brandConfig.tone_of_voice.restrictions.join(', ')}
+
+Your task is to evaluate a list of raw news items and score each from 1 to 10 for whether we should publish it on our channels today.
+
+Scoring Rubric:
+1. Daily Utility & Impact (30%): Does it affect daily Syrian life (currency, gold/fuel rates, weather, public utility alerts)?
+2. Audience Relevance (30%): Is it highly relevant to locals inside Syria and the global diaspora?
+3. Objectivity & Factual Integrity (20%): Can it be reported objectively and factually without clickbait or emotional bias?
+4. Visual Bento Potential (20%): Can the core details be neatly arranged into 1 to 4 clean, standalone bullet points?
+
+URGENCY CHECK: If the title or content contains any of these keywords: عاجل, مرسوم, قرار رئاسي, انفجار, عقوبات, زلزال, breaking
+Then mark "isUrgent": true. Urgent news always gets selected regardless of score.
+
+Selection Threshold: Only items with a score >= ${editorConfig.scoring_threshold} should be selected (unless urgent).
+`;
+
+    const model = genAI.getGenerativeModel({ 
+        model: modelName,
+        systemInstruction: systemInstruction
+    });
+
+    const scoringSchema = {
+        type: "array",
+        items: {
+            type: "object",
+            properties: {
+                id: { type: "string" },
+                score: { type: "number", description: "Score out of 10 (e.g. 8.5) based on the rubric." },
+                rationale: { type: "string" },
+                selected: { type: "boolean" },
+                isUrgent: { type: "boolean", description: "True if this is breaking/urgent news." }
+            },
+            required: ["id", "score", "rationale", "selected", "isUrgent"]
+        }
+    };
+
+    const prompt = `
+Please score the following raw news feed and identify the best items for publication.
+
+Raw News Feed (JSON):
+${JSON.stringify(rawItems, null, 2)}
+`;
+
+    try {
+        const response = await model.generateContent({
+            contents: [{ role: 'user', parts: [{ text: prompt }] }],
+            generationConfig: {
+                temperature: 0.1,
+                responseMimeType: "application/json",
+                responseSchema: scoringSchema
+            }
+        });
+
+        const resultText = response.response.text();
+        const scoredItems = JSON.parse(resultText);
+        
+        console.log("Curation Scoring Results:");
+        scoredItems.forEach(item => {
+            const urgent = item.isUrgent ? " 🚨 URGENT" : "";
+            const status = item.selected ? "✅ SELECTED" : "❌ REJECTED";
+            console.log(` - ID ${item.id} | Score: ${item.score}/10 | ${status}${urgent} | ${item.rationale}`);
+        });
+
+        return scoredItems;
+    } catch (error) {
+        console.error("❌ Error in Phase 1 Curation Scoring:", error);
+        throw error;
+    }
+}
+
+/**
+ * Phase 2: Copywrite/rewrite a selected item into visual templates
+ */
+async function copywriteNewsItem(selectedItem, isFallback = false) {
+    console.log(`\n--- Phase 2: Copywriting Rewrite (ID: ${selectedItem.id}${isFallback ? ' - FALLBACK MODE' : ''}) ---`);
+    const modelName = isFallback ? (editorConfig.fast_model || 'gemini-2.5-flash') : (editorConfig.heavy_model || 'gemini-2.5-pro');
+
+    const systemInstruction = `
+You are the Lead Copywriter for ${brandConfig.brand.name_arabic} (${brandConfig.brand.name}).
+Niche: ${brandConfig.brand.niche}
+Target Audience: ${brandConfig.brand.target_audience}
+Tone: ${brandConfig.tone_of_voice.archetype} (${brandConfig.tone_of_voice.traits.join(', ')})
+Restrictions: ${brandConfig.tone_of_voice.restrictions.join(', ')}
+
+Follow these strict copywriting guidelines:
+${copywritingGuidelines}
+
+Your task is to take the selected news article details and rewrite it into a structured copy payload for our designer engine.
+Output must follow the designated bento layout rules (T1/T2 headlines, point limits, and Standard Arabic styling).
+
+CRITICAL LAYOUT DECISION RULE:
+The number of points you generate directly determines the visual layout template the Designer will use for single-image posts:
+- 1 point -> '1-box' layout (Use for very short, single-focus news)
+- 2 points -> '2-stack' or '2-side' layout (Use for comparative or cause-effect news)
+- 4 points -> '4-grid' layout (Use for complex news with many details)
+
+CRITICAL FORMAT DECISION RULE (Single Post vs Carousel):
+Based on the depth of the story, you must decide whether it should be a Single Post or a Carousel.
+ONLY choose Carousel if the story is a complex, multi-faceted deep dive that has enough depth to fill AT LEAST 3 full body slides. If the story is a standard update or has 4 main points or less, you MUST set "isCarousel": false, and use the "headline", "imagePrompt", and "points" fields at the root level (utilizing the 4-grid layout).
+For Carousels (isCarousel: true):
+- Slide 1: type "hook", with a headline and imagePrompt.
+- Slides 2 to (N-1): type "body" with "layoutType" set to "1-box". You MUST provide EXACTLY ONE string in the "points" array containing EXACTLY 3 distinct sentences/paragraphs separated by the HTML tag "<br>". Do NOT use newline characters.
+- There MUST be at least 3 body slides (total minimum of 5 slides including hook and CTA).
+- Slide N (the last slide): type "cta", with "ctaText" containing ONLY a generic two-word phrase like "التفاصيل والمعلومات".
+When "isCarousel" is true, omit root-level "points", "headline", and "imagePrompt".
+
+CRITICAL IMAGE STRATEGY RULE (APPLIES TO BOTH SINGLE POSTS AND CAROUSELS):
+You must decide between two image strategies:
+- "reference": Use when the news is about a SPECIFIC PERSON, a SPECIFIC REAL-WORLD PLACE, or something that CANNOT be generalized. The system will fetch the scraped image from the article and pass it to the AI image generator as a reference to regenerate it in high quality without watermarks.
+- "generate": Use when the news is GENERAL or ABSTRACT. Write a highly specific, realistic prompt in English. The image MUST look realistic, meaningful, and NOT like generic AI slop. It MUST resemble the Syrian context where applicable.
+
+CRITICAL CAPTION & HASHTAG RULE (DUAL OUTPUT):
+You MUST generate TWO distinct captions:
+1. "socialMediaCaptionLong": For Facebook, Instagram, TikTok. This must be informative, engaging, include a question for engagement, and span 2 to 3 sentences. You MUST use a newline character '\\n' to separate the main text from the hashtags. Include the mandatory hashtags "${brandConfig.brand.hashtags.join(' ')}" PLUS 3 to 5 additional highly relevant hashtags to maximize exposure.
+2. "socialMediaCaptionShort": For X (Twitter). This must be extremely concise, straight to the point, and strictly under 240 characters total. Use a newline '\\n' before hashtags. Include the mandatory hashtags "${brandConfig.brand.hashtags.join(' ')}" PLUS only 1 or 2 extra highly relevant hashtags.
+
+Example format for Long:
+"This is an informative, engaging caption about the news... What do you think about this issue?
+\\n
+#Mandatory #Hashtags #Relevant1 #Relevant2 #Relevant3 #Relevant4"`;
+
+    const model = genAI.getGenerativeModel({ 
+        model: modelName,
+        systemInstruction: systemInstruction
+    });
+
+    const copywritingSchema = {
+        type: "object",
+        properties: {
+            contentType: { type: "string", enum: ["green", "white", "black", "urgent"] },
+            isCarousel: { type: "boolean", description: "Set to true if this should be a multi-image carousel." },
+            subHeadline: { type: "string", description: "Short 1-2 word Arabic topic tag (e.g. اقتصاد, طقس, رياضة, ثقافة, تكنولوجيا, خبر سريع)." },
+            headlineStyle: { type: "string", enum: ["T1", "T2"] },
+            headline: {
+                type: "object",
+                properties: { line1: { type: "string" }, line2: { type: "string" } },
+                required: ["line1"]
+            },
+            points: { type: "array", items: { type: "string" }, minItems: 1, maxItems: 4 },
+            imageUrl: { type: "string", description: "Original news image URL, if available from the source." },
+            imageStrategy: { type: "string", enum: ["reference", "generate"], description: "reference = re-generate from scraped image. generate = create from prompt." },
+            imagePrompt: { type: "string", description: "Visual generation prompt in English. Required for generate strategy. For reference, describe what the reference image should look like after regeneration." },
+            slides: {
+                type: "array",
+                description: "Required if isCarousel is true. Array of slide objects.",
+                items: {
+                    type: "object",
+                    properties: {
+                        type: { type: "string", enum: ["hook", "body", "cta"] },
+                        layoutType: { type: "string", enum: ["1-box", "2-stack", "2-side", "3-stack", "3-mixed-top", "3-mixed-bottom", "4-grid"] },
+                        headline: { type: "object", properties: { line1: { type: "string" }, line2: { type: "string" } } },
+                        imagePrompt: { type: "string" },
+                        points: { type: "array", items: { type: "string" } },
+                        ctaText: { type: "string" }
+                    },
+                    required: ["type"]
+                }
+            },
+            socialMediaCaptionLong: { type: "string", description: "Long, engaging caption for FB/IG/TikTok with many hashtags." },
+            socialMediaCaptionShort: { type: "string", description: "Strictly concise caption for X (under 240 chars) with essential hashtags." }
+        },
+        required: ["contentType", "isCarousel", "subHeadline", "imageStrategy", "socialMediaCaptionLong", "socialMediaCaptionShort"]
+    };
+
+    const prompt = `
+Rewrite the following article details:
+Title: ${selectedItem.title}
+Content: ${selectedItem.description || selectedItem.content || ''}
+Original Image URL: ${selectedItem.imageUrl || 'No image available'}
+`;
+
+    try {
+        const response = await model.generateContent({
+            contents: [{ role: 'user', parts: [{ text: prompt }] }],
+            generationConfig: {
+                temperature: editorConfig.temperature || 0.3,
+                topP: editorConfig.top_p || 0.9,
+                responseMimeType: "application/json",
+                responseSchema: copywritingSchema
+            }
+        });
+
+        const resultText = response.response.text();
+        const payload = JSON.parse(resultText);
+
+        // Inject the original imageUrl from the scout data
+        if (selectedItem.imageUrl && !payload.imageUrl) {
+            payload.imageUrl = selectedItem.imageUrl;
+        }
+
+        // Post-generation validation
+        validateCopywriterPayload(payload);
+
+        return payload;
+    } catch (error) {
+        console.error(`❌ Error copywriting item ${selectedItem.id} using model ${modelName}:`, error.message || error);
+        
+        if (!isFallback && editorConfig.fast_model && editorConfig.fast_model !== modelName) {
+            console.log(`⚠️ Attempting fallback curation with model: ${editorConfig.fast_model}`);
+            return await copywriteNewsItem(selectedItem, true);
+        }
+        
+        throw error;
+    }
+}
+
+/**
+ * Validates copywriting constraints
+ */
+function validateCopywriterPayload(payload) {
+    // Caption length check
+    if (payload.socialMediaCaption && payload.socialMediaCaption.length > 200) {
+        console.warn(`⚠️ Warning: Caption is ${payload.socialMediaCaption.length} chars (max 200). Truncating.`);
+        // Find the last space before 200 chars and truncate
+        const hashtags = `\n${brandConfig.brand.hashtags.join(' ')}`;
+        const maxTextLen = 200 - hashtags.length;
+        const truncated = payload.socialMediaCaption.substring(0, maxTextLen).trim();
+        payload.socialMediaCaption = truncated + hashtags;
+    }
+
+    if (payload.isCarousel) return; // Skip single-post constraints for carousels
+
+    // T1 headline constraint: 3-4 words
+    if (payload.headlineStyle === 'T1' && payload.headline && payload.headline.line1) {
+        const words = payload.headline.line1.trim().split(/\s+/);
+        if (words.length > 4) {
+            console.warn(`⚠️ Warning: T1 Headline has ${words.length} words (max is 3-4): "${payload.headline.line1}"`);
+        }
+    }
+
+    // 3-stack bullet constraint: max 7-8 words per bullet
+    if (payload.points && payload.points.length === 3) {
+        payload.points.forEach((point, idx) => {
+            const words = point.trim().split(/\s+/);
+            if (words.length > 8) {
+                console.warn(`⚠️ Warning: Point ${idx + 1} in 3-stack has ${words.length} words (max is 7-8): "${point}"`);
+            }
+        });
+    }
+}
+
+/**
+ * Main orchestration function
+ */
+async function runCurator(rawFeedPath, outputDir) {
+    if (!fs.existsSync(rawFeedPath)) {
+        console.error(`❌ Feed file not found at ${rawFeedPath}`);
+        return [];
+    }
+
+    const rawFeed = JSON.parse(fs.readFileSync(rawFeedPath, 'utf8'));
+    
+    // Safety check: ensure all items have an ID
+    rawFeed.forEach((item, index) => {
+        if (!item.id) item.id = `scout_${Date.now()}_${index}`;
+    });
+
+    const scoredFeed = await scoreNewsFeed(rawFeed);
+
+    const selectedItems = rawFeed.filter(item => {
+        const scored = scoredFeed.find(s => String(s.id) === String(item.id));
+        return scored && scored.selected;
+    });
+
+    // Attach urgency flag to selected items
+    selectedItems.forEach(item => {
+        const scored = scoredFeed.find(s => String(s.id) === String(item.id));
+        if (scored) {
+            item.score = scored.score;
+            item.isUrgent = scored.isUrgent || false;
+        }
+    });
+
+    if (selectedItems.length === 0) {
+        console.log("ℹ️ No items met the quality threshold for publishing today.");
+        return [];
+    }
+
+    console.log(`\nSelected ${selectedItems.length} items for rewriting.`);
+    const processedPayloads = [];
+
+    for (const item of selectedItems) {
+        try {
+            const payload = await copywriteNewsItem(item);
+            processedPayloads.push({
+                originalId: item.id,
+                score: item.score,
+                isUrgent: item.isUrgent,
+                payload: payload
+            });
+            
+            // Output payload file
+            if (outputDir) {
+                if (!fs.existsSync(outputDir)) fs.mkdirSync(outputDir, { recursive: true });
+                const outPath = path.join(outputDir, `post_${item.id}.json`);
+                fs.writeFileSync(outPath, JSON.stringify(payload, null, 2));
+                console.log(`✅ Copywriting payload written to ${outPath}`);
+            }
+
+            // Rate limit protection
+            console.log(`⏳ Waiting 15 seconds before processing the next item...`);
+            await sleep(15000);
+        } catch (err) {
+            console.error(`❌ Failed to curate news item ${item.id}:`, err);
+        }
+    }
+
+    return processedPayloads;
+}
+
+// CLI / Test Execution Block
+if (require.main === module) {
+    const args = process.argv.slice(2);
+    
+    if (args.includes('--test')) {
+        console.log("🚀 Running Curator Self-Test Workflow...");
+        
+        const testFeed = [
+            {
+                id: "101",
+                title: "ارتفاع تاريخي لأسعار الذهب بدمشق اليوم السبت",
+                description: "سجل غرام الذهب عيار 21 قيراط سعراً قياسياً جديداً في الأسواق السورية صباح اليوم، حيث بلغ 950 ألف ليرة سورية للغرام الواحد، وسط تراجع مستمر في قيمة الليرة والقدرة الشرائية للمواطنين.",
+                imageUrl: "https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?q=80&w=1600&auto=format&fit=crop"
+            },
+            {
+                id: "102",
+                title: "فوز المنتخب السوري لكرة القدم ودياً على نظيره اللبناني بهدفين لهدف",
+                description: "تمكن منتخب سوريا الوطني لكرة القدم من الفوز ودياً على نظيره اللبناني بنتيجة 2-1 في المباراة التي أقيمت بملعب المدينة الرياضية، في إطار التحضيرات للتصفيات الآسيوية المشتركة.",
+                imageUrl: "https://images.unsplash.com/photo-1508098682722-e99c43a406b2?q=80&w=1600&auto=format&fit=crop"
+            }
+        ];
+
+        (async () => {
+            try {
+                const scoredResult = await scoreNewsFeed(testFeed);
+                const selected = testFeed.filter(item => {
+                    const scored = scoredResult.find(s => s.id === item.id);
+                    return scored && scored.selected;
+                });
+                
+                console.log(`\nCurator selected ${selected.length} items out of ${testFeed.length}.`);
+                
+                for (const item of selected) {
+                    const payload = await copywriteNewsItem(item);
+                    console.log(`\nPayload output for ID ${item.id}:`, JSON.stringify(payload, null, 2));
+                }
+            } catch (err) {
+                console.error("❌ Curator self-test workflow failed:", err);
+            }
+        })();
+    } else {
+        const feedPath = args[0] || path.join(__dirname, '../Scout_Engine/feed.json');
+        const outputDir = args[1] || path.join(__dirname, '../Designer_Engine/copy_input');
+        
+        console.log(`Curating news feed from: ${feedPath}`);
+        runCurator(feedPath, outputDir)
+            .then(() => console.log("\nPipeline Curation Complete."))
+            .catch(console.error);
+    }
+}
+
+module.exports = {
+    scoreNewsFeed,
+    copywriteNewsItem,
+    runCurator
+};

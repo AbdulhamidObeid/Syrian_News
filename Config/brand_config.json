@@ -3,7 +3,8 @@
     "name": "HashSYR24",
     "name_arabic": "هاشتاق سوريا",
     "niche": "Syrian News & Daily Utility",
-    "target_audience": "Syrians inside Syria and the global diaspora"
+    "target_audience": "Syrians inside Syria and the global diaspora",
+    "hashtags": ["#هاشتاق_سوريا", "#HashSYR24"]
   },
   "visual_identity": {
     "primary_fonts": [
@@ -39,5 +40,15 @@
       "No emotional manipulation",
       "Always use standard global months (يناير) instead of Syriac"
     ]
+  },
+  "browser": {
+    "profile_path": "/Users/obeid/.gemini/antigravity-browser-profile",
+    "chrome_executable": "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome",
+    "debug_port": 9222
+  },
+  "social_accounts": {
+    "higgsfield_email": "95dddesigns@gmail.com",
+    "facebook_page_url": "https://www.facebook.com/HashSYR24",
+    "telegram_channel": "@HashSYR24"
   }
 }
