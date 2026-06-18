@@ -1,6 +1,18 @@
+/**
+ * get_telegram_id.js
+ * 
+ * One-time utility to discover your Telegram User ID.
+ * Run this once, send the bot a message, and it will print your ID.
+ */
+require('dotenv').config({ path: require('path').join(__dirname, '../.env') });
 const { Telegraf } = require('telegraf');
 
-const token = '8804350737:AAGRpFLfUCqNNXVacCwOyzsPgzpl6rHALRE';
+const token = process.env.TELEGRAM_BOT_TOKEN;
+if (!token) {
+    console.error("❌ TELEGRAM_BOT_TOKEN not found in .env file.");
+    process.exit(1);
+}
+
 const bot = new Telegraf(token);
 
 console.log("Listening for messages... Please send any message (like 'Hello') in your Telegram Bot!");

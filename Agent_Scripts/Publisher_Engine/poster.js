@@ -89,8 +89,8 @@ async function publishPost(imagePath, captionLong, captionShort) {
     let xApiSuccess = false;
     for (let i = 0; i < 3 && !xApiSuccess && uploadedUrls.length > 0; i++) {
         try {
-            const bufferToken = process.env.BUFFER_ACCESS_TOKEN || 'K0OZtbbQLJJGxLGGmjF_XIgdbXXg9lHirJaYFxfxpHJ';
-            const bufferChannelId = process.env.BUFFER_CHANNEL_ID || '6a3136ae38b55793459f188b';
+            const bufferToken = process.env.BUFFER_ACCESS_TOKEN;
+            const bufferChannelId = process.env.BUFFER_CHANNEL_ID;
             const res = await axios.post('https://api.buffer.com', {
                 query: `mutation createPost($input: CreatePostInput!) { createPost(input: $input) { ... on PostActionSuccess { post { id } } } }`,
                 variables: { input: { channelId: bufferChannelId, schedulingType: 'automatic', mode: 'shareNow', text: captionShort, assets: uploadedUrls.map(url => ({ image: { url } })) } }
