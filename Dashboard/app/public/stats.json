@@ -1,39 +1,165 @@
 {
-  "lastUpdated": "2026-06-17T20:49:03.672Z",
+  "lastUpdated": "2026-06-20T15:39:38.735Z",
   "platforms": {
     "facebook": {
       "followers": 1,
-      "weeklyGrowth": 0,
       "connected": true
     },
     "instagram": {
-      "followers": 0,
-      "weeklyGrowth": 0,
+      "followers": 2,
       "connected": true
     },
     "telegram": {
       "followers": 2,
-      "weeklyGrowth": 0,
       "connected": true
     },
     "x": {
       "followers": 0,
-      "weeklyGrowth": 0,
-      "connected": true
-    },
-    "tiktok": {
-      "followers": 0,
-      "weeklyGrowth": 0,
       "connected": true
     }
   },
   "kpis": {
-    "totalAudience": 3,
-    "postsPublished": 1,
-    "pendingInMemory": 6
+    "totalAudience": 5,
+    "postsPublished": 10,
+    "storyLibrary": 29,
+    "postsToday": 9,
+    "weeklyPostCounts": {
+      "2026-06-14": 0,
+      "2026-06-15": 0,
+      "2026-06-16": 0,
+      "2026-06-17": 0,
+      "2026-06-18": 8,
+      "2026-06-19": 5,
+      "2026-06-20": 9
+    }
   },
+  "platformInsights": {
+    "facebook": {
+      "weeklyViews": 3,
+      "weeklyEngaged": 0,
+      "weeklyNewFollows": 1,
+      "postsLikes": 0,
+      "postsComments": 0,
+      "postsShares": 0,
+      "available": true
+    },
+    "instagram": {
+      "weeklyReach": 0,
+      "totalInteractions": 7,
+      "likes": 7,
+      "comments": 0,
+      "saves": 0,
+      "shares": 0,
+      "profileViews": 0,
+      "available": true
+    },
+    "x": {
+      "weeklyImpressions": 0,
+      "weeklyLikes": 0,
+      "weeklyRetweets": 0,
+      "weeklyReplies": 0,
+      "available": false,
+      "note": ""
+    },
+    "telegram": {
+      "members": 2,
+      "available": true,
+      "note": "Message-level views require Bot polling"
+    }
+  },
+  "topPosts": [
+    {
+      "id": "1139516419249724_122107360815359008",
+      "message": "تمكنت وحدات وزارة الداخلية بالتعاون مع الاستخبارات العامة من إلقاء القبض على أحد أبرز مسؤولي تصنيع العبوات الناسفة التابعين لتنظيم داعش في ا",
+      "thumbnail": "https://scontent.fruh5-1.fna.fbcdn.net/v/t39.30808-6/723948302_122107360797359008_2313733615671980684_n.jpg?stp=dst-jpg_p720x720_tt6&_nc_cat=108&ccb=1-7&_nc_sid=127cfc&_nc_ohc=-dbG0FxwOJQQ7kNvwF4OdmE&_nc_oc=Ado5YH-M6etJkKqK0lcLE15sBVDGJgCYrD4ezmIm4qrmWpL3afxR9W_tZomI37imtz1Q1iNTMkadRjWobzHk0aH9&_nc_zt=23&_nc_ht=scontent.fruh5-1.fna&edm=APyxFHYEAAAA&_nc_gid=fMcpaDkL8FY7KsbqQ0r2tg&_nc_tpa=Q5bMBQHtWoha_lnyRQ73E8LKjUKU5jt_t46h07eih8iLMo7AllHw9xJ2Lr442fzQy9mxEjK9dbWZKSokGA&oh=00_Af-GT-W-91OqVqB8Vpu0AGm4aUnylgI_Q-JGfKF9OUBzuQ&oe=6A3C89F6",
+      "createdAt": "2026-06-20T15:32:53+0000",
+      "likes": 0,
+      "comments": 0,
+      "shares": 0,
+      "reach": 0,
+      "platform": "facebook"
+    },
+    {
+      "id": "1139516419249724_122107351983359008",
+      "message": "شهدت مدينة السويداء وقفة احتجاجية لأهالي القرى المهجرة من الريف الغربي والشمالي، مطالبين بإنهاء سيطرة المجموعات المسلحة على منازلهم وتحديد م",
+      "thumbnail": "https://scontent.fruh5-1.fna.fbcdn.net/v/t39.30808-6/727360960_122107351965359008_8463819312787000147_n.jpg?stp=dst-jpg_p720x720_tt6&_nc_cat=108&ccb=1-7&_nc_sid=127cfc&_nc_ohc=JlSqSCtYkpgQ7kNvwFxcgXh&_nc_oc=AdpE7iBCAN45HdD923zkdS2ohP0u_w6bZXiWUriYLqb6zZ_579VC_IDVqigG7Dw97W9aOz6cHwpd1XGqfI0UI0TO&_nc_zt=23&_nc_ht=scontent.fruh5-1.fna&edm=APyxFHYEAAAA&_nc_gid=fMcpaDkL8FY7KsbqQ0r2tg&_nc_tpa=Q5bMBQFXtbxVdlLuUZBxztysm_vJNiZEj5hYtwVAjz_X0DSwj06nQzHTp9n8NkAWS7-OUXQ4dz-woVKT7A&oh=00_Af_dC3zpgrtYa_HYWz53MYLRMCTfxPMfp75-wSVBwiufJw&oe=6A3C73CB",
+      "createdAt": "2026-06-20T15:21:00+0000",
+      "likes": 0,
+      "comments": 0,
+      "shares": 0,
+      "reach": 0,
+      "platform": "facebook"
+    },
+    {
+      "id": "1139516419249724_122107307499359008",
+      "message": "أعلن الحرس الثوري الإيراني اليوم السبت إغلاق مضيق هرمز بشكل رسمي، مرجعاً السبب إلى عدم التزام واشنطن بتعهداتها السابقة. كيف تتوقعون تأثير هذ",
+      "thumbnail": "https://scontent.fruh6-2.fna.fbcdn.net/v/t39.30808-6/725439864_122107307481359008_7261685931407047462_n.jpg?stp=dst-jpg_p720x720_tt6&_nc_cat=111&ccb=1-7&_nc_sid=127cfc&_nc_ohc=0ItCbc7x3FcQ7kNvwFaeGfw&_nc_oc=Adotyat_OVli2L-kUasmG81P3uKc0oRrypELJ01bbbwvgAJUnRMTtjTYYUB5CltoB6rIMiE1UpioUrnXUiX9RyhZ&_nc_zt=23&_nc_ht=scontent.fruh6-2.fna&edm=APyxFHYEAAAA&_nc_gid=fMcpaDkL8FY7KsbqQ0r2tg&_nc_tpa=Q5bMBQF5ijQq8c8QiWJrMTR9qOhVTtV0L2seyR98Ar9wYWzgzNKILC4ca7FE2xNnUswKzu5CukfdPPtkow&oh=00_Af8avHtJrnuRDc0OXRd8yb9qYUw2toW8m_6LxoC2Wyjc1Q&oe=6A3C9E0E",
+      "createdAt": "2026-06-20T14:29:01+0000",
+      "likes": 0,
+      "comments": 0,
+      "shares": 0,
+      "reach": 0,
+      "platform": "facebook"
+    },
+    {
+      "id": "1139516419249724_122107252887359008",
+      "message": "بدء تطبيق قرار تخفيض عدد أرغفة الخبز في الربطة التموينية إلى 8 أرغفة بدلاً من 10، مع بقاء السعر والوزن ثابتاً. كيف سيؤثر هذا القرار على ميزا",
+      "thumbnail": "https://scontent.fruh6-2.fna.fbcdn.net/v/t39.30808-6/726516948_122107252515359008_3703808666947091219_n.jpg?stp=dst-jpg_p720x720_tt6&_nc_cat=103&ccb=1-7&_nc_sid=127cfc&_nc_ohc=V5FL4P5gT84Q7kNvwF7JJqX&_nc_oc=Adqz1K78-RXXz3yrI_m4Sw89YLJiIiwTMk9XsY0WkZT_qKb8D-7RQvynl9EEUfNwcVeHWjXV3JOgrSYTCfWrUpdd&_nc_zt=23&_nc_ht=scontent.fruh6-2.fna&edm=APyxFHYEAAAA&_nc_gid=fMcpaDkL8FY7KsbqQ0r2tg&_nc_tpa=Q5bMBQEl7QIE3QcPk0kumxLOPCFiDizv6Ojdcln4qceCricfylxw5ysOg1UzsAjnQa_LKDt-EvYmlDtXoA&oh=00_Af_fL-P3xNSSZO_lNmzIeBqkqCBlaWxD9rVFXUbLXXQ9fA&oe=6A3C7567",
+      "createdAt": "2026-06-20T13:30:27+0000",
+      "likes": 0,
+      "comments": 0,
+      "shares": 0,
+      "reach": 0,
+      "platform": "facebook"
+    },
+    {
+      "id": "1139516419249724_122107237281359008",
+      "message": "ارتفاع حصيلة ضحايا الغارات الإسرائيلية على بلدتي شحور وقناريت في جنوب لبنان إلى 8 قتلى و17 مصاباً. كيف تقرأون تطورات الأوضاع الميدانية في ال",
+      "thumbnail": "https://scontent.fruh6-2.fna.fbcdn.net/v/t39.30808-6/723103616_122107237245359008_696751221858609797_n.jpg?stp=dst-jpg_p720x720_tt6&_nc_cat=100&ccb=1-7&_nc_sid=127cfc&_nc_ohc=sIoRl3NAD1EQ7kNvwF9DZOz&_nc_oc=AdoqhvEbE3NnXfnPV1YhjrKg5Tabe71qJwVt4tkcIDNRuYFKD_tnPcyAQbB7RsFMfbFKu7ajcYxHNzKMIef6q8fs&_nc_zt=23&_nc_ht=scontent.fruh6-2.fna&edm=APyxFHYEAAAA&_nc_gid=fMcpaDkL8FY7KsbqQ0r2tg&_nc_tpa=Q5bMBQEUiV0lBHlSjMiFeqHzZew0mUuGVWkjnbOG8x7o7QvaSd0p01LZDHSVOKujemsbVFehe9vSFmTgQA&oh=00_Af_qZWUa3_2U0giTDdzZdggI8uToplwMcxfTPoynUsCrNg&oe=6A3C9AB4",
+      "createdAt": "2026-06-20T13:13:56+0000",
+      "likes": 0,
+      "comments": 0,
+      "shares": 0,
+      "reach": 0,
+      "platform": "facebook"
+    }
+  ],
+  "contentPillars": [
+    {
+      "id": "did_you_know",
+      "nameArabic": "هل تعلم؟",
+      "frequency": "daily",
+      "preferredTime": "12:00",
+      "postedToday": false,
+      "template": "pillar_didyouknow"
+    },
+    {
+      "id": "world_cup",
+      "nameArabic": "مونديال 2026",
+      "frequency": "event_based",
+      "preferredTime": null,
+      "postedToday": false,
+      "template": "pillar_worldcup"
+    },
+    {
+      "id": "poll_opinion",
+      "nameArabic": "رأيك يهمنا",
+      "frequency": "every_2_days",
+      "preferredTime": "20:00",
+      "postedToday": false,
+      "template": "pillar_poll"
+    },
+    {
+      "id": "infographic",
+      "nameArabic": "إنفوغرافيك",
+      "frequency": "every_3_days",
+      "preferredTime": "15:00",
+      "postedToday": false,
+      "template": "pillar_infographic"
+    }
+  ],
   "pipeline": {
-    "lastRun": "2026-06-17T17:15:09.202Z",
+    "lastRun": "2026-06-20T15:39:49.487Z",
     "status": "operational"
   }
 }

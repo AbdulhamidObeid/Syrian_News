@@ -51,9 +51,18 @@ const genAI = new GoogleGenerativeAI(apiKey);
 /**
  * Phase 1: Score raw feed items to filter high-value candidates
  */
-async function scoreNewsFeed(rawItems) {
+async function scoreNewsFeed(rawItems, activeTopics = []) {
     console.log(`\n--- Phase 1: Curation Scoring (${rawItems.length} items) ---`);
     const modelName = editorConfig.fast_model || 'gemini-2.5-flash';
+
+    let avoidanceInstruction = "";
+    if (activeTopics.length > 0) {
+        avoidanceInstruction = `
+6. RECENT TOPICS AVOIDANCE (CRITICAL):
+We have recently published or are currently processing posts about these exact topics:
+${activeTopics.map(t => '- ' + t).join('\n')}
+If ANY of the news items in your list cover the EXACT SAME story or event as the topics above (even if from a different news source), you MUST score them low and set "selected": false. DO NOT select news we already covered!`;
+    }
 
     const systemInstruction = `
 You are the Chief Editor for ${brandConfig.brand.name_arabic} (${brandConfig.brand.name}).
@@ -70,6 +79,7 @@ GROWTH PHASE SCORING RUBRIC (we are a new account aggressively building audience
 3. Audience Relevance (20%): Is it relevant to Syrians inside Syria AND the global diaspora? Local + diaspora appeal scores highest.
 4. Social Media Appeal (20%): Will this generate comments, saves, and engagement? Questions, debates, surprising facts, and relatable struggles score high. Dry government meetings score low.
 5. Visual Bento Potential (15%): Can the core details be neatly arranged into 1 to 4 clean standalone bullet points for our branded template?
+${avoidanceInstruction}
 
 BONUS: If the topic is about the FIFA World Cup 2026, football/soccer, or the Syrian national team, add +2 to the score (major global event = high engagement).
 
@@ -137,6 +147,44 @@ ${JSON.stringify(rawItems, null, 2)}
 /**
  * Phase 2: Copywrite/rewrite a selected item into visual templates
  */
+const copywritingSchema = {
+    type: "object",
+    properties: {
+        contentType: { type: "string", enum: ["green", "white", "black", "urgent"] },
+        isCarousel: { type: "boolean", description: "Set to true if this should be a multi-image carousel." },
+        subHeadline: { type: "string", description: "Short 1-2 word Arabic topic tag (e.g. اقتصاد, طقس, رياضة, ثقافة, تكنولوجيا, خبر سريع)." },
+        headlineStyle: { type: "string", enum: ["T1", "T2"] },
+        headline: {
+            type: "object",
+            properties: { line1: { type: "string" }, line2: { type: "string" } },
+            required: ["line1"]
+        },
+        points: { type: "array", items: { type: "string" }, minItems: 1, maxItems: 4 },
+        imageUrl: { type: "string", description: "Original news image URL, if available from the source." },
+        imageStrategy: { type: "string", enum: ["generate"], description: "Always use 'generate'." },
+        imagePrompt: { type: "string", description: "Visual generation prompt in English. Must be highly detailed." },
+        slides: {
+            type: "array",
+            description: "Required if isCarousel is true. Array of slide objects.",
+            items: {
+                type: "object",
+                properties: {
+                    type: { type: "string", enum: ["hook", "body", "cta"] },
+                    layoutType: { type: "string", enum: ["1-box", "2-stack", "2-side", "3-stack", "3-mixed-top", "3-mixed-bottom", "4-grid"] },
+                    headline: { type: "object", properties: { line1: { type: "string" }, line2: { type: "string" } } },
+                    imagePrompt: { type: "string" },
+                    points: { type: "array", items: { type: "string" } },
+                    ctaText: { type: "string" }
+                },
+                required: ["type"]
+            }
+        },
+        socialMediaCaptionLong: { type: "string", description: "Long, engaging caption for FB/IG/TikTok with many hashtags." },
+        socialMediaCaptionShort: { type: "string", description: "Strictly concise caption for X (under 240 chars) with essential hashtags." }
+    },
+    required: ["contentType", "isCarousel", "subHeadline", "imageStrategy", "socialMediaCaptionLong", "socialMediaCaptionShort"]
+};
+
 async function copywriteNewsItem(selectedItem, isFallback = false) {
     console.log(`\n--- Phase 2: Copywriting Rewrite (ID: ${selectedItem.id}${isFallback ? ' - FALLBACK MODE' : ''}) ---`);
     const modelName = isFallback ? (editorConfig.fast_model || 'gemini-2.5-flash') : (editorConfig.heavy_model || 'gemini-2.5-pro');
@@ -171,9 +219,16 @@ For Carousels (isCarousel: true):
 When "isCarousel" is true, omit root-level "points", "headline", and "imagePrompt".
 
 CRITICAL IMAGE STRATEGY RULE (APPLIES TO BOTH SINGLE POSTS AND CAROUSELS):
-You must decide between two image strategies:
-- "reference": Use when the news is about a SPECIFIC PERSON, a SPECIFIC REAL-WORLD PLACE, or something that CANNOT be generalized. The system will fetch the scraped image from the article and pass it to the AI image generator as a reference to regenerate it in high quality without watermarks.
-- "generate": Use when the news is GENERAL or ABSTRACT. Write a highly specific, realistic prompt in English. The image MUST look realistic, meaningful, and NOT like generic AI slop. It MUST resemble the Syrian context where applicable.
+You must ALWAYS use the "generate" strategy. Do NOT use "reference".
+Write a highly specific, photorealistic prompt in English describing EXACTLY what the image should look like.
+- Detail the exact subjects (e.g., if it's a specific country, person, or object, name them and describe their appearance).
+- AI IMAGE SAFETY (CRITICAL): Image AI models default to the Syrian Regime when generating "Syria". You MUST forcefully override this in your prompt:
+  * If a Syrian flag is requested, you MUST write "the Syrian Revolution flag with green, white, and black horizontal stripes and three red stars in the middle". NEVER just write "Syrian flag".
+  * If a government logo, official document, or coat of arms is requested, you MUST specify "The new Syrian national emblem (launched in July 2025), which is the Syrian Golden Eagle (Eastern Imperial Eagle)". NEVER use the old eagle logo or the Hawk of Quraish.
+  * NEVER use terms like "Syrian president", "Syrian diplomat", or "Syrian leader", as the AI will generate Bashar Al-Assad. Describe them generically instead (e.g., "A generic Arab official in a suit").
+- Do NOT be vague. If the news is about "Morocco vs Scotland", explicitly say "Morocco flag and Scotland flag" or "Morocco football players playing against Scotland football players in stadium".
+- DO NOT hallucinate details that conflict with the news (e.g. don't write Portugal if the news says Scotland).
+- The image MUST look realistic, cinematic, and NOT like generic AI slop. It MUST resemble the Syrian or Arab context where applicable.
 
 CRITICAL CAPTION & HASHTAG RULE (DUAL OUTPUT):
 You MUST generate TWO distinct captions:
@@ -189,44 +244,6 @@ Example format for Long:
         model: modelName,
         systemInstruction: systemInstruction
     });
-
-    const copywritingSchema = {
-        type: "object",
-        properties: {
-            contentType: { type: "string", enum: ["green", "white", "black", "urgent"] },
-            isCarousel: { type: "boolean", description: "Set to true if this should be a multi-image carousel." },
-            subHeadline: { type: "string", description: "Short 1-2 word Arabic topic tag (e.g. اقتصاد, طقس, رياضة, ثقافة, تكنولوجيا, خبر سريع)." },
-            headlineStyle: { type: "string", enum: ["T1", "T2"] },
-            headline: {
-                type: "object",
-                properties: { line1: { type: "string" }, line2: { type: "string" } },
-                required: ["line1"]
-            },
-            points: { type: "array", items: { type: "string" }, minItems: 1, maxItems: 4 },
-            imageUrl: { type: "string", description: "Original news image URL, if available from the source." },
-            imageStrategy: { type: "string", enum: ["reference", "generate"], description: "reference = re-generate from scraped image. generate = create from prompt." },
-            imagePrompt: { type: "string", description: "Visual generation prompt in English. Required for generate strategy. For reference, describe what the reference image should look like after regeneration." },
-            slides: {
-                type: "array",
-                description: "Required if isCarousel is true. Array of slide objects.",
-                items: {
-                    type: "object",
-                    properties: {
-                        type: { type: "string", enum: ["hook", "body", "cta"] },
-                        layoutType: { type: "string", enum: ["1-box", "2-stack", "2-side", "3-stack", "3-mixed-top", "3-mixed-bottom", "4-grid"] },
-                        headline: { type: "object", properties: { line1: { type: "string" }, line2: { type: "string" } } },
-                        imagePrompt: { type: "string" },
-                        points: { type: "array", items: { type: "string" } },
-                        ctaText: { type: "string" }
-                    },
-                    required: ["type"]
-                }
-            },
-            socialMediaCaptionLong: { type: "string", description: "Long, engaging caption for FB/IG/TikTok with many hashtags." },
-            socialMediaCaptionShort: { type: "string", description: "Strictly concise caption for X (under 240 chars) with essential hashtags." }
-        },
-        required: ["contentType", "isCarousel", "subHeadline", "imageStrategy", "socialMediaCaptionLong", "socialMediaCaptionShort"]
-    };
 
     const prompt = `
 Rewrite the following article details:
@@ -271,6 +288,90 @@ Original Image URL: ${selectedItem.imageUrl || 'No image available'}
 }
 
 /**
+ * Phase 2b: Refine/modify copywriting payload based on admin feedback
+ */
+async function refineCopywriteNewsItem(selectedItem, previousPayload, feedback) {
+    console.log(`\n--- Phase 2b: Copywriting Refinement (ID: ${selectedItem.id}) ---`);
+    const modelName = editorConfig.heavy_model || 'gemini-2.5-pro';
+
+    const systemInstruction = `
+You are the Lead Copywriter for ${brandConfig.brand.name_arabic} (${brandConfig.brand.name}).
+Niche: ${brandConfig.brand.niche}
+Target Audience: ${brandConfig.brand.target_audience}
+Tone: ${brandConfig.tone_of_voice.archetype} (${brandConfig.tone_of_voice.traits.join(', ')})
+Restrictions: ${brandConfig.tone_of_voice.restrictions.join(', ')}
+
+We have already generated a post payload, but the Admin requested changes to the content, headline, or caption.
+Your task is to refine the previous copywriting payload based on the Admin's feedback.
+
+Previous Copywriting Payload:
+${JSON.stringify(previousPayload, null, 2)}
+
+Admin Feedback/Modification Request:
+"${feedback}"
+
+Ensure you ONLY change the text or styling as requested by the feedback. Keep all other fields, image prompts, image strategy, and structures intact unless specifically requested to change them. Maintain standard layout guidelines and character limits.
+`;
+
+    const model = genAI.getGenerativeModel({ 
+        model: modelName,
+        systemInstruction: systemInstruction
+    });
+
+    const prompt = `Please apply the admin feedback to refine the payload.`;
+
+    try {
+        const response = await model.generateContent({
+            contents: [{ role: 'user', parts: [{ text: prompt }] }],
+            generationConfig: {
+                temperature: 0.2,
+                responseMimeType: "application/json",
+                responseSchema: copywritingSchema
+            }
+        });
+
+        const resultText = response.response.text();
+        const payload = JSON.parse(resultText);
+
+        if (previousPayload.imageUrl && !payload.imageUrl) {
+            payload.imageUrl = previousPayload.imageUrl;
+        }
+
+        validateCopywriterPayload(payload);
+        return payload;
+    } catch (error) {
+        console.error(`❌ Error refining copywriting item ${selectedItem.id}:`, error.message || error);
+        throw error;
+    }
+}
+
+/**
+ * Phase 2c: Refine ONLY the image prompt based on admin feedback
+ */
+async function refineImagePrompt(previousPayload, feedback) {
+    console.log(`\n--- Phase 2c: Image Prompt Refinement ---`);
+    const modelName = editorConfig.fast_model || 'gemini-2.5-flash';
+    const model = genAI.getGenerativeModel({ model: modelName });
+    
+    const prompt = `You are a creative director. We have an image prompt for an AI image generator:
+"${previousPayload.imagePrompt || (previousPayload.slides && previousPayload.slides[0] && previousPayload.slides[0].imagePrompt) || ''}"
+
+The user wants to modify the generated image with this feedback:
+"${feedback}"
+
+Rewrite and improve the English image prompt to incorporate the user's feedback. Keep the core subject, style, and context intact, but adjust the details as requested.
+CRITICAL AI IMAGE SAFETY RULES:
+- If a Syrian flag is requested or implied, you MUST explicitly write "the Syrian Revolution flag with green, white, and black horizontal stripes and three red stars in the middle".
+- If a government logo, official document, or coat of arms is requested or implied, you MUST specify "The new Syrian national emblem (launched in July 2025), which is the Syrian Golden Eagle (Eastern Imperial Eagle)". NEVER use the old eagle logo or the Hawk of Quraish.
+- NEVER use terms like "Syrian president", "Syrian diplomat", or "Syrian leader", as the AI will generate Bashar Al-Assad. Describe them generically instead (e.g., "A generic Arab official in a suit").
+
+Return ONLY the new rewritten image prompt text in English.`;
+
+    const response = await model.generateContent(prompt);
+    return response.response.text().trim();
+}
+
+/**
  * Validates copywriting constraints
  */
 function validateCopywriterPayload(payload) {
@@ -308,7 +409,7 @@ function validateCopywriterPayload(payload) {
 /**
  * Main orchestration function
  */
-async function runCurator(rawFeedPath, outputDir) {
+async function runCurator(rawFeedPath, outputDir, activeTopics = []) {
     if (!fs.existsSync(rawFeedPath)) {
         console.error(`❌ Feed file not found at ${rawFeedPath}`);
         return [];
@@ -321,7 +422,7 @@ async function runCurator(rawFeedPath, outputDir) {
         if (!item.id) item.id = `scout_${Date.now()}_${index}`;
     });
 
-    const scoredFeed = await scoreNewsFeed(rawFeed);
+    const scoredFeed = await scoreNewsFeed(rawFeed, activeTopics);
 
     const selectedItems = rawFeed.filter(item => {
         const scored = scoredFeed.find(s => String(s.id) === String(item.id));
@@ -428,5 +529,7 @@ if (require.main === module) {
 module.exports = {
     scoreNewsFeed,
     copywriteNewsItem,
-    runCurator
+    runCurator,
+    refineCopywriteNewsItem,
+    refineImagePrompt
 };

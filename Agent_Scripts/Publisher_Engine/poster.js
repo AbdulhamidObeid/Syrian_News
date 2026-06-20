@@ -1,13 +1,13 @@
 const fs = require('fs');
+const os = require('os');
 const axios = require('axios');
 const FormData = require('form-data');
 const path = require('path');
-const os = require('os');
-const { execSync } = require('child_process');
 const puppeteer = require('puppeteer-extra');
 const StealthPlugin = require('puppeteer-extra-plugin-stealth');
 puppeteer.use(StealthPlugin());
 require('dotenv').config({ path: require('path').join(__dirname, '../../.env') });
+
 
 async function delay(ms) {
     return new Promise(resolve => setTimeout(resolve, ms));
@@ -29,14 +29,19 @@ async function sendTelegramAlert(message) {
 }
 
 async function getBrowser() {
-    const profilePath = path.join(os.homedir(), '.gemini', 'antigravity-browser-profile');
-    const browser = await puppeteer.launch({
-        headless: false,
-        executablePath: '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome',
-        userDataDir: profilePath,
-        defaultViewport: null,
-        args: ['--no-sandbox', '--disable-setuid-sandbox', '--start-maximized']
-    });
+    let browser;
+    try {
+        browser = await puppeteer.connect({ browserURL: 'http://127.0.0.1:9222', defaultViewport: null });
+    } catch (e) {
+        const profilePath = path.join(os.homedir(), '.gemini', 'antigravity-browser-profile');
+        browser = await puppeteer.launch({
+            headless: false,
+            executablePath: '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome',
+            userDataDir: profilePath,
+            defaultViewport: null,
+            args: ['--no-sandbox', '--disable-setuid-sandbox', '--start-maximized']
+        });
+    }
     
     // NUCLEAR OPTION to prevent OS File Choosers
     await browser.on('targetcreated', async (target) => {
@@ -67,10 +72,10 @@ async function publishPost(imagePath, captionLong, captionShort) {
     let browser = null;
     let pages = [];
 
-    // --- ZERNIO HOSTING FOR APIS ---
+    // --- ZERNIO HOSTING FOR APIS (Facebook/IG/X) ---
     const uploadedUrls = [];
     try {
-        console.log(`Uploading ${imageArray.length} image(s) to Zernio...`);
+        console.log(`Uploading ${imageArray.length} image(s) to Zernio for hosting...`);
         const zernioKey = process.env.ZERNIO_API_KEY;
         for (const img of imageArray) {
             const mediaForm = new FormData();
@@ -80,8 +85,9 @@ async function publishPost(imagePath, captionLong, captionShort) {
             });
             uploadedUrls.push(res.data.files[0].url);
         }
+        console.log(`  ✅ Uploaded ${uploadedUrls.length} image(s) to Zernio.`);
     } catch (e) {
-        console.error('Zernio failed:', e.message);
+        console.error('Zernio upload failed:', e.message);
     }
 
     // --- X (TWITTER) ---
@@ -140,7 +146,10 @@ async function publishPost(imagePath, captionLong, captionShort) {
                 }
                 console.log('✅ Facebook Posted via API');
                 fbApiSuccess = true;
-            } catch (e) { console.log(`FB API Attempt ${i+1} failed.`); await delay(2000); }
+            } catch (e) { 
+                console.error(`FB API Attempt ${i+1} failed:`, e.response?.data || e.message); 
+                await delay(2000); 
+            }
         }
     }
 
@@ -185,9 +194,17 @@ async function publishPost(imagePath, captionLong, captionShort) {
                     }
                     console.log('✅ Instagram Posted via API');
                     igApiSuccess = true;
+                } else {
+                    console.log(`❌ IG ID not found in response:`, JSON.stringify(accRes.data));
+                    break;
                 }
-            } catch (e) { console.log(`IG API Attempt ${i+1} failed.`); await delay(2000); }
+            } catch (e) {
+                console.log(`IG API Attempt ${i+1} failed:`, e.response?.data?.error?.message || e.message);
+                await delay(2000);
+            }
         }
+    } else {
+        console.log(`Skipping IG API due to missing credentials or images.`);
     }
 
     if (!igApiSuccess) {
@@ -231,69 +248,11 @@ async function publishPost(imagePath, captionLong, captionShort) {
         } catch (e) { console.error('❌ IG Web-Bot failed:', e.message); }
     }
 
-    // --- TIKTOK (API VIA ZERNIO) ---
-    {
-        console.log('\n--- Posting to TikTok via Zernio ---');
-        try {
-            await sendTelegramAlert('⚠️ TikTok publishing via Zernio API initiating.');
-            
-            console.log('Converting image(s) to MP4 for TikTok...');
-            const durationPerSlide = 3.5;
-            const tkVideoPath = path.join(os.tmpdir(), `tiktok_concat_${Date.now()}.mp4`);
-            
-            if (imageArray.length > 1) {
-                const concatFilePath = path.join(os.tmpdir(), 'tk_concat.txt');
-                let concatContent = '';
-                for (const img of imageArray) concatContent += `file '${img}'\nduration ${durationPerSlide}\n`;
-                concatContent += `file '${imageArray[imageArray.length - 1]}'\n`;
-                fs.writeFileSync(concatFilePath, concatContent);
-                execSync(`ffmpeg -f concat -safe 0 -i "${concatFilePath}" -c:v libx264 -pix_fmt yuv420p -vf scale=1080:1350 "${tkVideoPath}" -y`);
-            } else {
-                execSync(`ffmpeg -loop 1 -i "${imageArray[0]}" -c:v libx264 -t 5 -pix_fmt yuv420p -vf scale=1080:1350 "${tkVideoPath}" -y`);
-            }
-            
-            console.log('Uploading TikTok MP4 to Zernio Media Endpoint...');
-            const tkMediaForm = new FormData();
-            tkMediaForm.append('files', fs.createReadStream(tkVideoPath));
-            
-            const tkMediaRes = await axios.post('https://zernio.com/api/v1/media', tkMediaForm, {
-                headers: {
-                    ...tkMediaForm.getHeaders(),
-                    'Authorization': `Bearer ${process.env.ZERNIO_API_KEY}`
-                }
-            });
-            const tkVideoUrl = tkMediaRes.data.files[0].url;
-            console.log('TikTok Video uploaded to Zernio:', tkVideoUrl);
-            
-            console.log('Publishing TikTok Video via Zernio Posts Endpoint...');
-            const zernioAccountsRes = await axios.get('https://zernio.com/api/v1/accounts', {
-                headers: { 'Authorization': `Bearer ${process.env.ZERNIO_API_KEY}` }
-            });
-            const tkAccounts = zernioAccountsRes.data.accounts.filter(acc => acc.platform === 'tiktok').map(acc => acc._id);
-            
-            if (tkAccounts.length === 0) throw new Error('No TikTok accounts connected to Zernio.');
-            
-            const tkPostRes = await axios.post('https://zernio.com/api/v1/posts', {
-                content: captionLong,
-                accountIds: tkAccounts,
-                mediaUrls: [tkVideoUrl],
-                publishNow: true
-            }, {
-                headers: { 'Authorization': `Bearer ${process.env.ZERNIO_API_KEY}` }
-            });
-            
-            console.log('✅ Successfully posted to TikTok via Zernio API:', tkPostRes.data);
-            await sendTelegramAlert('✅ Successfully published to TikTok via Zernio API.');
-            if (fs.existsSync(tkVideoPath)) fs.unlinkSync(tkVideoPath);
-            
-        } catch (e) {
-            console.error('❌ Failed on TikTok (Zernio API):', e.response?.data || e.message);
-            await sendTelegramAlert(`❌ Error posting to TikTok (Zernio API): ${e.response?.data?.error || e.message}`);
-        }
-    }
+    // TikTok publishing has been removed from this pipeline.
 
-    if (browser) await browser.close();
+    if (browser) await browser.disconnect();
     console.log('\n🎉 Pipeline Complete!');
+    await sendTelegramAlert('🎉 Post processing has finished across all platforms. Check your social media accounts to confirm it went live!');
 }
 
 module.exports = { publishPost };

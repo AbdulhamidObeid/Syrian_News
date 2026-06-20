@@ -48,8 +48,8 @@ function downloadFile(url, dest) {
 /**
  * Automates the browser generation using the open Higgsfield tab
  */
-async function generateImageViaBrowser(promptText, referenceImagePath = null) {
-    console.log("Connecting to running Chrome on 9222 for Unlimited Higgsfield generation...");
+async function generateImageViaBrowser(promptText, referenceImagePath = null, imageModel = 'nano-banana-pro') {
+    console.log(`Connecting to running Chrome on 9222 for Higgsfield generation (model: ${imageModel})...`);
     let browser;
     try {
         browser = await puppeteer.connect({ browserURL: 'http://localhost:9222' });
@@ -66,16 +66,18 @@ async function generateImageViaBrowser(promptText, referenceImagePath = null) {
         browser = await puppeteer.connect({ browserURL: 'http://localhost:9222' });
     }
 
+    const higgsfieldUrl = `https://higgsfield.ai/ai/image?model=${imageModel}`;
+
     try {
         const pages = await browser.pages();
         let page = pages.find(p => p.url().includes('ai/image') || p.url().includes('higgsfield'));
         if (!page) {
-            console.log("Higgsfield tab not found, creating a new one...");
+            console.log(`Higgsfield tab not found, creating a new one (model: ${imageModel})...`);
             page = await browser.newPage();
-            await page.goto('https://higgsfield.ai/ai/image?model=nano-banana-pro', { waitUntil: 'networkidle2' });
-        } else if (!page.url().includes('ai/image')) {
-            console.log("Navigating existing Higgsfield tab to image generation...");
-            await page.goto('https://higgsfield.ai/ai/image?model=nano-banana-pro', { waitUntil: 'networkidle2' });
+            await page.goto(higgsfieldUrl, { waitUntil: 'networkidle2' });
+        } else {
+            console.log(`Reloading Higgsfield model to ${imageModel} to clear state...`);
+            await page.goto(higgsfieldUrl, { waitUntil: 'networkidle2' });
         }
 
         console.log(`Connected to: ${page.url()}`);
@@ -127,6 +129,11 @@ async function generateImageViaBrowser(promptText, referenceImagePath = null) {
             await page.goto('https://higgsfield.ai/ai/image?model=nano-banana-pro', { waitUntil: 'networkidle2' });
         }
 
+        // Wait for past history images to load (if any) to prevent race conditions
+        try {
+            await page.waitForSelector('img[alt="image generation"]', { timeout: 3000 });
+        } catch (e) {}
+
         // 1. Get the current first generated image src
         const firstImageBefore = await page.evaluate(() => {
             const firstImg = document.querySelector('img[alt="image generation"]');
@@ -171,15 +178,10 @@ async function generateImageViaBrowser(promptText, referenceImagePath = null) {
 
 
         // 2. Upload reference image if strategy is 'reference'
+        // DISABLED BY ADMIN: Reference images were causing distorted "wrong" outputs.
+        // We now rely entirely on the text prompt.
         if (referenceImagePath) {
-            console.log(`Uploading reference image: ${referenceImagePath}`);
-            const fileInput = await page.$('#image-form-reference');
-            if (fileInput) {
-                await fileInput.uploadFile(referenceImagePath);
-                await new Promise(r => setTimeout(r, 1500)); // wait for upload attachment
-            } else {
-                console.warn("Reference image file input not found!");
-            }
+            console.log(`[DISABLED] Skipping reference image upload: ${referenceImagePath}`);
         }
 
         // 4. Ensure Unlimited Toggle is ON
@@ -194,20 +196,26 @@ async function generateImageViaBrowser(promptText, referenceImagePath = null) {
             }
         });
 
-        // 5. Ensure aspect ratio is set to 5:4
-        await page.evaluate(() => {
+        // 5. Ensure aspect ratio is set correctly for the chosen model:
+        //    nano-banana-pro → 5:4  |  flux-2-pro → 4:3 (FLUX doesn't support 5:4)
+        const targetRatio = imageModel === 'flux-2-pro' ? '4:3' : '5:4';
+        await page.evaluate((ratio) => {
             const buttons = Array.from(document.querySelectorAll('button'));
-            // Look for any of the aspect ratio strings
-            const arButton = buttons.find(b => b.innerText.includes('5:4') || b.innerText.includes('4:5') || b.innerText.includes('4:3') || b.innerText.includes('1:1'));
-            if (arButton && !arButton.innerText.includes('5:4')) {
+            // Find the active aspect ratio button (shows the current selection)
+            const arButton = buttons.find(b =>
+                b.innerText.includes('5:4') || b.innerText.includes('4:5') ||
+                b.innerText.includes('4:3') || b.innerText.includes('1:1') ||
+                b.innerText.includes('16:9') || b.innerText.includes('9:16')
+            );
+            if (arButton && !arButton.innerText.includes(ratio)) {
                 arButton.click();
                 setTimeout(() => {
                     const items = Array.from(document.querySelectorAll('div, button, li'));
-                    const item54 = items.find(el => el.innerText.trim() === '5:4');
-                    if (item54) item54.click();
+                    const target = items.find(el => el.innerText.trim() === ratio);
+                    if (target) target.click();
                 }, 500);
             }
-        });
+        }, targetRatio);
         await new Promise(r => setTimeout(r, 1000));
 
         // 6. Ensure resolution is set to 2K
@@ -296,6 +304,38 @@ async function generateImageViaBrowser(promptText, referenceImagePath = null) {
         }
 
         console.log(`Successfully generated new image in browser: ${cleanUrl}`);
+
+        // 🧹 Cleanup: Remove reference image from Higgsfield UI so it doesn't bleed into next run
+        if (referenceImagePath) {
+            try {
+                await page.evaluate(() => {
+                    // Try various selectors Higgsfield uses for the reference image remove button
+                    const selectors = [
+                        'button[aria-label="Remove image"]',
+                        'button[aria-label="remove"]',
+                        '[data-testid="remove-reference"]',
+                        'button.remove-reference',
+                    ];
+                    for (const sel of selectors) {
+                        const btn = document.querySelector(sel);
+                        if (btn) { btn.click(); return true; }
+                    }
+                    // Fallback: look for any × button near the reference image preview
+                    const allButtons = Array.from(document.querySelectorAll('button'));
+                    const removeBtn = allButtons.find(b =>
+                        (b.innerText === '×' || b.innerText === 'x' || b.getAttribute('aria-label')?.toLowerCase().includes('remov')) &&
+                        b.closest('[id*="reference"], [class*="reference"], [class*="upload"]')
+                    );
+                    if (removeBtn) { removeBtn.click(); return true; }
+                    return false;
+                });
+                await new Promise(r => setTimeout(r, 800));
+                console.log('✅ Reference image removed from Higgsfield UI.');
+            } catch (cleanupErr) {
+                console.warn(`⚠️ Could not auto-remove reference image from UI: ${cleanupErr.message}`);
+            }
+        }
+
         return cleanUrl;
 
     } finally {
@@ -329,7 +369,9 @@ async function generateSinglePost(payloadPath, outputDir = null, payloadObj = nu
             payload.imageStrategy = 'generate';
         }
     }
+    
     const localMainImagePath = path.join(tempDir, `main_image_${postId}.jpg`);
+        
     let imageSuccess = false;
 
     // Phase 1: Retrieve main image
@@ -359,9 +401,9 @@ async function generateSinglePost(payloadPath, outputDir = null, payloadObj = nu
 
                 while (!generatedUrl && currentAttempt < maxRetries) {
                     currentAttempt++;
-                    console.log(`\n--- Higgsfield Generation Attempt ${currentAttempt}/${maxRetries} ---`);
+                    console.log(`\n--- Higgsfield Generation Attempt ${currentAttempt}/${maxRetries} (model: ${payload.imageModel || 'nano-banana-pro'}) ---`);
                     try {
-                        generatedUrl = await generateImageViaBrowser(payload.imagePrompt, referenceLocalPath);
+                        generatedUrl = await generateImageViaBrowser(payload.imagePrompt, referenceLocalPath, payload.imageModel || 'nano-banana-pro');
                     } catch (browserError) {
                         console.error(`Attempt ${currentAttempt} failed: ${browserError.message}`);
                         if (currentAttempt === maxRetries) {
@@ -446,21 +488,26 @@ async function generateSinglePost(payloadPath, outputDir = null, payloadObj = nu
         
         let boldedParagraphs = paragraphs;
         
+        const isCarouselSlide = ['hook', 'body', 'cta'].includes(payload.type);
+        const isDarkBg = !isCarouselSlide && ['urgent', 'green', 'black'].includes(payload.contentType);
+        const boldClass = isDarkBg ? 'text-white' : 'text-slate-950';
+        const textColorClass = isDarkBg ? 'text-white' : 'text-slate-900';
+
         if (payload.type !== 'cta') {
             boldedParagraphs = paragraphs.map(p => {
                 const words = p.trim().split(/\s+/);
                 if (words.length >= 2) {
                     const boldPart = words.slice(0, 2).join(' ');
                     const restPart = words.slice(2).join(' ');
-                    return `<span class="font-bold text-slate-950">${boldPart}</span> ${restPart}`;
+                    return `<span class="font-bold ${boldClass}">${boldPart}</span> ${restPart}`;
                 } else if (words.length === 1) {
-                    return `<span class="font-bold text-slate-950">${words[0]}</span>`;
+                    return `<span class="font-bold ${boldClass}">${words[0]}</span>`;
                 }
                 return p;
             });
         }
 
-        const gapDiv = layoutType === '1-box' ? '</div><div class="h-6 w-full"></div><div class="bullet-text w-full text-slate-900 leading-[1.6] text-center font-medium" dir="rtl">' : '<br>';
+        const gapDiv = layoutType === '1-box' ? `</div><div class="h-6 w-full"></div><div class="bullet-text w-full ${textColorClass} leading-[1.6] text-center font-medium" dir="rtl">` : '<br>';
 
         let html = bulletTemplateStr
             .replace(/__BULLET_INDEX__/g, (index + 1).toString().padStart(2, '0'))
@@ -707,8 +754,10 @@ async function generatePost(payloadPath, outputDir = null) {
                 points: slide.points || [],
                 layoutType: '1-box', // Carousels ALWAYS use 1-box layout, never 2-stack
                 imagePrompt: slide.imagePrompt || null,
-                // For CTA slide, we might just hack layoutType or points if needed, but for now map it closely
             };
+            
+            // Remove the slides array so generateSinglePost doesn't get confused and override the prompt
+            delete slidePayload.slides;
 
             // If CTA, force 1-box and make points contain ctaText
             if (slide.type === 'cta') {

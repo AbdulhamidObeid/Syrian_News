@@ -40,3 +40,18 @@ Archive/
 Dashboard/app/node_modules/
 Dashboard/app/dist/
 Dashboard/stitch_design_system.md
+
+# Logs
+*.log
+Dashboard/*.log
+
+# Locks
+*.lock
+
+# Temporary/Test Scripts
+test_*.js
+exchange_token.js
+fix_lock.js
+
+# Extra JSON State
+recent_topics.json

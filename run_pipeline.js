@@ -11,12 +11,38 @@
 require('dotenv').config({ path: require('path').join(__dirname, '.env') });
 const fs = require('fs');
 const path = require('path');
+
+const lockfile = require('fs');
+const LOCK_FILE = path.join(__dirname, 'engine.lock');
+try {
+    if (lockfile.existsSync(LOCK_FILE)) {
+        const pid = lockfile.readFileSync(LOCK_FILE, 'utf8');
+        try {
+            process.kill(pid, 0);
+            console.error('⚠️ Engine is already running (PID: ' + pid + '). Exiting to prevent duplicates.');
+            process.exit(1);
+        } catch (e) {
+            // Process is dead, safe to remove lock
+            lockfile.unlinkSync(LOCK_FILE);
+        }
+    }
+    lockfile.writeFileSync(LOCK_FILE, process.pid.toString());
+} catch (e) {}
+
+// Clean up lock on exit
+['exit', 'SIGINT', 'SIGTERM'].forEach(sig => {
+    process.on(sig, () => {
+        try { lockfile.unlinkSync(LOCK_FILE); } catch(e) {}
+        if (sig !== 'exit') process.exit();
+    });
+});
+
 const { execSync } = require('child_process');
 
 // Require the Engine Modules
-const { runCurator } = require('./Agent_Scripts/Editor_Engine/curator');
+const { runCurator, refineCopywriteNewsItem, refineImagePrompt } = require('./Agent_Scripts/Editor_Engine/curator');
 const { generatePost } = require('./Agent_Scripts/Designer_Engine/generate_post');
-const { sendForApproval, publishToChannel, sendErrorAlert, startBot, stopBot } = require('./Agent_Scripts/Telegram_Engine/telegram_admin');
+const { sendForApproval, publishToChannel, sendErrorAlert, startBot, stopBot, registerBoostCommand, isApprovalPending } = require('./Agent_Scripts/Telegram_Engine/telegram_admin');
 const { publishPost } = require('./Agent_Scripts/Publisher_Engine/poster');
 
 const FEED_PATH = path.join(__dirname, 'Agent_Scripts/Scout_Engine/feed.json');
@@ -25,6 +51,7 @@ const COPY_INPUT_DIR = path.join(__dirname, 'Agent_Scripts/Designer_Engine/copy_
 const IMAGE_OUTPUT_DIR = path.join(__dirname, 'Agent_Scripts/Designer_Engine/output');
 const MEMORY_PATH = path.join(__dirname, 'memory.json');
 const HISTORY_PATH = path.join(__dirname, 'posted_history.json');
+const RECENT_TOPICS_PATH = path.join(__dirname, 'recent_topics.json');
 const SCHEDULE_CONFIG_PATH = path.join(__dirname, 'Config/schedule_config.json');
 const POST_LOG_PATH = path.join(__dirname, 'post_log.json');
 
@@ -119,54 +146,161 @@ function recordPost() {
     console.log(`📊 Posts today: ${postLog[today].count}`);
 }
 
+let isProcessingAnyPost = false;
+
 // ---- CORE PROCESSING ----
 
-async function processPost(post) {
-    console.log(`\n🎨 Processing Post ID: ${post.originalId} (Score: ${post.score})`);
-    const payloadPath = path.join(COPY_INPUT_DIR, `post_${post.originalId}.json`);
-    
-    if (!fs.existsSync(COPY_INPUT_DIR)) fs.mkdirSync(COPY_INPUT_DIR, { recursive: true });
-    fs.writeFileSync(payloadPath, JSON.stringify(post.payload, null, 2));
+async function processPost(post, countQuota = true) {
+    if (isProcessingAnyPost) {
+        console.log(`⚠️ processPost called but another post is already processing. Aborting to prevent race condition.`);
+        return false;
+    }
+    isProcessingAnyPost = true;
+    try {
+        console.log(`\n🎨 Processing Post ID: ${post.originalId} (Score: ${post.score})`);
+        const payloadPath = path.join(COPY_INPUT_DIR, `post_${post.originalId}.json`);
+        
+        if (!fs.existsSync(COPY_INPUT_DIR)) fs.mkdirSync(COPY_INPUT_DIR, { recursive: true });
+        fs.writeFileSync(payloadPath, JSON.stringify(post.payload, null, 2));
 
-    let imagePaths = [];
-    let designSuccess = false;
-    
-    while (!designSuccess) {
-        try {
-            imagePaths = await generatePost(payloadPath, IMAGE_OUTPUT_DIR);
-            if (!imagePaths || imagePaths.length === 0) throw new Error("Image generation returned empty.");
-            designSuccess = true;
-        } catch (err) {
-            console.error(`❌ Designer failed for Post ${post.originalId}:`, err);
-            const alertResponse = await sendErrorAlert(err.message, post.originalId, "Check Higgsfield/Chrome. Click Retry.");
-            if (alertResponse.action === 'skip') {
-                console.log(`⏭️ Admin chose to skip post ${post.originalId}.`);
-                return false;
+        let currentPayload = post.payload;
+        let imagePaths = [];
+
+        while (true) {
+            let designSuccess = false;
+            
+            // Ensure old images are deleted if we are re-generating
+            const tempImage = path.join(__dirname, 'Agent_Scripts/Designer_Engine/temp_run', `main_image_${post.originalId}.jpg`);
+            if (fs.existsSync(tempImage)) {
+                try { fs.unlinkSync(tempImage); } catch (e) {}
+            }
+
+        if (fs.existsSync(IMAGE_OUTPUT_DIR)) {
+            const files = fs.readdirSync(IMAGE_OUTPUT_DIR);
+            for (const file of files) {
+                if (file.startsWith(`post_${post.originalId}`)) {
+                    try { fs.unlinkSync(path.join(IMAGE_OUTPUT_DIR, file)); } catch (e) {}
+                }
             }
         }
-    }
 
-    console.log(`\n📲 Sending to Telegram Admin for Approval...`);
-    let approvalStatus = null;
-    try {
-        approvalStatus = await sendForApproval(imagePaths, post.payload.socialMediaCaptionLong, post.payload.socialMediaCaptionShort, "All Platforms");
-    } catch (err) {
-        console.error(`❌ Telegram send failed:`, err);
-        return false;
-    }
+        while (!designSuccess) {
+            try {
+                imagePaths = await generatePost(payloadPath, IMAGE_OUTPUT_DIR);
+                if (!imagePaths || imagePaths.length === 0) throw new Error("Image generation returned empty.");
+                designSuccess = true;
+            } catch (err) {
+                console.error(`❌ Designer failed for Post ${post.originalId}:`, err);
+                const alertResponse = await sendErrorAlert(err.message, post.originalId, "Check Higgsfield/Chrome. Click Retry.");
+                if (alertResponse.action === 'skip') {
+                    console.log(`⏭️ Admin chose to skip post ${post.originalId}.`);
+                    return false;
+                }
+            }
+        }
 
-    if (approvalStatus.action === 'approve') {
-        console.log(`✅ Post ${post.originalId} APPROVED! Broadcasting...`);
-        await publishToChannel(imagePaths, post.payload.socialMediaCaptionLong);
-        await publishPost(imagePaths, post.payload.socialMediaCaptionLong, post.payload.socialMediaCaptionShort);
-        recordPost();
-        return true;
-    } else if (approvalStatus.action === 'modify') {
-        console.log(`✍️ Admin requested modifications: "${approvalStatus.feedback}". (Needs Editor regeneration)`);
-        return false;
-    } else {
-        console.log(`🗑️ Post REJECTED by Admin. Discarding.`);
-        return false;
+        console.log(`\n📲 Sending to Telegram Admin for Approval...`);
+        let approvalStatus = null;
+        try {
+            approvalStatus = await sendForApproval(imagePaths, currentPayload.socialMediaCaptionLong, currentPayload.socialMediaCaptionShort, "All Platforms");
+        } catch (err) {
+            console.error(`❌ Telegram send failed:`, err);
+            return false;
+        }
+
+        if (approvalStatus.action === 'approve') {
+            console.log(`✅ Post ${post.originalId} APPROVED! Broadcasting...`);
+            await publishToChannel(imagePaths, currentPayload.socialMediaCaptionLong);
+            await publishPost(imagePaths, currentPayload.socialMediaCaptionLong, currentPayload.socialMediaCaptionShort);
+            if (countQuota) {
+                recordPost();
+                
+                // Add to recent topics
+                let activeTopics = fs.existsSync(RECENT_TOPICS_PATH) ? loadJson(RECENT_TOPICS_PATH) : [];
+                const topicStr = (post.payload?.headline?.line1 || "") + " " + (post.payload?.headline?.line2 || "");
+                if (topicStr.trim().length > 0) {
+                    activeTopics.unshift(topicStr);
+                    if (activeTopics.length > 50) activeTopics.length = 50;
+                    saveJson(RECENT_TOPICS_PATH, activeTopics);
+                }
+            } else {
+                console.log('(🚀 Override post — published without consuming quota slot.)');
+            }
+            return true;
+        } else if (approvalStatus.action === 'reject') {
+            console.log(`🗑️ Post REJECTED by Admin. Discarding.`);
+            return false;
+
+        // ---- One-click agent rerun (no text feedback) ----
+        } else if (approvalStatus.action === 'rerun_from' && approvalStatus.agent === 'designer') {
+            if (approvalStatus.imageModel) {
+                // Model switch requested — stamp the new model onto the payload so generate_post uses it
+                console.log(`🔄 Switching image model to: ${approvalStatus.imageModel}`);
+                currentPayload.imageModel = approvalStatus.imageModel;
+                fs.writeFileSync(payloadPath, JSON.stringify(currentPayload, null, 2));
+            } else {
+                console.log(`🎨 Admin requested Designer rerun — regenerating image with existing prompt.`);
+            }
+            // The image cleanup at the top of the while-loop handles deleting temp/output files.
+            // Just loop back — generatePost will re-run with the updated payload.
+
+        } else if (approvalStatus.action === 'rerun_from' && approvalStatus.agent === 'writer') {
+            console.log(`✍️ Admin requested Writer rerun — rewriting content with original source data.`);
+            try {
+                const rawFeed = loadJson(FEED_PATH);
+                const originalItem = rawFeed.find(item => String(item.id) === String(post.originalId)) || {
+                    id: post.originalId,
+                    title: currentPayload.headline ? currentPayload.headline.line1 : "",
+                    description: currentPayload.points ? currentPayload.points.join(" ") : ""
+                };
+                // Rewrite from scratch (empty feedback string signals a clean rerun)
+                const refinedPayload = await refineCopywriteNewsItem(originalItem, currentPayload, 'Rewrite the entire post fresh — keep the same news story but generate new phrasing, headline, and copy.');
+                currentPayload = refinedPayload;
+                fs.writeFileSync(payloadPath, JSON.stringify(refinedPayload, null, 2));
+                console.log("📝 Writer rerun complete — payload updated.");
+            } catch (err) {
+                console.error("❌ Writer rerun failed:", err);
+            }
+
+        // ---- Custom feedback (text-based modifications) ----
+        } else if (approvalStatus.action === 'modify_writer') {
+            console.log(`✍️ Admin requested content/caption modifications: "${approvalStatus.feedback}"`);
+            
+            try {
+                const rawFeed = loadJson(FEED_PATH);
+                const originalItem = rawFeed.find(item => String(item.id) === String(post.originalId)) || {
+                    id: post.originalId,
+                    title: currentPayload.headline ? currentPayload.headline.line1 : "",
+                    description: currentPayload.points ? currentPayload.points.join(" ") : ""
+                };
+                
+                const refinedPayload = await refineCopywriteNewsItem(originalItem, currentPayload, approvalStatus.feedback);
+                currentPayload = refinedPayload;
+                fs.writeFileSync(payloadPath, JSON.stringify(refinedPayload, null, 2));
+                console.log("📝 Payload updated with refined content.");
+            } catch (err) {
+                console.error("❌ Refinement failed:", err);
+            }
+        } else if (approvalStatus.action === 'modify_designer') {
+            console.log(`🎨 Admin requested image modifications: "${approvalStatus.feedback}"`);
+            
+            try {
+                const newPrompt = await refineImagePrompt(currentPayload, approvalStatus.feedback);
+                console.log(`✨ Refined Image Prompt: "${newPrompt}"`);
+                
+                currentPayload.imagePrompt = newPrompt;
+                if (currentPayload.isCarousel && currentPayload.slides && currentPayload.slides[0]) {
+                    currentPayload.slides[0].imagePrompt = newPrompt;
+                }
+                
+                fs.writeFileSync(payloadPath, JSON.stringify(currentPayload, null, 2));
+            } catch (err) {
+                console.error("❌ Image prompt refinement failed:", err);
+            }
+        } // end else if
+    } // end while (true)
+    } finally {
+        isProcessingAnyPost = false;
     }
 }
 
@@ -195,6 +329,13 @@ async function runCycle() {
     console.log("=======================================================\n");
 
     try {
+        console.log("📊 Updating dashboard statistics...");
+        try {
+            execSync(`node ${path.join(__dirname, 'Dashboard/update_stats.js')}`, { stdio: 'inherit' });
+        } catch (e) {
+            console.error("⚠️ Failed to update stats:", e.message);
+        }
+
         const scheduleConfig = JSON.parse(fs.readFileSync(SCHEDULE_CONFIG_PATH, 'utf8'));
         let memory = loadJson(MEMORY_PATH);
         const history = loadJson(HISTORY_PATH);
@@ -216,7 +357,13 @@ async function runCycle() {
         if (newFeed.length > 0) {
             saveJson(TEMP_FEED_PATH, newFeed);
             console.log(`\n✍️ Triggering Editor Engine for ${newFeed.length} new articles...`);
-            const curatedPayloads = await runCurator(TEMP_FEED_PATH, COPY_INPUT_DIR);
+            
+            // Build a list of active and recently published topics to prevent semantic duplication
+            let recentTopics = fs.existsSync(RECENT_TOPICS_PATH) ? loadJson(RECENT_TOPICS_PATH) : [];
+            const memoryTopics = memory.map(m => (m.payload?.headline?.line1 || "") + " " + (m.payload?.headline?.line2 || "")).filter(t => t.trim().length > 0);
+            const allActiveTopics = [...recentTopics, ...memoryTopics];
+
+            const curatedPayloads = await runCurator(TEMP_FEED_PATH, COPY_INPUT_DIR, allActiveTopics);
             
             for (const c of curatedPayloads) {
                 c.fetchedAt = Date.now();
@@ -228,18 +375,37 @@ async function runCycle() {
 
         // Sort memory by score descending
         memory.sort((a, b) => b.score - a.score);
+
+        // 🧠 Smart Memory Cap — keep only the top N articles to prevent unbounded growth
+        const maxMemSize = scheduleConfig.max_memory_size || 30;
+        if (memory.length > maxMemSize) {
+            const trimmed = memory.length - maxMemSize;
+            memory = memory.slice(0, maxMemSize);
+            console.log(`✂️  Memory trimmed: removed ${trimmed} lower-scored articles (cap: ${maxMemSize}). Best content preserved.`);
+        }
+
         saveJson(MEMORY_PATH, memory);
 
         const currentTime = getDamascusTime();
         console.log(`\n📦 Memory: ${memory.length} curated posts available.`);
 
         // 3. Process URGENT posts immediately (bypass all limits)
-        const urgentPosts = memory.filter(m => m.isUrgent);
+        let currentMemoryForUrgent = loadJson(MEMORY_PATH);
+        const urgentPosts = currentMemoryForUrgent.filter(m => m.isUrgent);
         for (const upost of urgentPosts) {
             console.log(`🚨 Processing URGENT Post: ${upost.originalId}`);
+            // Remove from memory immediately to prevent concurrent cycles picking it up
+            currentMemoryForUrgent = loadJson(MEMORY_PATH).filter(m => m.originalId !== upost.originalId);
+            saveJson(MEMORY_PATH, currentMemoryForUrgent);
+
+            // Add to history BEFORE processing
+            let currentHistory = loadJson(HISTORY_PATH);
+            if(!currentHistory.includes(upost.originalId)) {
+                currentHistory.push(upost.originalId);
+                saveJson(HISTORY_PATH, currentHistory);
+            }
+
             const published = await processPost(upost);
-            memory = memory.filter(m => m.originalId !== upost.originalId);
-            history.push(upost.originalId);
         }
 
         // 4. Check Routine Carousels
@@ -248,38 +414,50 @@ async function runCycle() {
             const morning = scheduleConfig.routine_posts.morning;
             if (morning && isTimeWithinWindow(currentTime, morning.time, morning.window_minutes || 20)) {
                 const routineId = `routine_morning_${getTodayDateStr()}`;
-                if (!history.includes(routineId)) {
+                let currentHistory = loadJson(HISTORY_PATH);
+                if (!currentHistory.includes(routineId)) {
+                    currentHistory.push(routineId);
+                    saveJson(HISTORY_PATH, currentHistory);
                     const published = await runRoutineCarousel(morning, routineId);
-                    history.push(routineId);
                 }
             }
             // Evening routine
             const evening = scheduleConfig.routine_posts.evening;
             if (evening && isTimeWithinWindow(currentTime, evening.time, evening.window_minutes || 20)) {
                 const routineId = `routine_evening_${getTodayDateStr()}`;
-                if (!history.includes(routineId)) {
+                let currentHistory = loadJson(HISTORY_PATH);
+                if (!currentHistory.includes(routineId)) {
+                    currentHistory.push(routineId);
+                    saveJson(HISTORY_PATH, currentHistory);
                     const published = await runRoutineCarousel(evening, routineId);
-                    history.push(routineId);
                 }
             }
         }
 
         // 5. AGGRESSIVE POSTING — Post the best available content if allowed
-        if (canPostNow(scheduleConfig)) {
-            const bestPost = memory.find(m => !m.isUrgent);
+        if (isApprovalPending()) {
+            console.log(`⏳ Admin approval is currently pending for a previous post. Halting non-urgent posts until resolved.`);
+        } else if (canPostNow(scheduleConfig)) {
+            let currentMemory = loadJson(MEMORY_PATH);
+            const bestPost = currentMemory.find(m => !m.isUrgent);
             if (bestPost) {
                 console.log(`⚡ Best post available: "${bestPost.originalId}" (Score: ${bestPost.score}). Posting now!`);
+                // Remove from memory immediately to prevent concurrent cycles picking it up
+                currentMemory = currentMemory.filter(m => m.originalId !== bestPost.originalId);
+                saveJson(MEMORY_PATH, currentMemory);
+
+                // Add to history BEFORE processing
+                let currentHistory = loadJson(HISTORY_PATH);
+                if(!currentHistory.includes(bestPost.originalId)) {
+                    currentHistory.push(bestPost.originalId);
+                    saveJson(HISTORY_PATH, currentHistory);
+                }
+
                 const published = await processPost(bestPost);
-                memory = memory.filter(m => m.originalId !== bestPost.originalId);
-                history.push(bestPost.originalId);
             } else {
                 console.log("📭 No posts in memory to publish right now.");
             }
         }
-
-        // Save updated state
-        saveJson(MEMORY_PATH, memory);
-        saveJson(HISTORY_PATH, history);
 
     } catch (error) {
         console.error("❌ Master Loop Error:", error);
@@ -296,14 +474,62 @@ const args = process.argv.slice(2);
 
 startBot(); // start telegram bot listening
 
+// ---- Register /postnow Override Publish ----
+let isProcessingBoost = false;
+
+registerBoostCommand(async (ctx) => {
+    console.log(`\n🛎️ Override Publish requested! Checking locks...`);
+    if (isProcessingBoost || isProcessingAnyPost) {
+        console.log(`⚠️ Locked! isProcessingBoost=${isProcessingBoost}, isProcessingAnyPost=${isProcessingAnyPost}`);
+        return ctx.reply('⚠️ Please wait! The engine is currently generating another post. Running them together will mix up the images.');
+    }
+    console.log(`🔓 Locks cleared! Proceeding with override...`);
+    isProcessingBoost = true;
+    
+    try {
+        let memory = loadJson(MEMORY_PATH);
+        const history = loadJson(HISTORY_PATH);
+
+        // Find the best non-urgent story in the library
+        const overridePost = memory.find(m => !m.isUrgent);
+        if (!overridePost) {
+            return ctx.reply('💭 Memory library is empty right now — no stories available to override-publish. Wait for the next Scout cycle.');
+        }
+
+        console.log(`\n🚀 OVERRIDE PUBLISH triggered via /postnow`);
+        console.log(`📌 Using best story: ${overridePost.originalId} (Score: ${overridePost.score})`);
+
+        // Remove from memory immediately
+        const updatedMemory = loadJson(MEMORY_PATH).filter(m => m.originalId !== overridePost.originalId);
+        saveJson(MEMORY_PATH, updatedMemory);
+
+        // Add to history BEFORE processing to prevent concurrent pick-ups
+        let currentHistory = loadJson(HISTORY_PATH);
+        if (!currentHistory.includes(overridePost.originalId)) {
+            currentHistory.push(overridePost.originalId);
+            saveJson(HISTORY_PATH, currentHistory);
+        }
+
+        // Process it — countQuota=false so it doesn't burn a quota slot
+        const published = await processPost(overridePost, false);
+
+        if (published) {
+            console.log(`✅ Override publish complete for ${overridePost.originalId}.`);
+        }
+    } finally {
+        isProcessingBoost = false;
+    }
+});
+
 if (args.includes('--run-now')) {
     runCycle().then(() => {
         stopBot();
         process.exit(0);
     });
 } else {
-    console.log("🟢 HashSYR24 Aggressive Growth Engine Online (24/7 — every 15 mins).");
+    console.log("🟢 HashSYR24 Growth Engine Online (24/7 — every 15 mins).");
     console.log("📋 Rules: 45min gap | 12 posts/day cap | Prime 07:00-23:00 Damascus");
+    console.log("📡 Platforms: Facebook · Instagram · X · Telegram");
     runCycle();
     const INTERVAL_MS = 15 * 60 * 1000; // 15 minutes
     setInterval(runCycle, INTERVAL_MS);

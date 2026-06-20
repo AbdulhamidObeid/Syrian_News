@@ -80,14 +80,12 @@
   },
 
   "platform_distribution": {
-    "default": ["facebook", "x", "instagram", "tiktok", "telegram"],
-    "tiktok_format": "mp4",
-    "tiktok_slide_duration_seconds": 3.5,
-    "tiktok_single_duration_seconds": 5,
+    "default": ["facebook", "x", "instagram", "telegram"],
     "image_format": "png",
     "image_dimensions": "1080x1350"
   },
 
   "cycle_interval_minutes": 15,
-  "news_memory_ttl_hours": 24
+  "news_memory_ttl_hours": 24,
+  "max_memory_size": 30
 }

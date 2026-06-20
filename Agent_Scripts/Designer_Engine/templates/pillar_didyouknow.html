@@ -6,7 +6,7 @@
     <title>Pillar: Did You Know — هل تعلم؟</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
@@ -14,62 +14,114 @@
         }
     </script>
     <style>
+        * { box-sizing: border-box; }
         body, html {
             margin: 0; padding: 0; width: 1080px; height: 1350px; overflow: hidden;
             background-color: transparent;
             background-image: url('file:///Users/obeid/Desktop/Antigravity-Hub/Projects/Syrian_News/Assets/Templates/1080x1350_white.jpg');
             background-size: cover; background-position: center;
+            font-family: 'IBM Plex Sans Arabic', sans-serif;
         }
+        /* Safe zone: left:116 top:206 width:847 height:978 */
         #content-sandbox {
             position: absolute;
             left: 116px; top: 206px; width: 847px; height: 978px;
-        }
-        .fact-card {
-            background: rgba(255,255,255,0.6);
-            backdrop-filter: blur(20px);
-            border: 1px solid rgba(0,0,0,0.08);
-            border-radius: 24px;
-            padding: 40px 32px;
+            display: flex;
+            flex-direction: column;
+            gap: 0;
         }
         .pillar-badge {
             background: #002D29;
             color: #DBBE8F;
-            padding: 8px 24px;
+            padding: 10px 28px;
             border-radius: 999px;
-            font-size: 22px;
-            font-weight: 600;
-            letter-spacing: 0.05em;
+            font-size: 24px;
+            font-weight: 700;
+            letter-spacing: 0.04em;
             display: inline-flex;
             align-items: center;
             gap: 10px;
+            white-space: nowrap;
+            box-shadow: 0 4px 20px rgba(0,45,41,0.25);
+        }
+        .hero-image {
+            width: 100%;
+            flex: 1;
+            min-height: 0;
+            border-radius: 24px;
+            overflow: hidden;
+            border: 1px solid rgba(0,0,0,0.08);
+            position: relative;
+        }
+        .hero-image img {
+            position: absolute; inset: 0;
+            width: 100%; height: 100%;
+            object-fit: cover;
+        }
+        .hero-image .overlay {
+            position: absolute; inset: 0;
+            border-radius: 24px;
+            box-shadow: inset 0 0 0 1px rgba(0,0,0,0.08);
+        }
+        .fact-card {
+            background: rgba(255,255,255,0.72);
+            backdrop-filter: blur(24px);
+            -webkit-backdrop-filter: blur(24px);
+            border: 1px solid rgba(0,0,0,0.07);
+            border-radius: 24px;
+            padding: 36px 40px;
+            flex-shrink: 0;
+        }
+        .headline {
+            font-size: 42px;
+            font-weight: 800;
+            color: #0D1117;
+            line-height: 1.35;
+            text-align: center;
+            margin-bottom: 18px;
+        }
+        .body-text {
+            font-size: 26px;
+            font-weight: 500;
+            color: #374151;
+            line-height: 1.65;
+            text-align: center;
+        }
+        .source-line {
+            font-size: 18px;
+            color: #9CA3AF;
+            font-weight: 500;
+            text-align: center;
+            flex-shrink: 0;
         }
     </style>
 </head>
-<body class="antialiased">
-    <div id="content-sandbox" dir="rtl" class="flex flex-col justify-between" style="gap: 28px;">
-        
-        <!-- Pillar Badge -->
-        <div class="w-full flex justify-center">
+<body>
+    <div id="content-sandbox">
+        <!-- Row 1: Badge centered -->
+        <div style="display:flex; justify-content:center; margin-bottom:24px; flex-shrink:0;">
             <div class="pillar-badge">
                 <span>💡</span>
                 <span>هل تعلم؟</span>
             </div>
         </div>
 
-        <!-- Hero Image -->
-        <div class="w-full relative overflow-hidden rounded-[1.5rem] border border-black/10 flex-1" style="min-height: 35%;">
-            <img src="__MAIN_IMAGE_URL__" class="absolute inset-0 w-full h-full object-cover" />
-            <div class="absolute inset-0 ring-1 ring-inset ring-black/10 rounded-[1.5rem]"></div>
+        <!-- Row 2: Hero image — grows to fill available space -->
+        <div class="hero-image">
+            <img src="__MAIN_IMAGE_URL__" />
+            <div class="overlay"></div>
         </div>
 
-        <!-- Fact Card -->
-        <div class="w-full fact-card">
-            <h2 class="text-slate-900 text-center text-4xl font-bold leading-[1.4] mb-4">__MAIN_HEADLINE__</h2>
-            <p class="text-slate-700 text-center text-2xl leading-[1.6]">__FACT_BODY__</p>
+        <!-- Row 3: Fact card -->
+        <div style="margin-top:24px;">
+            <div class="fact-card">
+                <div class="headline">__MAIN_HEADLINE__</div>
+                <div class="body-text">__FACT_BODY__</div>
+            </div>
         </div>
 
-        <!-- Source attribution -->
-        <div class="w-full text-center text-lg text-slate-400">__SOURCE_TEXT__</div>
+        <!-- Row 4: Source -->
+        <div class="source-line" style="margin-top:16px;">__SOURCE_TEXT__</div>
     </div>
 </body>
 </html>
