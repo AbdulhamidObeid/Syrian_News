@@ -13,15 +13,9 @@ The Publisher must dynamically select the correct file based on the platform bei
 *   **Action:** If a post requires multiple slides (Carousel format), you must detect this and utilize the platform's multi-image upload feature.
 
 ## Known Issues & Workarounds
-1. **React/Lexical/Draft.js Captions (Facebook, Instagram, TikTok):** Modern platforms use complex rich-text editors that actively block or drop characters if typed via Puppeteer's standard `page.keyboard.type()`. **DO NOT use `keyboard.type()` for captions!**
-   *   **The Fix:** You must construct a synthetic HTML `ClipboardEvent` inside `page.evaluate()` and trigger a native `paste`. Convert newlines into `<div>` or `<br>` before pasting. For TikTok, ensure you use `insertHTML`. (See `poster.js` for the exact reference implementation).
-2. **TikTok Pre-filled Filenames:** TikTok automatically injects the uploaded video's filename (e.g. `post_101_tiktok`) into the caption box. 
-   *   **The Fix:** You must clear this by programmatically triggering `Meta + A` (Select All) and `Backspace` in Puppeteer *before* pasting the real caption.
-3. **Instagram "Discard Post?" Block:** Instagram takes time to upload a post even after clicking "Share". If you navigate away too quickly, it cancels the upload.
-   *   **The Fix:** Always inject a static 15-second `delay()` loop after clicking Share, and monitor the page for the success toast ("Your post has been shared") before closing the tab.
-4. **Facebook Profile Switching:** Facebook's page switching modal uses nested elements and the blue "Switch" button lacks a standard ID. We must search for `aria-label*="Switch"` broadly and wait at least 15 seconds for the profile context to fully reload.
-5. **Facebook Post Button:** The post button says "What's on your mind?" for personal profiles, and "What's on your mind, [Page Name]?" for page profiles. Always match loosely with `.includes("what's on your mind")` or `.includes("بم تفكر")`.
-6. **Hashtags:** The Publisher Engine expects the `socialMediaCaption` to be pre-formatted with `#HashSYR24` and `#هاشتاق_سوريا` by the Editor Engine.
+1. **Facebook Profile Switching:** Facebook's page switching modal uses nested elements and the blue "Switch" button lacks a standard ID. We must search for `aria-label*="Switch"` broadly and wait at least 15 seconds for the profile context to fully reload.
+2. **Facebook Post Button:** The post button says "What's on your mind?" for personal profiles, and "What's on your mind, [Page Name]?" for page profiles. Always match loosely with `.includes("what's on your mind")` or `.includes("بم تفكر")`.
+3. **Hashtags:** The Publisher Engine expects the `socialMediaCaption` to be pre-formatted with `#HashSYR24` and `#هاشتاق_سوريا` by the Editor Engine.
 
 ## 2. macOS Popup Bypassing (The Nuclear Intercept)
 When automating file uploads in `headless: false` mode (specifically on macOS), native OS File Choosers will block execution or become permanently stuck on the screen if triggered. 

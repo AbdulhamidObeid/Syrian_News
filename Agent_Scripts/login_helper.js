@@ -21,7 +21,7 @@ async function run() {
     console.log("==========================================================");
     console.log(`Reusing Chrome agent profile: ${profilePath}\n`);
     console.log("1. We will open Chrome on your desktop.");
-    console.log("2. Please log in to X (Twitter), Facebook, Instagram, TikTok, and Higgsfield.");
+    console.log("2. Please log in to X (Twitter), Facebook, Instagram, and Higgsfield.");
     console.log("3. Once logged in, return here and press ENTER to extract tokens and close Chrome.");
     console.log("==========================================================\n");
 
@@ -47,9 +47,6 @@ async function run() {
     
     const xPage = await browser.newPage();
     await xPage.goto('https://x.com/login', { waitUntil: 'domcontentloaded' });
-
-    const tkPage = await browser.newPage();
-    await tkPage.goto('https://www.tiktok.com/login', { waitUntil: 'domcontentloaded' });
 
     // Focus on Higgsfield tab first
     await page.bringToFront();

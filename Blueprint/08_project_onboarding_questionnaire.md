@@ -16,7 +16,7 @@
    - Neutral Colors (e.g., Off-White, Dark Gray)
 
 ## Phase 3: Layout & Safe Zones (Designer Config)
-7. **Aspect Ratios:** Which aspect ratios will we support? (Typically 1080x1350 for FB/IG/X, and 1080x1920 for TikTok/Reels).
+7. **Aspect Ratios:** Which aspect ratios will we support? (Typically 1080x1350 for FB/IG/X, and 1080x1920 for Reels).
 8. **The Safe Zone Calculation:** 
    *Note: The user will not calculate this manually. You (the Architect) will generate an `.ai` file with a "Design" layer and a "Safe Zone" layer. The user will draw a white box in the Safe Zone layer, and you will read the coordinates to fill the `designer_config.json` automatically.*
 9. **Typography Constraints:** Are there any strict limits on how many lines a headline can be, or maximum distances between text blocks?

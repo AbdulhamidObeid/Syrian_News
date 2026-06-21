@@ -1,140 +1,108 @@
 const fs = require('fs');
-const os = require('os');
 const axios = require('axios');
 const FormData = require('form-data');
 const path = require('path');
-const puppeteer = require('puppeteer-extra');
-const StealthPlugin = require('puppeteer-extra-plugin-stealth');
-puppeteer.use(StealthPlugin());
-require('dotenv').config({ path: require('path').join(__dirname, '../../.env') });
-
+require('dotenv').config({ path: path.join(__dirname, '../../.env') });
 
 async function delay(ms) {
     return new Promise(resolve => setTimeout(resolve, ms));
 }
 
-async function sendTelegramAlert(message) {
-    const botToken = process.env.TELEGRAM_BOT_TOKEN;
-    const adminId = process.env.TELEGRAM_ADMIN_ID;
-    if (botToken && adminId) {
-        try {
-            await axios.post(`https://api.telegram.org/bot${botToken}/sendMessage`, {
-                chat_id: adminId,
-                text: message
-            });
-        } catch (e) {
-            console.error('Failed to send Telegram alert:', e.message);
-        }
-    }
-}
-
-async function getBrowser() {
-    let browser;
-    try {
-        browser = await puppeteer.connect({ browserURL: 'http://127.0.0.1:9222', defaultViewport: null, protocolTimeout: 120000 });
-    } catch (e) {
-        const profilePath = path.join(os.homedir(), '.gemini', 'antigravity-browser-profile');
-        browser = await puppeteer.launch({
-            headless: false,
-            executablePath: '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome',
-            userDataDir: profilePath,
-            defaultViewport: null,
-            args: ['--no-sandbox', '--disable-setuid-sandbox', '--start-maximized']
-        });
-    }
-    
-    // NUCLEAR OPTION to prevent OS File Choosers
-    await browser.on('targetcreated', async (target) => {
-        if (target.type() === 'page') {
-            const newPage = await target.page();
-            if (newPage) {
-                await newPage.evaluateOnNewDocument(() => {
-                    const originalClick = window.HTMLInputElement.prototype.click;
-                    window.HTMLInputElement.prototype.click = function() {
-                        if (this.type === 'file') return;
-                        return originalClick.call(this);
-                    };
-                    window.showOpenFilePicker = async () => [];
-                });
-            }
-        }
-    });
-    return browser;
-}
-
-async function publishPost(imagePath, captionLong, captionShort) {
+/**
+ * Publishes the post across X (Twitter), Facebook, and Instagram.
+ * If any platform API fails, it calls sendErrorAlertFn to block and ask the user (Retry/Skip).
+ */
+async function publishPost(imagePath, captionLong, captionShort, postId, sendErrorAlertFn) {
     if (!captionLong) captionLong = "No caption";
     if (!captionShort) captionShort = "No caption";
     captionLong = captionLong.replace(/\\n/g, '\n');
     captionShort = captionShort.replace(/\\n/g, '\n');
     const imageArray = typeof imagePath === 'string' ? imagePath.split(',') : imagePath;
-    
-    let browser = null;
-    let pages = [];
 
     // --- ZERNIO HOSTING FOR APIS (Facebook/IG/X) ---
     const uploadedUrls = [];
-    try {
-        console.log(`Uploading ${imageArray.length} image(s) to Zernio for hosting...`);
-        const zernioKey = process.env.ZERNIO_API_KEY;
-        for (const img of imageArray) {
-            const mediaForm = new FormData();
-            mediaForm.append('files', fs.createReadStream(img));
-            const res = await axios.post('https://zernio.com/api/v1/media', mediaForm, {
-                headers: { ...mediaForm.getHeaders(), 'Authorization': `Bearer ${zernioKey}` }
-            });
-            uploadedUrls.push(res.data.files[0].url);
+    let zernioSuccess = false;
+    while (!zernioSuccess) {
+        try {
+            console.log(`Uploading ${imageArray.length} image(s) to Zernio for hosting...`);
+            const zernioKey = process.env.ZERNIO_API_KEY;
+            if (!zernioKey) throw new Error("ZERNIO_API_KEY is not defined in environment/.env");
+            
+            uploadedUrls.length = 0; // Clear any partial uploads
+            for (const img of imageArray) {
+                const mediaForm = new FormData();
+                mediaForm.append('files', fs.createReadStream(img));
+                const res = await axios.post('https://zernio.com/api/v1/media', mediaForm, {
+                    headers: { ...mediaForm.getHeaders(), 'Authorization': `Bearer ${zernioKey}` }
+                });
+                uploadedUrls.push(res.data.files[0].url);
+            }
+            console.log(`  ✅ Uploaded ${uploadedUrls.length} image(s) to Zernio.`);
+            zernioSuccess = true;
+        } catch (e) {
+            console.error('❌ Zernio upload failed:', e.message);
+            if (sendErrorAlertFn) {
+                const alertRes = await sendErrorAlertFn(
+                    `Zernio Image Upload failed: ${e.message}`, 
+                    postId, 
+                    "Check your internet connection, disk space, or Zernio API Key in .env. Click Retry to upload again, or Skip to skip all APIs."
+                );
+                if (alertRes.action === 'skip') {
+                    console.log("⏭️ Admin chose to skip all API publishing due to Zernio failure.");
+                    return;
+                }
+            } else {
+                return; // Move on if no alert function
+            }
         }
-        console.log(`  ✅ Uploaded ${uploadedUrls.length} image(s) to Zernio.`);
-    } catch (e) {
-        console.error('Zernio upload failed:', e.message);
     }
 
     // --- X (TWITTER) ---
     console.log('\n--- Posting to X (Twitter) ---');
-    let xApiSuccess = false;
-    for (let i = 0; i < 3 && !xApiSuccess && uploadedUrls.length > 0; i++) {
-        try {
-            const bufferToken = process.env.BUFFER_ACCESS_TOKEN;
-            const bufferChannelId = process.env.BUFFER_CHANNEL_ID;
-            const res = await axios.post('https://api.buffer.com', {
-                query: `mutation createPost($input: CreatePostInput!) { createPost(input: $input) { ... on PostActionSuccess { post { id } } } }`,
-                variables: { input: { channelId: bufferChannelId, schedulingType: 'automatic', mode: 'shareNow', text: captionShort, assets: uploadedUrls.map(url => ({ image: { url } })) } }
-            }, { headers: { 'Authorization': `Bearer ${bufferToken}`, 'Content-Type': 'application/json' } });
-            
-            if (res.data.errors) throw new Error(JSON.stringify(res.data.errors));
-            console.log('✅ X Posted via API');
-            xApiSuccess = true;
-        } catch (e) { console.log(`X API Attempt ${i+1} failed.`); await delay(2000); }
-    }
-
-    if (!xApiSuccess) {
-        await sendTelegramAlert('⚠️ X (Twitter) API failed 3 times. Resorting to Web-Bot.');
-        try {
-            if (!browser) browser = await getBrowser();
-            const targets = await browser.targets();
-            const xTarget = targets.find(t => t.type() === 'page' && t.url().includes('x.com'));
-            let p = xTarget ? await xTarget.page() : await browser.newPage();
-            await p.bringToFront(); await p.goto('https://x.com/compose/post', { waitUntil: 'networkidle2' }); await delay(4000);
-            const fileInput = await p.waitForSelector('input[data-testid="fileInput"]', { timeout: 5000 });
-            for (const img of imageArray) { await fileInput.uploadFile(img); await delay(1000); }
-            await p.type('[data-testid="tweetTextarea_0"]', captionShort); await delay(2000);
-            const clicked = await p.evaluate(() => {
-                const btn = Array.from(document.querySelectorAll('button[data-testid="tweetButton"]')).find(b => b.offsetParent !== null && !b.disabled);
-                if (btn) { btn.click(); return true; } return false;
-            });
-            if (clicked) console.log('✅ X Posted via Web-Bot');
-        } catch (e) { console.error('❌ X Web-Bot failed:', e.message); }
+    if (uploadedUrls.length > 0) {
+        let xSuccess = false;
+        while (!xSuccess) {
+            try {
+                const bufferToken = process.env.BUFFER_ACCESS_TOKEN;
+                const bufferChannelId = process.env.BUFFER_CHANNEL_ID;
+                if (!bufferToken || !bufferChannelId) {
+                    throw new Error("Missing BUFFER_ACCESS_TOKEN or BUFFER_CHANNEL_ID in environment/.env");
+                }
+                const res = await axios.post('https://api.buffer.com', {
+                    query: `mutation createPost($input: CreatePostInput!) { createPost(input: $input) { ... on PostActionSuccess { post { id } } } }`,
+                    variables: { input: { channelId: bufferChannelId, schedulingType: 'automatic', mode: 'shareNow', text: captionShort, assets: uploadedUrls.map(url => ({ image: { url } })) } }
+                }, { headers: { 'Authorization': `Bearer ${bufferToken}`, 'Content-Type': 'application/json' } });
+                
+                if (res.data.errors) throw new Error(JSON.stringify(res.data.errors));
+                console.log('✅ X Posted via API');
+                xSuccess = true;
+            } catch (e) {
+                console.error(`❌ X API publishing failed:`, e.message);
+                if (sendErrorAlertFn) {
+                    const alertRes = await sendErrorAlertFn(
+                        `X (Twitter) API failed: ${e.message}`, 
+                        postId, 
+                        "Check Buffer access token, channel ID, or network status. Click Retry to try posting again, or Skip to proceed to next platform."
+                    );
+                    if (alertRes.action === 'skip') {
+                        console.log("⏭️ Admin chose to skip X (Twitter) publishing.");
+                        break;
+                    }
+                } else {
+                    break; // Skip if no alert function
+                }
+            }
+        }
     }
 
     // --- FACEBOOK PAGE ---
     console.log('\n--- Posting to Facebook Page ---');
-    let fbApiSuccess = false;
     const fbToken = process.env.FACEBOOK_PAGE_ACCESS_TOKEN;
     const fbPageId = process.env.FACEBOOK_PAGE_ID;
     
     if (fbToken && fbPageId && uploadedUrls.length > 0) {
-        for (let i = 0; i < 3 && !fbApiSuccess; i++) {
+        let fbSuccess = false;
+        while (!fbSuccess) {
             try {
                 if (uploadedUrls.length === 1) {
                     await axios.post(`https://graph.facebook.com/v20.0/${fbPageId}/photos`, { url: uploadedUrls[0], message: captionLong, access_token: fbToken });
@@ -147,39 +115,34 @@ async function publishPost(imagePath, captionLong, captionShort) {
                     await axios.post(`https://graph.facebook.com/v20.0/${fbPageId}/feed`, { message: captionLong, attached_media: mediaIds.map(id => ({ media_fbid: id })), access_token: fbToken });
                 }
                 console.log('✅ Facebook Posted via API');
-                fbApiSuccess = true;
-            } catch (e) { 
-                console.error(`FB API Attempt ${i+1} failed:`, e.response?.data || e.message); 
-                await delay(2000); 
+                fbSuccess = true;
+            } catch (e) {
+                const errMsg = e.response?.data?.error?.message || e.message;
+                console.error(`❌ FB API publishing failed:`, errMsg);
+                if (sendErrorAlertFn) {
+                    const alertRes = await sendErrorAlertFn(
+                        `Facebook API failed: ${errMsg}`, 
+                        postId, 
+                        "Check Facebook Page access token, Page ID, or rate limits. Click Retry to try posting again, or Skip to proceed to next platform."
+                    );
+                    if (alertRes.action === 'skip') {
+                        console.log("⏭️ Admin chose to skip Facebook publishing.");
+                        break;
+                    }
+                } else {
+                    break;
+                }
             }
         }
-    }
-
-    if (!fbApiSuccess) {
-        await sendTelegramAlert('⚠️ Facebook API failed 3 times. Resorting to Web-Bot.');
-        try {
-            if (!browser) browser = await getBrowser();
-            const targets = await browser.targets();
-            const fbTarget = targets.find(t => t.type() === 'page' && t.url().includes('facebook.com'));
-            let p = fbTarget ? await fbTarget.page() : await browser.newPage();
-            await p.bringToFront(); await p.goto('https://www.facebook.com/HashSYR24', { waitUntil: 'networkidle2' }); await delay(5000);
-            const fileInputs = await p.$$('input[type="file"][accept*="image"]');
-            if (fileInputs.length > 0) {
-                for (const img of imageArray) { await fileInputs[0].uploadFile(img); await delay(1000); }
-                const captionInput = await p.$('div[role="textbox"][contenteditable="true"]');
-                if (captionInput) { await captionInput.focus(); await p.keyboard.type(captionLong, { delay: 10 }); }
-                await delay(2000);
-                const postBtn = Array.from(await p.$$('div[role="button"]')).pop(); // Simplification
-                if (postBtn) { await postBtn.click(); console.log('✅ FB Posted via Web-Bot'); }
-            }
-        } catch (e) { console.error('❌ FB Web-Bot failed:', e.message); }
+    } else {
+        console.log(`Skipping FB API due to missing credentials or images.`);
     }
 
     // --- INSTAGRAM ---
     console.log('\n--- Posting to Instagram ---');
-    let igApiSuccess = false;
     if (fbToken && fbPageId && uploadedUrls.length > 0) {
-        for (let i = 0; i < 3 && !igApiSuccess; i++) {
+        let igSuccess = false;
+        while (!igSuccess) {
             try {
                 const accRes = await axios.get(`https://graph.facebook.com/v20.0/${fbPageId}?fields=instagram_business_account&access_token=${fbToken}`);
                 const igId = accRes.data?.instagram_business_account?.id;
@@ -197,74 +160,47 @@ async function publishPost(imagePath, captionLong, captionShort) {
                         await axios.post(`https://graph.facebook.com/v20.0/${igId}/media_publish`, { creation_id: cRes.data.id, access_token: fbToken });
                     }
                     console.log('✅ Instagram Posted via API');
-                    igApiSuccess = true;
+                    igSuccess = true;
                 } else {
-                    console.log(`❌ IG ID not found in response:`, JSON.stringify(accRes.data));
-                    break;
+                    throw new Error(`Instagram Business Account ID not found for Facebook Page ID ${fbPageId}`);
                 }
             } catch (e) {
-                console.log(`IG API Attempt ${i+1} failed:`, e.response?.data?.error?.message || e.message);
-                await delay(2000);
+                const errMsg = e.response?.data?.error?.message || e.message;
+                console.error(`❌ IG API publishing failed:`, errMsg);
+                if (sendErrorAlertFn) {
+                    const alertRes = await sendErrorAlertFn(
+                        `Instagram API failed: ${errMsg}`, 
+                        postId, 
+                        "Check Instagram settings, link state, or Facebook access token. Click Retry to try posting again, or Skip to complete publishing."
+                    );
+                    if (alertRes.action === 'skip') {
+                        console.log("⏭️ Admin chose to skip Instagram publishing.");
+                        break;
+                    }
+                } else {
+                    break;
+                }
             }
         }
     } else {
         console.log(`Skipping IG API due to missing credentials or images.`);
     }
 
-    if (!igApiSuccess) {
-        await sendTelegramAlert('⚠️ Instagram API failed 3 times. Resorting to Web-Bot.');
+    console.log('\n🎉 Platform API Publishing Complete!');
+    
+    // Send final success notification to Telegram admin
+    const botToken = process.env.TELEGRAM_BOT_TOKEN;
+    const adminId = process.env.TELEGRAM_ADMIN_ID;
+    if (botToken && adminId) {
         try {
-            if (!browser) browser = await getBrowser();
-            const targets = await browser.targets();
-            const igTarget = targets.find(t => t.type() === 'page' && t.url().includes('instagram.com'));
-            let p = igTarget ? await igTarget.page() : await browser.newPage();
-            await p.bringToFront(); await p.goto('https://www.instagram.com', { waitUntil: 'networkidle2' }); await delay(4000);
-            
-            await p.evaluate(() => {
-                const svgs = Array.from(document.querySelectorAll('svg[aria-label="New post"]'));
-                if (svgs.length > 0) svgs[0].closest('a, div[role="button"]').click();
+            await axios.post(`https://api.telegram.org/bot${botToken}/sendMessage`, {
+                chat_id: adminId,
+                text: `🎉 Post publishing process has completed for Post ID ${postId} across active platforms!`
             });
-            await delay(3000);
-            const fileInput = await p.$('input[type="file"]');
-            if (fileInput) {
-                // Upload all
-                await fileInput.uploadFile(...imageArray);
-                await delay(2000);
-                
-                // Next, Next, Share
-                for(let step=0; step<2; step++) {
-                    await p.evaluate(() => {
-                        const btns = Array.from(document.querySelectorAll('div[role="button"]'));
-                        const next = btns.find(b => b.textContent === 'Next');
-                        if (next) next.click();
-                    });
-                    await delay(2000);
-                }
-                
-                const captionBox = await p.$('div[aria-label="Write a caption..."]');
-                if (captionBox) await captionBox.type(captionLong, {delay: 10});
-                
-                await p.evaluate(() => {
-                    const btns = Array.from(document.querySelectorAll('div[role="button"]'));
-                    const share = btns.find(b => b.textContent === 'Share');
-                    if (share) share.click();
-                });
-                console.log('✅ IG Posted via Web-Bot');
-            }
-        } catch (e) { console.error('❌ IG Web-Bot failed:', e.message); }
+        } catch (e) {
+            console.error('Failed to send final Telegram success alert:', e.message);
+        }
     }
-
-    // TikTok publishing has been removed from this pipeline.
-
-    if (browser) await browser.disconnect();
-    console.log('\n🎉 Pipeline Complete!');
-    await sendTelegramAlert('🎉 Post processing has finished across all platforms. Check your social media accounts to confirm it went live!');
 }
 
 module.exports = { publishPost };
-// For direct CLI testing
-if (require.main === module) {
-    const images = process.argv[2];
-    const caption = process.argv[3];
-    if (images && caption) publishPost(images, caption, caption).catch(console.error);
-}

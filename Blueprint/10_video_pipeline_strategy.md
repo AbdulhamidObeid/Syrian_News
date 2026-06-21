@@ -20,7 +20,7 @@ When the Editor writes a script, the Video Agent will:
 1.  **Split the Script:** Break the text into 3-second read chunks.
 2.  **Fetch Assets:** Grab the corresponding B-roll video from Higgsfield or our library.
 3.  **Compile with Remotion:** The agent feeds the text chunks into our Remotion React template. The template automatically applies the Lower Third Lottie animation, places the text over the B-roll, and renders a 15-second `1080x1350` MP4 file.
-4.  **Publish:** The Publisher Agent natively uploads it as a Reel/TikTok.
+4.  **Publish:** The Publisher Agent natively uploads it as a Reel.
 
 ## 4. Why not After Effects?
 Automating Adobe After Effects via `nexrender` is incredibly powerful but requires a heavy, expensive server to run Photoshop/AE. Remotion runs instantly on standard cloud servers and is free to develop. We will stick to Remotion + Framer Motion for massive speed and zero server costs.

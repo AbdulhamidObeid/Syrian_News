@@ -349,10 +349,10 @@ function stopBot() {
  * @param {string|string[]} imagePath - Path to the local image file, or array of paths for Carousel
  * @param {string} captionLong - The generated Arabic long caption
  * @param {string} captionShort - The generated Arabic short caption
- * @param {string} platform - The target platform (e.g. "All Platforms", "TikTok Only")
+ * @param {string} platform - The target platform (e.g. "All APIs (FB/IG/X)", "Instagram Only")
  * @returns {Promise<{action: 'approve'|'reject'|'modify', feedback?: string}>}
  */
-async function sendForApproval(imagePath, captionLong, captionShort, platform = 'All Platforms') {
+async function sendForApproval(imagePath, captionLong, captionShort, platform = 'All APIs (FB/IG/X)') {
     return new Promise(async (resolve, reject) => {
         const postId = Date.now().toString();
         
@@ -371,7 +371,7 @@ async function sendForApproval(imagePath, captionLong, captionShort, platform = 
 
         const messageText = `🌐 <b>Target:</b> ${platform}
 
-📝 <b>Main Caption (FB/IG/TikTok/TG):</b>
+📝 <b>Main Caption (FB/IG/TG):</b>
 ${safeCaptionLong}
 
 📝 <b>X (Twitter) Short Caption:</b>

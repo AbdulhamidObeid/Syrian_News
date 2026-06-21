@@ -249,7 +249,18 @@ async function processPost(post, countQuota = true) {
             if (approvalStatus.action === 'approve') {
                 console.log(`✅ Post ${post.originalId} APPROVED! Broadcasting...`);
                 await publishToChannel(imagePaths, currentPayload.socialMediaCaptionLong);
-                await publishPost(imagePaths, currentPayload.socialMediaCaptionLong, currentPayload.socialMediaCaptionShort);
+                await publishPost(imagePaths, currentPayload.socialMediaCaptionLong, currentPayload.socialMediaCaptionShort, post.originalId, sendErrorAlert);
+                
+                // Add to history and remove from memory ONLY after successful publishing!
+                let currentHistory = loadJson(HISTORY_PATH);
+                if (!currentHistory.includes(post.originalId)) {
+                    currentHistory.push(post.originalId);
+                    saveJson(HISTORY_PATH, currentHistory);
+                }
+                let currentMemory = loadJson(MEMORY_PATH);
+                currentMemory = currentMemory.filter(m => String(m.originalId) !== String(post.originalId));
+                saveJson(MEMORY_PATH, currentMemory);
+
                 if (countQuota) {
                     recordPost();
                     
@@ -268,6 +279,12 @@ async function processPost(post, countQuota = true) {
                 return true;
             } else if (approvalStatus.action === 'reject') {
                 console.log(`🗑️ Post REJECTED by Admin. Discarding.`);
+                
+                // Remove from memory immediately since it was rejected
+                let currentMemory = loadJson(MEMORY_PATH);
+                currentMemory = currentMemory.filter(m => String(m.originalId) !== String(post.originalId));
+                saveJson(MEMORY_PATH, currentMemory);
+                
                 shouldCleanup = true;
                 return false;
 
@@ -383,9 +400,9 @@ async function runCycle() {
         let memory = loadJson(MEMORY_PATH);
         const history = loadJson(HISTORY_PATH);
 
-        // 1. Cleanup Memory (> 24 hours old)
-        const ttlMs = (scheduleConfig.news_memory_ttl_hours || 24) * 60 * 60 * 1000;
-        memory = memory.filter(m => (Date.now() - m.fetchedAt) < ttlMs);
+        // 1. Cleanup Memory (> 24 hours old) - DISABLED: Keep all curated stories until published
+        // const ttlMs = (scheduleConfig.news_memory_ttl_hours || 24) * 60 * 60 * 1000;
+        // memory = memory.filter(m => (Date.now() - m.fetchedAt) < ttlMs);
 
         // 2. Run Scout — pull fresh news
         console.log("📡 Triggering Scout Engine...");
@@ -419,13 +436,13 @@ async function runCycle() {
         // Sort memory by score descending
         memory.sort((a, b) => b.score - a.score);
 
-        // 🧠 Smart Memory Cap — keep only the top N articles to prevent unbounded growth
-        const maxMemSize = scheduleConfig.max_memory_size || 30;
-        if (memory.length > maxMemSize) {
-            const trimmed = memory.length - maxMemSize;
-            memory = memory.slice(0, maxMemSize);
-            console.log(`✂️  Memory trimmed: removed ${trimmed} lower-scored articles (cap: ${maxMemSize}). Best content preserved.`);
-        }
+        // 🧠 Smart Memory Cap — keep only the top N articles to prevent unbounded growth - DISABLED: Keep all curated stories until published
+        // const maxMemSize = scheduleConfig.max_memory_size || 30;
+        // if (memory.length > maxMemSize) {
+        //     const trimmed = memory.length - maxMemSize;
+        //     memory = memory.slice(0, maxMemSize);
+        //     console.log(`✂️  Memory trimmed: removed ${trimmed} lower-scored articles (cap: ${maxMemSize}). Best content preserved.`);
+        // }
 
         saveJson(MEMORY_PATH, memory);
 
@@ -485,17 +502,6 @@ async function runCycle() {
             const bestPost = currentMemory.find(m => !m.isUrgent);
             if (bestPost) {
                 console.log(`⚡ Best post available: "${bestPost.originalId}" (Score: ${bestPost.score}). Posting now!`);
-                // Remove from memory immediately to prevent concurrent cycles picking it up
-                currentMemory = currentMemory.filter(m => m.originalId !== bestPost.originalId);
-                saveJson(MEMORY_PATH, currentMemory);
-
-                // Add to history BEFORE processing
-                let currentHistory = loadJson(HISTORY_PATH);
-                if(!currentHistory.includes(bestPost.originalId)) {
-                    currentHistory.push(bestPost.originalId);
-                    saveJson(HISTORY_PATH, currentHistory);
-                }
-
                 const published = await processPost(bestPost);
             } else {
                 console.log("📭 No posts in memory to publish right now.");
@@ -531,7 +537,6 @@ registerBoostCommand(async (ctx) => {
     
     try {
         let memory = loadJson(MEMORY_PATH);
-        const history = loadJson(HISTORY_PATH);
 
         // Find the best non-urgent story in the library
         const overridePost = memory.find(m => !m.isUrgent);
@@ -541,17 +546,6 @@ registerBoostCommand(async (ctx) => {
 
         console.log(`\n🚀 OVERRIDE PUBLISH triggered via /postnow`);
         console.log(`📌 Using best story: ${overridePost.originalId} (Score: ${overridePost.score})`);
-
-        // Remove from memory immediately
-        const updatedMemory = loadJson(MEMORY_PATH).filter(m => m.originalId !== overridePost.originalId);
-        saveJson(MEMORY_PATH, updatedMemory);
-
-        // Add to history BEFORE processing to prevent concurrent pick-ups
-        let currentHistory = loadJson(HISTORY_PATH);
-        if (!currentHistory.includes(overridePost.originalId)) {
-            currentHistory.push(overridePost.originalId);
-            saveJson(HISTORY_PATH, currentHistory);
-        }
 
         // Process it — countQuota=false so it doesn't burn a quota slot
         const published = await processPost(overridePost, false);

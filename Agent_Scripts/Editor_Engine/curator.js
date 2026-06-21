@@ -179,7 +179,7 @@ const copywritingSchema = {
                 required: ["type"]
             }
         },
-        socialMediaCaptionLong: { type: "string", description: "Long, engaging caption for FB/IG/TikTok with many hashtags." },
+        socialMediaCaptionLong: { type: "string", description: "Long, engaging caption for FB/IG with many hashtags." },
         socialMediaCaptionShort: { type: "string", description: "Strictly concise caption for X (under 240 chars) with essential hashtags." }
     },
     required: ["contentType", "isCarousel", "subHeadline", "imageStrategy", "socialMediaCaptionLong", "socialMediaCaptionShort"]
@@ -232,7 +232,7 @@ Write a highly specific, photorealistic prompt in English describing EXACTLY wha
 
 CRITICAL CAPTION & HASHTAG RULE (DUAL OUTPUT):
 You MUST generate TWO distinct captions:
-1. "socialMediaCaptionLong": For Facebook, Instagram, TikTok. This must be informative, engaging, include a question for engagement, and span 2 to 3 sentences. You MUST use a newline character '\\n' to separate the main text from the hashtags. Include the mandatory hashtags "${brandConfig.brand.hashtags.join(' ')}" PLUS 3 to 5 additional highly relevant hashtags to maximize exposure.
+1. "socialMediaCaptionLong": For Facebook and Instagram. This must be informative, engaging, include a question for engagement, and span 2 to 3 sentences. You MUST use a newline character '\\n' to separate the main text from the hashtags. Include the mandatory hashtags "${brandConfig.brand.hashtags.join(' ')}" PLUS 3 to 5 additional highly relevant hashtags to maximize exposure.
 2. "socialMediaCaptionShort": For X (Twitter). This must be extremely concise, straight to the point, and strictly under 240 characters total. Use a newline '\\n' before hashtags. Include the mandatory hashtags "${brandConfig.brand.hashtags.join(' ')}" PLUS only 1 or 2 extra highly relevant hashtags.
 
 Example format for Long:

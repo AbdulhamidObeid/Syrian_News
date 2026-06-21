@@ -3,8 +3,8 @@
 This document defines the exact execution schedule and rules the HashSYR24 agents must follow for frequency, urgency, and platform distribution.
 
 ## 1. Platform Distribution Strategy
-*   **Universal Design (Default):** The Designer Agent generates ONE high-quality master design (1080x1350). The Publisher Agent automatically adapts this single asset for all platforms (e.g., uploading the image to FB/IG/X, and dynamically converting it to MP4 for TikTok).
-*   **Telegram Notification:** When the Telegram Bot sends a post for approval, it will explicitly state the target platform (e.g., `🌐 Platforms: All` or `📱 Platform: TikTok Only`).
+*   **Universal Design (Default):** The Designer Agent generates ONE high-quality master design (1080x1350). The Publisher Agent automatically adapts this single asset for all platforms (e.g., uploading the image to FB/IG/X).
+*   **Telegram Notification:** When the Telegram Bot sends a post for approval, it will explicitly state the target platforms.
 
 ## 2. Posting Frequency & Quotas
 

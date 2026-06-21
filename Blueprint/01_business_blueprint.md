@@ -21,7 +21,6 @@ To avoid the "spam trap" of high-frequency bot posting, we focus on **Quality & 
 *   **Facebook (The Absolute Core):** Primary engine for growth. Focus on highly shareable community news, discussion-starter posts, and engaging videos. (Post frequency: 3-5 times/day).
 *   **Instagram (The Visual Identity):** Focus on beautiful typography, infographics, "swipe-to-read" carousel news, and engaging Reels for quick summaries. (Post frequency: 1 Reel daily, 1 Carousel every 2 days).
 *   **X / Twitter (The Authority Builder):** Use for breaking news, official statements, and "Thread-First Journalism." Reply-staking in early growth to hijack reach. (Post frequency: 2-3 threads/posts daily).
-*   **TikTok (The Virality Engine):** Short, dynamic, vertical video news with intense 3-second visual hooks. (Post frequency: 1-2 Reels per day).
 *   **WhatsApp Channels:** Direct lifeline for urgent breaking news and daily "Top 5" summaries.
 
 ---
