@@ -49,6 +49,9 @@ function downloadFile(url, dest) {
  * Automates the browser generation using the open Higgsfield tab
  */
 async function generateImageViaBrowser(promptText, referenceImagePath = null, imageModel = 'nano-banana-pro') {
+    if (referenceImagePath) {
+        promptText = `A high quality photo, shot from a slightly different camera angle, no watermark, realistic details, depicting: ${promptText}`;
+    }
     console.log(`Connecting to running Chrome on 9222 for Higgsfield generation (model: ${imageModel})...`);
     let browser;
     try {
@@ -180,11 +183,24 @@ async function generateImageViaBrowser(promptText, referenceImagePath = null, im
         await new Promise(r => setTimeout(r, 1000));
 
 
-        // 2. Upload reference image if strategy is 'reference'
-        // DISABLED BY ADMIN: Reference images were causing distorted "wrong" outputs.
-        // We now rely entirely on the text prompt.
+        // 3. Upload reference image if strategy is 'reference'
         if (referenceImagePath) {
-            console.log(`[DISABLED] Skipping reference image upload: ${referenceImagePath}`);
+            console.log(`Uploading reference image to Higgsfield: ${referenceImagePath}`);
+            const fileInput = await page.$('input[type="file"]');
+            if (fileInput) {
+                await fileInput.uploadFile(referenceImagePath);
+                // Trigger change event to notify React
+                await page.evaluate(() => {
+                    const input = document.querySelector('input[type="file"]');
+                    if (input) {
+                        input.dispatchEvent(new Event('change', { bubbles: true }));
+                    }
+                });
+                console.log("Uploaded file. Waiting 3 seconds for attachment...");
+                await new Promise(r => setTimeout(r, 3000));
+            } else {
+                console.warn("⚠️ Warning: File input element for reference image not found on page.");
+            }
         }
 
         // 4. Ensure Unlimited Toggle is ON
@@ -309,34 +325,39 @@ async function generateImageViaBrowser(promptText, referenceImagePath = null, im
         console.log(`Successfully generated new image in browser: ${cleanUrl}`);
 
         // 🧹 Cleanup: Remove reference image from Higgsfield UI so it doesn't bleed into next run
-        if (referenceImagePath) {
-            try {
-                await page.evaluate(() => {
-                    // Try various selectors Higgsfield uses for the reference image remove button
-                    const selectors = [
-                        'button[aria-label="Remove image"]',
-                        'button[aria-label="remove"]',
-                        '[data-testid="remove-reference"]',
-                        'button.remove-reference',
-                    ];
-                    for (const sel of selectors) {
-                        const btn = document.querySelector(sel);
-                        if (btn) { btn.click(); return true; }
+        try {
+            let removedCount = 0;
+            let attempts = 0;
+            const maxAttempts = 10;
+            
+            while (attempts < maxAttempts) {
+                attempts++;
+                const stillExists = await page.evaluate(() => {
+                    const btn = document.querySelector('.cursor-grab button.absolute.-top-3.-right-3');
+                    if (btn) {
+                        btn.click();
+                        return true;
                     }
-                    // Fallback: look for any × button near the reference image preview
-                    const allButtons = Array.from(document.querySelectorAll('button'));
-                    const removeBtn = allButtons.find(b =>
-                        (b.innerText === '×' || b.innerText === 'x' || b.getAttribute('aria-label')?.toLowerCase().includes('remov')) &&
-                        b.closest('[id*="reference"], [class*="reference"], [class*="upload"]')
-                    );
-                    if (removeBtn) { removeBtn.click(); return true; }
+                    const fallbackBtn = document.querySelector('.cursor-grab button');
+                    if (fallbackBtn) {
+                        fallbackBtn.click();
+                        return true;
+                    }
                     return false;
                 });
-                await new Promise(r => setTimeout(r, 800));
-                console.log('✅ Reference image removed from Higgsfield UI.');
-            } catch (cleanupErr) {
-                console.warn(`⚠️ Could not auto-remove reference image from UI: ${cleanupErr.message}`);
+                
+                if (!stillExists) {
+                    break;
+                }
+                
+                removedCount++;
+                await new Promise(r => setTimeout(r, 500));
             }
+            if (removedCount > 0) {
+                console.log(`✅ Successfully removed ${removedCount} reference image(s) from Higgsfield UI.`);
+            }
+        } catch (cleanupErr) {
+            console.warn(`⚠️ Could not auto-remove reference image from UI: ${cleanupErr.message}`);
         }
 
         return cleanUrl;

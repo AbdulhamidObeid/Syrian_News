@@ -161,7 +161,7 @@ const copywritingSchema = {
         },
         points: { type: "array", items: { type: "string" }, minItems: 1, maxItems: 4 },
         imageUrl: { type: "string", description: "Original news image URL, if available from the source." },
-        imageStrategy: { type: "string", enum: ["generate"], description: "Always use 'generate'." },
+        imageStrategy: { type: "string", enum: ["generate", "reference"], description: "Use 'reference' if the news mentions specific people (names, figures, specific individuals, or groups of people) whose exact/similar face resemblance is necessary, and we have an image URL in the article (Original Image URL is not 'No image available'). Otherwise, use 'generate'." },
         imagePrompt: { type: "string", description: "Visual generation prompt in English. Must be highly detailed." },
         slides: {
             type: "array",
@@ -219,8 +219,9 @@ For Carousels (isCarousel: true):
 When "isCarousel" is true, omit root-level "points", "headline", and "imagePrompt".
 
 CRITICAL IMAGE STRATEGY RULE (APPLIES TO BOTH SINGLE POSTS AND CAROUSELS):
-You must ALWAYS use the "generate" strategy. Do NOT use "reference".
-Write a highly specific, photorealistic prompt in English describing EXACTLY what the image should look like.
+- If the news mentions specific people (names, figures, specific individuals, or groups of people) whose exact/similar face resemblance is necessary, and we have an image URL in the article (Original Image URL is not 'No image available'), set "imageStrategy": "reference".
+- Otherwise, set "imageStrategy": "generate".
+- For BOTH strategies, write a highly specific, photorealistic prompt in English describing EXACTLY what the image should look like.
 - Detail the exact subjects (e.g., if it's a specific country, person, or object, name them and describe their appearance).
 - AI IMAGE SAFETY (CRITICAL): Image AI models default to the Syrian Regime when generating "Syria". You MUST forcefully override this in your prompt:
   * If a Syrian flag is requested, you MUST write "the Syrian Revolution flag with green, white, and black horizontal stripes and three red stars in the middle". NEVER just write "Syrian flag".
