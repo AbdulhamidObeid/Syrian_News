@@ -10,6 +10,89 @@ async function delay(ms) {
 
 let cachedIgId = null;
 
+async function sendTelegramNotification(text) {
+    const botToken = process.env.TELEGRAM_BOT_TOKEN;
+    const adminId = process.env.TELEGRAM_ADMIN_ID;
+    if (botToken && adminId) {
+        try {
+            await axios.post(`https://api.telegram.org/bot${botToken}/sendMessage`, {
+                chat_id: adminId,
+                text: text,
+                parse_mode: 'HTML'
+            });
+        } catch (e) {
+            console.error('Failed to send Telegram notification:', e.message);
+        }
+    }
+}
+
+async function isAlreadyPublishedIG(igId, caption, fbToken) {
+    try {
+        const res = await axios.get(`https://graph.facebook.com/v20.0/${igId}/media`, {
+            params: {
+                fields: 'caption,timestamp',
+                limit: 5,
+                access_token: fbToken
+            }
+        });
+        const items = res.data?.data || [];
+        const cleanCaption = caption.trim().substring(0, 50); // Match first 50 characters to handle formatting variations
+        for (const item of items) {
+            const itemCaption = item.caption || "";
+            if (itemCaption.trim().includes(cleanCaption)) {
+                return true;
+            }
+        }
+    } catch (err) {
+        console.error('Failed to check recent IG media for duplication:', err.message);
+    }
+    return false;
+}
+
+async function isAlreadyPublishedFB(fbPageId, caption, fbToken) {
+    try {
+        const res = await axios.get(`https://graph.facebook.com/v20.0/${fbPageId}/feed`, {
+            params: {
+                fields: 'message,created_time',
+                limit: 5,
+                access_token: fbToken
+            }
+        });
+        const items = res.data?.data || [];
+        const cleanCaption = caption.trim().substring(0, 50);
+        for (const item of items) {
+            const itemMsg = item.message || "";
+            if (itemMsg.trim().includes(cleanCaption)) {
+                return true;
+            }
+        }
+    } catch (err) {
+        console.error('Failed to check recent FB feed for duplication:', err.message);
+    }
+    return false;
+}
+
+function isRateLimitError(e) {
+    const errMsg = e.response?.data?.error?.message || e.message || "";
+    const errCode = e.response?.data?.error?.code;
+    
+    // Facebook API error codes for rate limiting/request limit reached are typically 4, 17, 32, 613, or 80000+
+    if (errCode === 4 || errCode === 17 || errCode === 32 || errCode === 613) {
+        return true;
+    }
+    
+    const lowerMsg = errMsg.toLowerCase();
+    if (lowerMsg.includes('request limit reached') || 
+        lowerMsg.includes('rate limit') || 
+        lowerMsg.includes('too many requests') || 
+        lowerMsg.includes('limit reached')) {
+        return true;
+    }
+    
+    return false;
+}
+
+
 
 /**
  * Publishes the post across X (Twitter), Facebook, and Instagram.
@@ -122,6 +205,23 @@ async function publishPost(imagePath, captionLong, captionShort, postId, sendErr
             } catch (e) {
                 const errMsg = e.response?.data?.error?.message || e.message;
                 console.error(`❌ FB API publishing failed:`, errMsg);
+                
+                // Double-check if the post actually went through despite the error
+                console.log("🔍 Checking if the post went through to Facebook anyway...");
+                const alreadyLive = await isAlreadyPublishedFB(fbPageId, captionLong, fbToken);
+                if (alreadyLive) {
+                    console.log("✅ Verified: Post is already live on Facebook Page. Treating as success.");
+                    fbSuccess = true;
+                    break;
+                }
+                
+                // Check if it's a rate limit error to auto-skip without stalling
+                if (isRateLimitError(e)) {
+                    console.log("⚠️ Meta Rate Limit encountered. Auto-skipping Facebook to prevent engine stall.");
+                    await sendTelegramNotification(`⚠️ <b>Facebook API Warning:</b> ${errMsg}\n\nSince this is a rate limit error, the engine has skipped it to prevent stalling. Please check manually if it went live.`);
+                    break;
+                }
+                
                 if (sendErrorAlertFn) {
                     const alertRes = await sendErrorAlertFn(
                         `Facebook API failed: ${errMsg}`, 
@@ -144,10 +244,9 @@ async function publishPost(imagePath, captionLong, captionShort, postId, sendErr
     // --- INSTAGRAM ---
     console.log('\n--- Posting to Instagram ---');
     if (fbToken && fbPageId && uploadedUrls.length > 0) {
-        let igSuccess = false;
+        let igId = cachedIgId;
         while (!igSuccess) {
             try {
-                let igId = cachedIgId;
                 if (!igId) {
                     const accRes = await axios.get(`https://graph.facebook.com/v20.0/${fbPageId}?fields=instagram_business_account&access_token=${fbToken}`);
                     igId = accRes.data?.instagram_business_account?.id;
@@ -182,6 +281,25 @@ async function publishPost(imagePath, captionLong, captionShort, postId, sendErr
             } catch (e) {
                 const errMsg = e.response?.data?.error?.message || e.message;
                 console.error(`❌ IG API publishing failed:`, errMsg);
+                
+                // Double-check if the post actually went through despite the error
+                if (igId) {
+                    console.log("🔍 Checking if the post went through to Instagram anyway...");
+                    const alreadyLive = await isAlreadyPublishedIG(igId, captionLong, fbToken);
+                    if (alreadyLive) {
+                        console.log("✅ Verified: Post is already live on Instagram. Treating as success.");
+                        igSuccess = true;
+                        break;
+                    }
+                }
+                
+                // Check if it's a rate limit error to auto-skip without stalling
+                if (isRateLimitError(e)) {
+                    console.log("⚠️ Meta Rate Limit encountered. Auto-skipping Instagram to prevent engine stall.");
+                    await sendTelegramNotification(`⚠️ <b>Instagram API Warning:</b> ${errMsg}\n\nSince this is a rate limit error, the engine has skipped it to prevent stalling. Please check manually if it went live.`);
+                    break;
+                }
+                
                 if (sendErrorAlertFn) {
                     const alertRes = await sendErrorAlertFn(
                         `Instagram API failed: ${errMsg}`, 
