@@ -52,7 +52,7 @@ async function generateImageViaBrowser(promptText, referenceImagePath = null, im
     console.log(`Connecting to running Chrome on 9222 for Higgsfield generation (model: ${imageModel})...`);
     let browser;
     try {
-        browser = await puppeteer.connect({ browserURL: 'http://localhost:9222' });
+        browser = await puppeteer.connect({ browserURL: 'http://localhost:9222', protocolTimeout: 120000 });
     } catch (e) {
         console.log("Chrome not running on port 9222. Launching it automatically...");
         const { spawn } = require('child_process');
@@ -63,21 +63,23 @@ async function generateImageViaBrowser(promptText, referenceImagePath = null, im
         
         console.log("Waiting 5 seconds for Chrome to start...");
         await new Promise(r => setTimeout(r, 5000));
-        browser = await puppeteer.connect({ browserURL: 'http://localhost:9222' });
+        browser = await puppeteer.connect({ browserURL: 'http://localhost:9222', protocolTimeout: 120000 });
     }
 
     const higgsfieldUrl = `https://higgsfield.ai/ai/image?model=${imageModel}`;
 
     try {
-        const pages = await browser.pages();
-        let page = pages.find(p => p.url().includes('ai/image') || p.url().includes('higgsfield'));
-        if (!page) {
+        const targets = await browser.targets();
+        const higgsfieldTarget = targets.find(t => t.type() === 'page' && (t.url().includes('ai/image') || t.url().includes('higgsfield')));
+        let page;
+        if (!higgsfieldTarget) {
             console.log(`Higgsfield tab not found, creating a new one (model: ${imageModel})...`);
             page = await browser.newPage();
-            await page.goto(higgsfieldUrl, { waitUntil: 'networkidle2' });
+            await page.goto(higgsfieldUrl, { waitUntil: 'domcontentloaded', timeout: 60000 });
         } else {
             console.log(`Reloading Higgsfield model to ${imageModel} to clear state...`);
-            await page.goto(higgsfieldUrl, { waitUntil: 'networkidle2' });
+            page = await higgsfieldTarget.page();
+            await page.goto(higgsfieldUrl, { waitUntil: 'domcontentloaded', timeout: 60000 });
         }
 
         console.log(`Connected to: ${page.url()}`);
@@ -104,10 +106,11 @@ async function generateImageViaBrowser(promptText, referenceImagePath = null, im
             // In the Chrome profile popup, look for 95dddesigns@gmail.com
             // Note: Since this is OAuth popup, we might not be able to evaluate in it if it's a cross-origin popup.
             // But if it's the same tab redirection:
-            const pagesAfter = await browser.pages();
-            const authPage = pagesAfter.find(p => p.url().includes('accounts.google.com'));
-            if (authPage) {
+            const targetsAfter = await browser.targets();
+            const authTarget = targetsAfter.find(t => t.type() === 'page' && t.url().includes('accounts.google.com'));
+            if (authTarget) {
                 console.log("Google Auth page detected. Attempting to select 95dddesigns@gmail.com");
+                const authPage = await authTarget.page();
                 await authPage.evaluate(() => {
                     const accounts = Array.from(document.querySelectorAll('div[data-identifier]'));
                     const target = accounts.find(a => a.getAttribute('data-identifier') === '95dddesigns@gmail.com');
@@ -126,7 +129,7 @@ async function generateImageViaBrowser(promptText, referenceImagePath = null, im
             }
             
             // Go back to the image generation url to ensure we're on the right page
-            await page.goto('https://higgsfield.ai/ai/image?model=nano-banana-pro', { waitUntil: 'networkidle2' });
+            await page.goto('https://higgsfield.ai/ai/image?model=nano-banana-pro', { waitUntil: 'domcontentloaded', timeout: 60000 });
         }
 
         // Wait for past history images to load (if any) to prevent race conditions

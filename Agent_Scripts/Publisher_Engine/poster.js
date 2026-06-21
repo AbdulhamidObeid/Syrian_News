@@ -31,7 +31,7 @@ async function sendTelegramAlert(message) {
 async function getBrowser() {
     let browser;
     try {
-        browser = await puppeteer.connect({ browserURL: 'http://127.0.0.1:9222', defaultViewport: null });
+        browser = await puppeteer.connect({ browserURL: 'http://127.0.0.1:9222', defaultViewport: null, protocolTimeout: 120000 });
     } catch (e) {
         const profilePath = path.join(os.homedir(), '.gemini', 'antigravity-browser-profile');
         browser = await puppeteer.launch({
@@ -111,8 +111,10 @@ async function publishPost(imagePath, captionLong, captionShort) {
     if (!xApiSuccess) {
         await sendTelegramAlert('⚠️ X (Twitter) API failed 3 times. Resorting to Web-Bot.');
         try {
-            if (!browser) { browser = await getBrowser(); pages = await browser.pages(); }
-            let p = pages.find(pg => pg.url().includes('x.com')) || await browser.newPage();
+            if (!browser) browser = await getBrowser();
+            const targets = await browser.targets();
+            const xTarget = targets.find(t => t.type() === 'page' && t.url().includes('x.com'));
+            let p = xTarget ? await xTarget.page() : await browser.newPage();
             await p.bringToFront(); await p.goto('https://x.com/compose/post', { waitUntil: 'networkidle2' }); await delay(4000);
             const fileInput = await p.waitForSelector('input[data-testid="fileInput"]', { timeout: 5000 });
             for (const img of imageArray) { await fileInput.uploadFile(img); await delay(1000); }
@@ -156,8 +158,10 @@ async function publishPost(imagePath, captionLong, captionShort) {
     if (!fbApiSuccess) {
         await sendTelegramAlert('⚠️ Facebook API failed 3 times. Resorting to Web-Bot.');
         try {
-            if (!browser) { browser = await getBrowser(); pages = await browser.pages(); }
-            let p = pages.find(pg => pg.url().includes('facebook.com')) || await browser.newPage();
+            if (!browser) browser = await getBrowser();
+            const targets = await browser.targets();
+            const fbTarget = targets.find(t => t.type() === 'page' && t.url().includes('facebook.com'));
+            let p = fbTarget ? await fbTarget.page() : await browser.newPage();
             await p.bringToFront(); await p.goto('https://www.facebook.com/HashSYR24', { waitUntil: 'networkidle2' }); await delay(5000);
             const fileInputs = await p.$$('input[type="file"][accept*="image"]');
             if (fileInputs.length > 0) {
@@ -210,8 +214,10 @@ async function publishPost(imagePath, captionLong, captionShort) {
     if (!igApiSuccess) {
         await sendTelegramAlert('⚠️ Instagram API failed 3 times. Resorting to Web-Bot.');
         try {
-            if (!browser) { browser = await getBrowser(); pages = await browser.pages(); }
-            let p = pages.find(pg => pg.url().includes('instagram.com')) || await browser.newPage();
+            if (!browser) browser = await getBrowser();
+            const targets = await browser.targets();
+            const igTarget = targets.find(t => t.type() === 'page' && t.url().includes('instagram.com'));
+            let p = igTarget ? await igTarget.page() : await browser.newPage();
             await p.bringToFront(); await p.goto('https://www.instagram.com', { waitUntil: 'networkidle2' }); await delay(4000);
             
             await p.evaluate(() => {

@@ -59,7 +59,8 @@ async function run() {
 async function approveUrl(url) {
     console.log("\nConnecting to running Chrome on 9222 to approve device code...");
     const browser = await puppeteer.connect({
-        browserURL: 'http://localhost:9222'
+        browserURL: 'http://localhost:9222',
+        protocolTimeout: 120000
     });
 
     const page = await browser.newPage();

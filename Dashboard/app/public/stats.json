@@ -1,12 +1,12 @@
 {
-  "lastUpdated": "2026-06-20T15:39:38.735Z",
+  "lastUpdated": "2026-06-21T13:39:30.622Z",
   "platforms": {
     "facebook": {
       "followers": 1,
       "connected": true
     },
     "instagram": {
-      "followers": 2,
+      "followers": 6,
       "connected": true
     },
     "telegram": {
@@ -19,25 +19,25 @@
     }
   },
   "kpis": {
-    "totalAudience": 5,
-    "postsPublished": 10,
-    "storyLibrary": 29,
-    "postsToday": 9,
+    "totalAudience": 9,
+    "postsPublished": 24,
+    "storyLibrary": 31,
+    "postsToday": 1,
     "weeklyPostCounts": {
-      "2026-06-14": 0,
       "2026-06-15": 0,
       "2026-06-16": 0,
       "2026-06-17": 0,
       "2026-06-18": 8,
       "2026-06-19": 5,
-      "2026-06-20": 9
+      "2026-06-20": 13,
+      "2026-06-21": 1
     }
   },
   "platformInsights": {
     "facebook": {
-      "weeklyViews": 3,
+      "weeklyViews": 2,
       "weeklyEngaged": 0,
-      "weeklyNewFollows": 1,
+      "weeklyNewFollows": 0,
       "postsLikes": 0,
       "postsComments": 0,
       "postsShares": 0,
@@ -45,8 +45,8 @@
     },
     "instagram": {
       "weeklyReach": 0,
-      "totalInteractions": 7,
-      "likes": 7,
+      "totalInteractions": 10,
+      "likes": 10,
       "comments": 0,
       "saves": 0,
       "shares": 0,
@@ -69,10 +69,10 @@
   },
   "topPosts": [
     {
-      "id": "1139516419249724_122107360815359008",
-      "message": "تمكنت وحدات وزارة الداخلية بالتعاون مع الاستخبارات العامة من إلقاء القبض على أحد أبرز مسؤولي تصنيع العبوات الناسفة التابعين لتنظيم داعش في ا",
-      "thumbnail": "https://scontent.fruh5-1.fna.fbcdn.net/v/t39.30808-6/723948302_122107360797359008_2313733615671980684_n.jpg?stp=dst-jpg_p720x720_tt6&_nc_cat=108&ccb=1-7&_nc_sid=127cfc&_nc_ohc=-dbG0FxwOJQQ7kNvwF4OdmE&_nc_oc=Ado5YH-M6etJkKqK0lcLE15sBVDGJgCYrD4ezmIm4qrmWpL3afxR9W_tZomI37imtz1Q1iNTMkadRjWobzHk0aH9&_nc_zt=23&_nc_ht=scontent.fruh5-1.fna&edm=APyxFHYEAAAA&_nc_gid=fMcpaDkL8FY7KsbqQ0r2tg&_nc_tpa=Q5bMBQHtWoha_lnyRQ73E8LKjUKU5jt_t46h07eih8iLMo7AllHw9xJ2Lr442fzQy9mxEjK9dbWZKSokGA&oh=00_Af-GT-W-91OqVqB8Vpu0AGm4aUnylgI_Q-JGfKF9OUBzuQ&oe=6A3C89F6",
-      "createdAt": "2026-06-20T15:32:53+0000",
+      "id": "1139516419249724_122107958481359008",
+      "message": "تغييرات جذرية في نظام التأهل لكأس العالم 2026 تثير جدلاً واسعاً في الأوساط الرياضية العالمية. كيف سيؤثر هذا النظام الجديد على فرص المنتخبات ",
+      "thumbnail": "https://scontent.fruh6-2.fna.fbcdn.net/v/t39.30808-6/727940811_122107958223359008_2614942726900469160_n.jpg?stp=dst-jpg_p720x720_tt6&_nc_cat=103&ccb=1-7&_nc_sid=127cfc&_nc_ohc=YuB203Q3CisQ7kNvwHYwRSv&_nc_oc=Adq-WsGh62kSVe-4xLmq48LoOyhvBMQvjn6yDGX3pVKir1lhovZ8AfZ5EttE_K5nHzOuIvi-nVa-OCYXgKjt4iTX&_nc_zt=23&_nc_ht=scontent.fruh6-2.fna&edm=APyxFHYEAAAA&_nc_gid=nn3-nQMv_fO47bj8GgKaQw&_nc_tpa=Q5bMBQGvCG8gKlCHlS6L-feFqwPE52caRnTBJ5nv6iWS_nEB0peA7pzlqHkSGGh_s4dE_KaKpBC9LIHiJA&oh=00_Af_HLKrLjg2gUi7fqoCDZ60V1DbGhnBDjHMEtKGrM4-8TA&oe=6A3DD71E",
+      "createdAt": "2026-06-21T07:21:05+0000",
       "likes": 0,
       "comments": 0,
       "shares": 0,
@@ -80,10 +80,10 @@
       "platform": "facebook"
     },
     {
-      "id": "1139516419249724_122107351983359008",
-      "message": "شهدت مدينة السويداء وقفة احتجاجية لأهالي القرى المهجرة من الريف الغربي والشمالي، مطالبين بإنهاء سيطرة المجموعات المسلحة على منازلهم وتحديد م",
-      "thumbnail": "https://scontent.fruh5-1.fna.fbcdn.net/v/t39.30808-6/727360960_122107351965359008_8463819312787000147_n.jpg?stp=dst-jpg_p720x720_tt6&_nc_cat=108&ccb=1-7&_nc_sid=127cfc&_nc_ohc=JlSqSCtYkpgQ7kNvwFxcgXh&_nc_oc=AdpE7iBCAN45HdD923zkdS2ohP0u_w6bZXiWUriYLqb6zZ_579VC_IDVqigG7Dw97W9aOz6cHwpd1XGqfI0UI0TO&_nc_zt=23&_nc_ht=scontent.fruh5-1.fna&edm=APyxFHYEAAAA&_nc_gid=fMcpaDkL8FY7KsbqQ0r2tg&_nc_tpa=Q5bMBQFXtbxVdlLuUZBxztysm_vJNiZEj5hYtwVAjz_X0DSwj06nQzHTp9n8NkAWS7-OUXQ4dz-woVKT7A&oh=00_Af_dC3zpgrtYa_HYWz53MYLRMCTfxPMfp75-wSVBwiufJw&oe=6A3C73CB",
-      "createdAt": "2026-06-20T15:21:00+0000",
+      "id": "1139516419249724_122107542393359008",
+      "message": "استشهد مصور قناة الجزيرة مباشر، الصحفي أحمد وشاح، اليوم السبت إثر غارة جوية إسرائيلية استهدفت وسط قطاع غزة. ننعى ببالغ الحزن والأسى زميلاً ج",
+      "thumbnail": "https://scontent.fruh6-1.fna.fbcdn.net/v/t39.30808-6/728334909_122107542375359008_8423792554136341681_n.jpg?stp=dst-jpg_p720x720_tt6&_nc_cat=101&ccb=1-7&_nc_sid=127cfc&_nc_ohc=etXHB3xt5uAQ7kNvwHVQXCn&_nc_oc=AdqTrAtz5Vte8AFJYx13uT2FSWxmd9RMy-056ihzTFZzOJBxrFO3RDpCv0y7_BRYQvvKVlQ0xEm-2YfqJyZoYh-M&_nc_zt=23&_nc_ht=scontent.fruh6-1.fna&edm=APyxFHYEAAAA&_nc_gid=nn3-nQMv_fO47bj8GgKaQw&_nc_tpa=Q5bMBQHsCDWfEjIRLXNSipPdrmT48BAq7Yg-4gpytjrf5C_pdyWq2HRsoIEzhjRz9KFy7HV3Y6ogG9etNQ&oh=00_Af9PmJXkVX7GGHwwlHBhbK-9ftMcYcvIjbL1HkplqkIR-g&oe=6A3DD2C8",
+      "createdAt": "2026-06-20T19:11:59+0000",
       "likes": 0,
       "comments": 0,
       "shares": 0,
@@ -91,10 +91,10 @@
       "platform": "facebook"
     },
     {
-      "id": "1139516419249724_122107307499359008",
-      "message": "أعلن الحرس الثوري الإيراني اليوم السبت إغلاق مضيق هرمز بشكل رسمي، مرجعاً السبب إلى عدم التزام واشنطن بتعهداتها السابقة. كيف تتوقعون تأثير هذ",
-      "thumbnail": "https://scontent.fruh6-2.fna.fbcdn.net/v/t39.30808-6/725439864_122107307481359008_7261685931407047462_n.jpg?stp=dst-jpg_p720x720_tt6&_nc_cat=111&ccb=1-7&_nc_sid=127cfc&_nc_ohc=0ItCbc7x3FcQ7kNvwFaeGfw&_nc_oc=Adotyat_OVli2L-kUasmG81P3uKc0oRrypELJ01bbbwvgAJUnRMTtjTYYUB5CltoB6rIMiE1UpioUrnXUiX9RyhZ&_nc_zt=23&_nc_ht=scontent.fruh6-2.fna&edm=APyxFHYEAAAA&_nc_gid=fMcpaDkL8FY7KsbqQ0r2tg&_nc_tpa=Q5bMBQF5ijQq8c8QiWJrMTR9qOhVTtV0L2seyR98Ar9wYWzgzNKILC4ca7FE2xNnUswKzu5CukfdPPtkow&oh=00_Af8avHtJrnuRDc0OXRd8yb9qYUw2toW8m_6LxoC2Wyjc1Q&oe=6A3C9E0E",
-      "createdAt": "2026-06-20T14:29:01+0000",
+      "id": "1139516419249724_122107529697359008",
+      "message": "تغيير جذري في قوانين مونديال 2026.. الفيفا يعتمد المواجهات المباشرة كمعيار أول لفك التعادل بين المنتخبات بدلاً من فارق الأهداف. كيف سيؤثر هذ",
+      "thumbnail": "https://scontent.fruh6-2.fna.fbcdn.net/v/t39.30808-6/729149192_122107529679359008_8103185225491998695_n.jpg?stp=dst-jpg_p720x720_tt6&_nc_cat=103&ccb=1-7&_nc_sid=127cfc&_nc_ohc=O-6Ryj3fErcQ7kNvwG7YG3s&_nc_oc=Adpc_4F8KsA6PMuvfxVeD1Jj7DtpamkQvYswGLTwQ8ay2SfCUh2-_RLkudMkXIYz1blugEL3OrzrIHnFNbgYVpJK&_nc_zt=23&_nc_ht=scontent.fruh6-2.fna&edm=APyxFHYEAAAA&_nc_gid=nn3-nQMv_fO47bj8GgKaQw&_nc_tpa=Q5bMBQFdH6woTqGWu2Alv1_UZFr3LTDNvMev9s3iR-4inyaswh29ml0r3iSni-e9CJR5LzeGTKt_kCwZhA&oh=00_Af_iRvLydsR5sn3Bt7PmA0ucA3DZzpdNd72SQn8YB93dgg&oe=6A3DD25A",
+      "createdAt": "2026-06-20T18:52:40+0000",
       "likes": 0,
       "comments": 0,
       "shares": 0,
@@ -102,10 +102,10 @@
       "platform": "facebook"
     },
     {
-      "id": "1139516419249724_122107252887359008",
-      "message": "بدء تطبيق قرار تخفيض عدد أرغفة الخبز في الربطة التموينية إلى 8 أرغفة بدلاً من 10، مع بقاء السعر والوزن ثابتاً. كيف سيؤثر هذا القرار على ميزا",
-      "thumbnail": "https://scontent.fruh6-2.fna.fbcdn.net/v/t39.30808-6/726516948_122107252515359008_3703808666947091219_n.jpg?stp=dst-jpg_p720x720_tt6&_nc_cat=103&ccb=1-7&_nc_sid=127cfc&_nc_ohc=V5FL4P5gT84Q7kNvwF7JJqX&_nc_oc=Adqz1K78-RXXz3yrI_m4Sw89YLJiIiwTMk9XsY0WkZT_qKb8D-7RQvynl9EEUfNwcVeHWjXV3JOgrSYTCfWrUpdd&_nc_zt=23&_nc_ht=scontent.fruh6-2.fna&edm=APyxFHYEAAAA&_nc_gid=fMcpaDkL8FY7KsbqQ0r2tg&_nc_tpa=Q5bMBQEl7QIE3QcPk0kumxLOPCFiDizv6Ojdcln4qceCricfylxw5ysOg1UzsAjnQa_LKDt-EvYmlDtXoA&oh=00_Af_fL-P3xNSSZO_lNmzIeBqkqCBlaWxD9rVFXUbLXXQ9fA&oe=6A3C7567",
-      "createdAt": "2026-06-20T13:30:27+0000",
+      "id": "1139516419249724_122107471005359008",
+      "message": "أعلنت وزارة الداخلية السورية عن نجاح عملية أمنية في القبض على مسؤول تصنيع المتفجرات في تنظيم داعش شرقي سوريا. كيف تقيمون الجهود الأمنية المس",
+      "thumbnail": "https://scontent.fruh6-2.fna.fbcdn.net/v/t39.30808-6/727178794_122107470987359008_7698995436057676656_n.jpg?stp=dst-jpg_p720x720_tt6&_nc_cat=111&ccb=1-7&_nc_sid=127cfc&_nc_ohc=zUHwNBFCt04Q7kNvwG9OUlO&_nc_oc=AdoW6f1QR-lzvJyp412j-6Nf-ntXDetFNOaGXmBdsBFJOckPTkDUQXxEWxbxw4GE0qAJoGICnV4H-NyQfYsjl_1K&_nc_zt=23&_nc_ht=scontent.fruh6-2.fna&edm=APyxFHYEAAAA&_nc_gid=nn3-nQMv_fO47bj8GgKaQw&_nc_tpa=Q5bMBQFermMIXBOjM1WVx0Ds5uIIq9hYU4N98_IKxGFYzza6qtZS_n3iSXRLQOipwVSqDMgau7VtOiPzjA&oh=00_Af-cOdud1kEnrbqeYl3vV4etiwl9wSTghRt3Dnlm7WrvjQ&oe=6A3DCB23",
+      "createdAt": "2026-06-20T17:31:55+0000",
       "likes": 0,
       "comments": 0,
       "shares": 0,
@@ -113,10 +113,10 @@
       "platform": "facebook"
     },
     {
-      "id": "1139516419249724_122107237281359008",
-      "message": "ارتفاع حصيلة ضحايا الغارات الإسرائيلية على بلدتي شحور وقناريت في جنوب لبنان إلى 8 قتلى و17 مصاباً. كيف تقرأون تطورات الأوضاع الميدانية في ال",
-      "thumbnail": "https://scontent.fruh6-2.fna.fbcdn.net/v/t39.30808-6/723103616_122107237245359008_696751221858609797_n.jpg?stp=dst-jpg_p720x720_tt6&_nc_cat=100&ccb=1-7&_nc_sid=127cfc&_nc_ohc=sIoRl3NAD1EQ7kNvwF9DZOz&_nc_oc=AdoqhvEbE3NnXfnPV1YhjrKg5Tabe71qJwVt4tkcIDNRuYFKD_tnPcyAQbB7RsFMfbFKu7ajcYxHNzKMIef6q8fs&_nc_zt=23&_nc_ht=scontent.fruh6-2.fna&edm=APyxFHYEAAAA&_nc_gid=fMcpaDkL8FY7KsbqQ0r2tg&_nc_tpa=Q5bMBQEUiV0lBHlSjMiFeqHzZew0mUuGVWkjnbOG8x7o7QvaSd0p01LZDHSVOKujemsbVFehe9vSFmTgQA&oh=00_Af_qZWUa3_2U0giTDdzZdggI8uToplwMcxfTPoynUsCrNg&oe=6A3C9AB4",
-      "createdAt": "2026-06-20T13:13:56+0000",
+      "id": "1139516419249724_122107373787359008",
+      "message": "تتواصل عمليات البحث عن مفقودين في نهر الفرات بريف دير الزور بعد غرق ثلاثة مدنيين أثناء السباحة في حوادث متفرقة. ندعو الأهالي إلى توخي الحذر ",
+      "thumbnail": "https://scontent.fruh6-1.fna.fbcdn.net/v/t39.30808-6/723852255_122107373775359008_5100332396449375369_n.jpg?stp=dst-jpg_p720x720_tt6&_nc_cat=101&ccb=1-7&_nc_sid=127cfc&_nc_ohc=BRXzawie-aEQ7kNvwFLqnwv&_nc_oc=AdpUFlJMMKMxGu-aYx4NVBJcdjPFJ3WU5xi9RaYFJe9i7E5QlvmxxNV5MJq4FqQuLYWcLRYx2F1Rf3H9oDXDNbZ9&_nc_zt=23&_nc_ht=scontent.fruh6-1.fna&edm=APyxFHYEAAAA&_nc_gid=nn3-nQMv_fO47bj8GgKaQw&_nc_tpa=Q5bMBQEejmIsdDz9n5W54yM63R51qAQhc3U5RIBXbjKQjzb92e_gpmIex9F6vnszUIw5erNnTN8JfpKm2w&oh=00_Af8BTaxtAp0uPTT9avBvWWQvl0H5-tDJjSzRz7E5v5_Vzw&oe=6A3DABDB",
+      "createdAt": "2026-06-20T15:44:38+0000",
       "likes": 0,
       "comments": 0,
       "shares": 0,
@@ -159,7 +159,7 @@
     }
   ],
   "pipeline": {
-    "lastRun": "2026-06-20T15:39:49.487Z",
+    "lastRun": "2026-06-21T13:39:41.927Z",
     "status": "operational"
   }
 }
