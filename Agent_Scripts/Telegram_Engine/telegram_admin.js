@@ -62,15 +62,13 @@ bot.command('postnow', async (ctx) => {
     if (!_boostHandler) {
         return ctx.reply('⚠️ Override publish not initialised yet. Try again in a moment.');
     }
-    await ctx.reply(`🚀 <b>Override Publish triggered!</b>
-
-Picking the best story from the library and sending it through the pipeline. This bypasses all quota and timing rules. I'll send you the post for approval shortly.`, { parse_mode: 'HTML' });
-    try {
-        await _boostHandler(ctx);
-    } catch (err) {
+    await ctx.reply(`🚀 <b>Override Publish triggered!</b>\n\nPicking the best story from the library and sending it through the pipeline. This bypasses all quota and timing rules. I'll send you the post for approval shortly.`, { parse_mode: 'HTML' });
+    
+    // Trigger in the background to prevent Telegraf middleware timeout (90s limit)
+    _boostHandler(ctx).catch(err => {
         console.error('❌ Boost handler error:', err);
         ctx.reply(`❌ Override publish failed: ${err.message}`);
-    }
+    });
 });
 
 // Handle text messages (used for providing feedback when modifying)
@@ -83,12 +81,12 @@ bot.on('text', async (ctx) => {
             return ctx.reply('⚠️ Override publish not ready yet. Try again in a moment.');
         }
         await ctx.reply('🚀 Picking the best story from the library and running it through the pipeline. I\'ll send you the post for approval shortly...');
-        try {
-            await _boostHandler(ctx);
-        } catch (err) {
+        
+        // Trigger in the background to prevent Telegraf middleware timeout (90s limit)
+        _boostHandler(ctx).catch(err => {
             console.error('❌ Boost handler error:', err);
             ctx.reply(`❌ Override publish failed: ${err.message}`);
-        }
+        });
         return;
     }
 
