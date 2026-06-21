@@ -49,6 +49,7 @@ const FEED_PATH = path.join(__dirname, 'Agent_Scripts/Scout_Engine/feed.json');
 const TEMP_FEED_PATH = path.join(__dirname, 'Agent_Scripts/Scout_Engine/temp_feed.json');
 const COPY_INPUT_DIR = path.join(__dirname, 'Agent_Scripts/Designer_Engine/copy_input');
 const IMAGE_OUTPUT_DIR = path.join(__dirname, 'Agent_Scripts/Designer_Engine/output');
+const TEMP_RUN_DIR = path.join(__dirname, 'Agent_Scripts/Designer_Engine/temp_run');
 const MEMORY_PATH = path.join(__dirname, 'memory.json');
 const HISTORY_PATH = path.join(__dirname, 'posted_history.json');
 const RECENT_TOPICS_PATH = path.join(__dirname, 'recent_topics.json');
@@ -146,6 +147,40 @@ function recordPost() {
     console.log(`📊 Posts today: ${postLog[today].count}`);
 }
 
+function cleanupPostFiles(postId) {
+    console.log(`\n🧹 Cleaning up files for Post ID: ${postId}...`);
+    try {
+        // 1. Delete payload file from Designer_Engine/copy_input
+        const payloadPath = path.join(COPY_INPUT_DIR, `post_${postId}.json`);
+        if (fs.existsSync(payloadPath)) {
+            try { fs.unlinkSync(payloadPath); } catch (e) { console.warn(`Failed to delete payload: ${e.message}`); }
+        }
+        
+        // 2. Delete main image and rendered HTML files from Designer_Engine/temp_run
+        if (fs.existsSync(TEMP_RUN_DIR)) {
+            const files = fs.readdirSync(TEMP_RUN_DIR);
+            for (const file of files) {
+                if (file.includes(postId)) {
+                    try { fs.unlinkSync(path.join(TEMP_RUN_DIR, file)); } catch (e) {}
+                }
+            }
+        }
+        
+        // 3. Delete generated images/videos from Designer_Engine/output
+        if (fs.existsSync(IMAGE_OUTPUT_DIR)) {
+            const files = fs.readdirSync(IMAGE_OUTPUT_DIR);
+            for (const file of files) {
+                if (file.includes(postId)) {
+                    try { fs.unlinkSync(path.join(IMAGE_OUTPUT_DIR, file)); } catch (e) {}
+                }
+            }
+        }
+        console.log(`🧹 Cleanup complete for Post ID: ${postId}.`);
+    } catch (e) {
+        console.error(`⚠️ Error during post cleanup:`, e.message);
+    }
+}
+
 let isProcessingAnyPost = false;
 
 // ---- CORE PROCESSING ----
@@ -156,6 +191,7 @@ async function processPost(post, countQuota = true) {
         return false;
     }
     isProcessingAnyPost = true;
+    let shouldCleanup = false;
     try {
         console.log(`\n🎨 Processing Post ID: ${post.originalId} (Score: ${post.score})`);
         const payloadPath = path.join(COPY_INPUT_DIR, `post_${post.originalId}.json`);
@@ -175,132 +211,139 @@ async function processPost(post, countQuota = true) {
                 try { fs.unlinkSync(tempImage); } catch (e) {}
             }
 
-        if (fs.existsSync(IMAGE_OUTPUT_DIR)) {
-            const files = fs.readdirSync(IMAGE_OUTPUT_DIR);
-            for (const file of files) {
-                if (file.startsWith(`post_${post.originalId}`)) {
-                    try { fs.unlinkSync(path.join(IMAGE_OUTPUT_DIR, file)); } catch (e) {}
+            if (fs.existsSync(IMAGE_OUTPUT_DIR)) {
+                const files = fs.readdirSync(IMAGE_OUTPUT_DIR);
+                for (const file of files) {
+                    if (file.startsWith(`post_${post.originalId}`)) {
+                        try { fs.unlinkSync(path.join(IMAGE_OUTPUT_DIR, file)); } catch (e) {}
+                    }
                 }
             }
-        }
 
-        while (!designSuccess) {
-            try {
-                imagePaths = await generatePost(payloadPath, IMAGE_OUTPUT_DIR);
-                if (!imagePaths || imagePaths.length === 0) throw new Error("Image generation returned empty.");
-                designSuccess = true;
-            } catch (err) {
-                console.error(`❌ Designer failed for Post ${post.originalId}:`, err);
-                const alertResponse = await sendErrorAlert(err.message, post.originalId, "Check Higgsfield/Chrome. Click Retry.");
-                if (alertResponse.action === 'skip') {
-                    console.log(`⏭️ Admin chose to skip post ${post.originalId}.`);
-                    return false;
+            while (!designSuccess) {
+                try {
+                    imagePaths = await generatePost(payloadPath, IMAGE_OUTPUT_DIR);
+                    if (!imagePaths || imagePaths.length === 0) throw new Error("Image generation returned empty.");
+                    designSuccess = true;
+                } catch (err) {
+                    console.error(`❌ Designer failed for Post ${post.originalId}:`, err);
+                    const alertResponse = await sendErrorAlert(err.message, post.originalId, "Check Higgsfield/Chrome. Click Retry.");
+                    if (alertResponse.action === 'skip') {
+                        console.log(`⏭️ Admin chose to skip post ${post.originalId}.`);
+                        shouldCleanup = true;
+                        return false;
+                    }
                 }
             }
-        }
 
-        console.log(`\n📲 Sending to Telegram Admin for Approval...`);
-        let approvalStatus = null;
-        try {
-            approvalStatus = await sendForApproval(imagePaths, currentPayload.socialMediaCaptionLong, currentPayload.socialMediaCaptionShort, "All Platforms");
-        } catch (err) {
-            console.error(`❌ Telegram send failed:`, err);
-            return false;
-        }
+            console.log(`\n📲 Sending to Telegram Admin for Approval...`);
+            let approvalStatus = null;
+            try {
+                approvalStatus = await sendForApproval(imagePaths, currentPayload.socialMediaCaptionLong, currentPayload.socialMediaCaptionShort, "All Platforms");
+            } catch (err) {
+                console.error(`❌ Telegram send failed:`, err);
+                shouldCleanup = true;
+                return false;
+            }
 
-        if (approvalStatus.action === 'approve') {
-            console.log(`✅ Post ${post.originalId} APPROVED! Broadcasting...`);
-            await publishToChannel(imagePaths, currentPayload.socialMediaCaptionLong);
-            await publishPost(imagePaths, currentPayload.socialMediaCaptionLong, currentPayload.socialMediaCaptionShort);
-            if (countQuota) {
-                recordPost();
-                
-                // Add to recent topics
-                let activeTopics = fs.existsSync(RECENT_TOPICS_PATH) ? loadJson(RECENT_TOPICS_PATH) : [];
-                const topicStr = (post.payload?.headline?.line1 || "") + " " + (post.payload?.headline?.line2 || "");
-                if (topicStr.trim().length > 0) {
-                    activeTopics.unshift(topicStr);
-                    if (activeTopics.length > 50) activeTopics.length = 50;
-                    saveJson(RECENT_TOPICS_PATH, activeTopics);
+            if (approvalStatus.action === 'approve') {
+                console.log(`✅ Post ${post.originalId} APPROVED! Broadcasting...`);
+                await publishToChannel(imagePaths, currentPayload.socialMediaCaptionLong);
+                await publishPost(imagePaths, currentPayload.socialMediaCaptionLong, currentPayload.socialMediaCaptionShort);
+                if (countQuota) {
+                    recordPost();
+                    
+                    // Add to recent topics
+                    let activeTopics = fs.existsSync(RECENT_TOPICS_PATH) ? loadJson(RECENT_TOPICS_PATH) : [];
+                    const topicStr = (post.payload?.headline?.line1 || "") + " " + (post.payload?.headline?.line2 || "");
+                    if (topicStr.trim().length > 0) {
+                        activeTopics.unshift(topicStr);
+                        if (activeTopics.length > 50) activeTopics.length = 50;
+                        saveJson(RECENT_TOPICS_PATH, activeTopics);
+                    }
+                } else {
+                    console.log('(🚀 Override post — published without consuming quota slot.)');
                 }
-            } else {
-                console.log('(🚀 Override post — published without consuming quota slot.)');
-            }
-            return true;
-        } else if (approvalStatus.action === 'reject') {
-            console.log(`🗑️ Post REJECTED by Admin. Discarding.`);
-            return false;
+                shouldCleanup = true;
+                return true;
+            } else if (approvalStatus.action === 'reject') {
+                console.log(`🗑️ Post REJECTED by Admin. Discarding.`);
+                shouldCleanup = true;
+                return false;
 
-        // ---- One-click agent rerun (no text feedback) ----
-        } else if (approvalStatus.action === 'rerun_from' && approvalStatus.agent === 'designer') {
-            if (approvalStatus.imageModel) {
-                // Model switch requested — stamp the new model onto the payload so generate_post uses it
-                console.log(`🔄 Switching image model to: ${approvalStatus.imageModel}`);
-                currentPayload.imageModel = approvalStatus.imageModel;
-                fs.writeFileSync(payloadPath, JSON.stringify(currentPayload, null, 2));
-            } else {
-                console.log(`🎨 Admin requested Designer rerun — regenerating image with existing prompt.`);
-            }
-            // The image cleanup at the top of the while-loop handles deleting temp/output files.
-            // Just loop back — generatePost will re-run with the updated payload.
-
-        } else if (approvalStatus.action === 'rerun_from' && approvalStatus.agent === 'writer') {
-            console.log(`✍️ Admin requested Writer rerun — rewriting content with original source data.`);
-            try {
-                const rawFeed = loadJson(FEED_PATH);
-                const originalItem = rawFeed.find(item => String(item.id) === String(post.originalId)) || {
-                    id: post.originalId,
-                    title: currentPayload.headline ? currentPayload.headline.line1 : "",
-                    description: currentPayload.points ? currentPayload.points.join(" ") : ""
-                };
-                // Rewrite from scratch (empty feedback string signals a clean rerun)
-                const refinedPayload = await refineCopywriteNewsItem(originalItem, currentPayload, 'Rewrite the entire post fresh — keep the same news story but generate new phrasing, headline, and copy.');
-                currentPayload = refinedPayload;
-                fs.writeFileSync(payloadPath, JSON.stringify(refinedPayload, null, 2));
-                console.log("📝 Writer rerun complete — payload updated.");
-            } catch (err) {
-                console.error("❌ Writer rerun failed:", err);
-            }
-
-        // ---- Custom feedback (text-based modifications) ----
-        } else if (approvalStatus.action === 'modify_writer') {
-            console.log(`✍️ Admin requested content/caption modifications: "${approvalStatus.feedback}"`);
-            
-            try {
-                const rawFeed = loadJson(FEED_PATH);
-                const originalItem = rawFeed.find(item => String(item.id) === String(post.originalId)) || {
-                    id: post.originalId,
-                    title: currentPayload.headline ? currentPayload.headline.line1 : "",
-                    description: currentPayload.points ? currentPayload.points.join(" ") : ""
-                };
-                
-                const refinedPayload = await refineCopywriteNewsItem(originalItem, currentPayload, approvalStatus.feedback);
-                currentPayload = refinedPayload;
-                fs.writeFileSync(payloadPath, JSON.stringify(refinedPayload, null, 2));
-                console.log("📝 Payload updated with refined content.");
-            } catch (err) {
-                console.error("❌ Refinement failed:", err);
-            }
-        } else if (approvalStatus.action === 'modify_designer') {
-            console.log(`🎨 Admin requested image modifications: "${approvalStatus.feedback}"`);
-            
-            try {
-                const newPrompt = await refineImagePrompt(currentPayload, approvalStatus.feedback);
-                console.log(`✨ Refined Image Prompt: "${newPrompt}"`);
-                
-                currentPayload.imagePrompt = newPrompt;
-                if (currentPayload.isCarousel && currentPayload.slides && currentPayload.slides[0]) {
-                    currentPayload.slides[0].imagePrompt = newPrompt;
+            // ---- One-click agent rerun (no text feedback) ----
+            } else if (approvalStatus.action === 'rerun_from' && approvalStatus.agent === 'designer') {
+                if (approvalStatus.imageModel) {
+                    // Model switch requested — stamp the new model onto the payload so generate_post uses it
+                    console.log(`🔄 Switching image model to: ${approvalStatus.imageModel}`);
+                    currentPayload.imageModel = approvalStatus.imageModel;
+                    fs.writeFileSync(payloadPath, JSON.stringify(currentPayload, null, 2));
+                } else {
+                    console.log(`🎨 Admin requested Designer rerun — regenerating image with existing prompt.`);
                 }
+                // The image cleanup at the top of the while-loop handles deleting temp/output files.
+                // Just loop back — generatePost will re-run with the updated payload.
+
+            } else if (approvalStatus.action === 'rerun_from' && approvalStatus.agent === 'writer') {
+                console.log(`✍️ Admin requested Writer rerun — rewriting content with original source data.`);
+                try {
+                    const rawFeed = loadJson(FEED_PATH);
+                    const originalItem = rawFeed.find(item => String(item.id) === String(post.originalId)) || {
+                        id: post.originalId,
+                        title: currentPayload.headline ? currentPayload.headline.line1 : "",
+                        description: currentPayload.points ? currentPayload.points.join(" ") : ""
+                    };
+                    // Rewrite from scratch (empty feedback string signals a clean rerun)
+                    const refinedPayload = await refineCopywriteNewsItem(originalItem, currentPayload, 'Rewrite the entire post fresh — keep the same news story but generate new phrasing, headline, and copy.');
+                    currentPayload = refinedPayload;
+                    fs.writeFileSync(payloadPath, JSON.stringify(refinedPayload, null, 2));
+                    console.log("📝 Writer rerun complete — payload updated.");
+                } catch (err) {
+                    console.error("❌ Writer rerun failed:", err);
+                }
+
+            // ---- Custom feedback (text-based modifications) ----
+            } else if (approvalStatus.action === 'modify_writer') {
+                console.log(`✍️ Admin requested content/caption modifications: "${approvalStatus.feedback}"`);
                 
-                fs.writeFileSync(payloadPath, JSON.stringify(currentPayload, null, 2));
-            } catch (err) {
-                console.error("❌ Image prompt refinement failed:", err);
-            }
-        } // end else if
-    } // end while (true)
+                try {
+                    const rawFeed = loadJson(FEED_PATH);
+                    const originalItem = rawFeed.find(item => String(item.id) === String(post.originalId)) || {
+                        id: post.originalId,
+                        title: currentPayload.headline ? currentPayload.headline.line1 : "",
+                        description: currentPayload.points ? currentPayload.points.join(" ") : ""
+                    };
+                    
+                    const refinedPayload = await refineCopywriteNewsItem(originalItem, currentPayload, approvalStatus.feedback);
+                    currentPayload = refinedPayload;
+                    fs.writeFileSync(payloadPath, JSON.stringify(refinedPayload, null, 2));
+                    console.log("📝 Payload updated with refined content.");
+                } catch (err) {
+                    console.error("❌ Refinement failed:", err);
+                }
+            } else if (approvalStatus.action === 'modify_designer') {
+                console.log(`🎨 Admin requested image modifications: "${approvalStatus.feedback}"`);
+                
+                try {
+                    const newPrompt = await refineImagePrompt(currentPayload, approvalStatus.feedback);
+                    console.log(`✨ Refined Image Prompt: "${newPrompt}"`);
+                    
+                    currentPayload.imagePrompt = newPrompt;
+                    if (currentPayload.isCarousel && currentPayload.slides && currentPayload.slides[0]) {
+                        currentPayload.slides[0].imagePrompt = newPrompt;
+                    }
+                    
+                    fs.writeFileSync(payloadPath, JSON.stringify(currentPayload, null, 2));
+                } catch (err) {
+                    console.error("❌ Image prompt refinement failed:", err);
+                }
+            } // end else if
+        } // end while (true)
     } finally {
         isProcessingAnyPost = false;
+        if (shouldCleanup) {
+            cleanupPostFiles(post.originalId);
+        }
     }
 }
 
