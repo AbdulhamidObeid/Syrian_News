@@ -8,6 +8,9 @@ async function delay(ms) {
     return new Promise(resolve => setTimeout(resolve, ms));
 }
 
+let cachedIgId = null;
+
+
 /**
  * Publishes the post across X (Twitter), Facebook, and Instagram.
  * If any platform API fails, it calls sendErrorAlertFn to block and ask the user (Retry/Skip).
@@ -144,19 +147,31 @@ async function publishPost(imagePath, captionLong, captionShort, postId, sendErr
         let igSuccess = false;
         while (!igSuccess) {
             try {
-                const accRes = await axios.get(`https://graph.facebook.com/v20.0/${fbPageId}?fields=instagram_business_account&access_token=${fbToken}`);
-                const igId = accRes.data?.instagram_business_account?.id;
+                let igId = cachedIgId;
+                if (!igId) {
+                    const accRes = await axios.get(`https://graph.facebook.com/v20.0/${fbPageId}?fields=instagram_business_account&access_token=${fbToken}`);
+                    igId = accRes.data?.instagram_business_account?.id;
+                    if (igId) {
+                        cachedIgId = igId;
+                    }
+                }
+                
                 if (igId) {
                     if (uploadedUrls.length === 1) {
                         const r1 = await axios.post(`https://graph.facebook.com/v20.0/${igId}/media`, { image_url: uploadedUrls[0], caption: captionLong, access_token: fbToken });
+                        console.log('⏳ Waiting 5 seconds for Instagram to download and process the image container...');
+                        await delay(5000);
                         await axios.post(`https://graph.facebook.com/v20.0/${igId}/media_publish`, { creation_id: r1.data.id, access_token: fbToken });
                     } else {
                         const itemIds = [];
                         for (const url of uploadedUrls) {
                             const r = await axios.post(`https://graph.facebook.com/v20.0/${igId}/media`, { image_url: url, is_carousel_item: true, access_token: fbToken });
                             itemIds.push(r.data.id);
+                            await delay(2000); // 2s spacing delay to prevent hitting Graph API rate limits
                         }
                         const cRes = await axios.post(`https://graph.facebook.com/v20.0/${igId}/media`, { caption: captionLong, media_type: 'CAROUSEL', children: itemIds.join(','), access_token: fbToken });
+                        console.log('⏳ Waiting 8 seconds for Instagram to download and process all carousel items...');
+                        await delay(8000); // 8s spacing delay before publishing carousel container
                         await axios.post(`https://graph.facebook.com/v20.0/${igId}/media_publish`, { creation_id: cRes.data.id, access_token: fbToken });
                     }
                     console.log('✅ Instagram Posted via API');
