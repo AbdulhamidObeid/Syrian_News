@@ -245,6 +245,7 @@ async function publishPost(imagePath, captionLong, captionShort, postId, sendErr
     console.log('\n--- Posting to Instagram ---');
     if (fbToken && fbPageId && uploadedUrls.length > 0) {
         let igId = cachedIgId;
+        let igSuccess = false;
         while (!igSuccess) {
             try {
                 if (!igId) {
