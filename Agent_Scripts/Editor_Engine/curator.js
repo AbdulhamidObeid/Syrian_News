@@ -297,9 +297,9 @@ Original Image URL: ${selectedItem.imageUrl || 'No image available'}
 /**
  * Phase 2b: Refine/modify copywriting payload based on admin feedback
  */
-async function refineCopywriteNewsItem(selectedItem, previousPayload, feedback) {
-    console.log(`\n--- Phase 2b: Copywriting Refinement (ID: ${selectedItem.id}) ---`);
-    const modelName = editorConfig.heavy_model || 'gemini-2.5-pro';
+async function refineCopywriteNewsItem(selectedItem, previousPayload, feedback, isFallback = false) {
+    console.log(`\n--- Phase 2b: Copywriting Refinement (ID: ${selectedItem.id}${isFallback ? ' - FALLBACK MODE' : ''}) ---`);
+    const modelName = isFallback ? (editorConfig.fast_model || 'gemini-2.5-flash') : (editorConfig.heavy_model || 'gemini-2.5-pro');
 
     const systemInstruction = `
 You are the Lead Copywriter for ${brandConfig.brand.name_arabic} (${brandConfig.brand.name}).
@@ -307,6 +307,9 @@ Niche: ${brandConfig.brand.niche}
 Target Audience: ${brandConfig.brand.target_audience}
 Tone: ${brandConfig.tone_of_voice.archetype} (${brandConfig.tone_of_voice.traits.join(', ')})
 Restrictions: ${brandConfig.tone_of_voice.restrictions.join(', ')}
+
+Follow these strict copywriting guidelines:
+${copywritingGuidelines}
 
 We have already generated a post payload, but the Admin requested changes to the content, headline, or caption.
 Your task is to refine the previous copywriting payload based on the Admin's feedback.
@@ -317,7 +320,12 @@ ${JSON.stringify(previousPayload, null, 2)}
 Admin Feedback/Modification Request:
 "${feedback}"
 
-Ensure you ONLY change the text or styling as requested by the feedback. Keep all other fields, image prompts, image strategy, and structures intact unless specifically requested to change them. Maintain standard layout guidelines and character limits.
+Ensure you ONLY change the text or styling as requested by the feedback. Keep all other fields, image prompts, image strategy, and structures intact unless specifically requested to change them.
+CRITICAL HEADLINE CONSTRAINT:
+- If you rewrite the headline, it MUST adhere strictly to the word limits:
+  * For T1: 4-5 words max (single line: line1).
+  * For T2: 10-12 words max in total combined across line1 and line2.
+  * If the headline has trailing dots, or was cut off, you MUST rewrite it to be shorter and cleaner while keeping the news value.
 `;
 
     const model = genAI.getGenerativeModel({ 
@@ -325,7 +333,13 @@ Ensure you ONLY change the text or styling as requested by the feedback. Keep al
         systemInstruction: systemInstruction
     });
 
-    const prompt = `Please apply the admin feedback to refine the payload.`;
+    const prompt = `Please apply the admin feedback to refine the payload.
+Feedback: "${feedback}"
+
+Original Article Context (refer to this if asked to rewrite or shorten content/headlines):
+Title: ${selectedItem.title || ''}
+Content: ${selectedItem.description || selectedItem.content || ''}
+`;
 
     try {
         const response = await model.generateContent({
@@ -348,6 +362,10 @@ Ensure you ONLY change the text or styling as requested by the feedback. Keep al
         return payload;
     } catch (error) {
         console.error(`❌ Error refining copywriting item ${selectedItem.id}:`, error.message || error);
+        if (!isFallback && editorConfig.fast_model && editorConfig.fast_model !== modelName) {
+            console.log(`⚠️ Attempting fallback refinement with model: ${editorConfig.fast_model}`);
+            return await refineCopywriteNewsItem(selectedItem, previousPayload, feedback, true);
+        }
         throw error;
     }
 }
@@ -470,7 +488,11 @@ async function runCurator(rawFeedPath, outputDir, activeTopics = []) {
                 originalId: item.id,
                 score: item.score,
                 isUrgent: item.isUrgent,
-                payload: payload
+                payload: payload,
+                originalItem: {
+                    title: item.title || '',
+                    description: item.description || item.content || ''
+                }
             });
             
             // Output payload file

@@ -42,7 +42,7 @@ const { execSync } = require('child_process');
 // Require the Engine Modules
 const { runCurator, refineCopywriteNewsItem, refineImagePrompt } = require('./Agent_Scripts/Editor_Engine/curator');
 const { generatePost } = require('./Agent_Scripts/Designer_Engine/generate_post');
-const { sendForApproval, publishToChannel, sendErrorAlert, startBot, stopBot, registerBoostCommand, isApprovalPending } = require('./Agent_Scripts/Telegram_Engine/telegram_admin');
+const { sendForApproval, publishToChannel, sendErrorAlert, startBot, stopBot, registerBoostCommand, isApprovalPending, sendAdminNotification } = require('./Agent_Scripts/Telegram_Engine/telegram_admin');
 const { publishPost } = require('./Agent_Scripts/Publisher_Engine/poster');
 
 const FEED_PATH = path.join(__dirname, 'Agent_Scripts/Scout_Engine/feed.json');
@@ -325,7 +325,7 @@ async function processPost(post, countQuota = true) {
                 
                 try {
                     const rawFeed = loadJson(FEED_PATH);
-                    const originalItem = rawFeed.find(item => String(item.id) === String(post.originalId)) || {
+                    const originalItem = post.originalItem || rawFeed.find(item => String(item.id) === String(post.originalId)) || {
                         id: post.originalId,
                         title: currentPayload.headline ? currentPayload.headline.line1 : "",
                         description: currentPayload.points ? currentPayload.points.join(" ") : ""
@@ -337,6 +337,7 @@ async function processPost(post, countQuota = true) {
                     console.log("📝 Payload updated with refined content.");
                 } catch (err) {
                     console.error("❌ Refinement failed:", err);
+                    await sendAdminNotification(`❌ <b>Writer Refinement Failed:</b>\n${err.message || err}\n\nReverting to previous post copy.`);
                 }
             } else if (approvalStatus.action === 'modify_designer') {
                 console.log(`🎨 Admin requested image modifications: "${approvalStatus.feedback}"`);
@@ -353,6 +354,7 @@ async function processPost(post, countQuota = true) {
                     fs.writeFileSync(payloadPath, JSON.stringify(currentPayload, null, 2));
                 } catch (err) {
                     console.error("❌ Image prompt refinement failed:", err);
+                    await sendAdminNotification(`❌ <b>Designer Refinement Failed:</b>\n${err.message || err}\n\nReverting to previous image prompt.`);
                 }
             } // end else if
         } // end while (true)

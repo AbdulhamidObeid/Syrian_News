@@ -562,6 +562,14 @@ ${safeSuggestedSolution}`;
     });
 }
 
+async function sendAdminNotification(message) {
+    try {
+        await bot.telegram.sendMessage(adminId, message, { parse_mode: 'HTML' });
+    } catch (e) {
+        console.error('Failed to send admin notification:', e.message);
+    }
+}
+
 module.exports = { 
     sendForApproval, 
     publishToChannel, 
@@ -570,5 +578,6 @@ module.exports = {
     stopBot, 
     getActiveModel, 
     registerBoostCommand,
+    sendAdminNotification,
     isApprovalPending: () => pendingApprovals.size > 0
 };

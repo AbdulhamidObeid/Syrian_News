@@ -1,6 +1,6 @@
 {
   "fast_model": "gemini-3.1-flash-lite",
-  "heavy_model": "gemini-3.5-flash",
+  "heavy_model": "gemini-2.5-flash",
   "temperature": 0.3,
   "top_p": 0.9,
   "scoring_threshold": 5.5,
