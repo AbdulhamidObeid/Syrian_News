@@ -219,8 +219,8 @@ For Carousels (isCarousel: true):
 When "isCarousel" is true, omit root-level "points", "headline", and "imagePrompt".
 
 CRITICAL IMAGE STRATEGY RULE (APPLIES TO BOTH SINGLE POSTS AND CAROUSELS):
-- If the news mentions specific people (names, figures, specific individuals, or groups of people) whose exact/similar face resemblance is necessary, and we have an image URL in the article (Original Image URL is not 'No image available'), set "imageStrategy": "reference".
-- Otherwise, set "imageStrategy": "generate".
+- If the news is about a specific person, a specific event, a specific object, or anything specific whose visual context or resemblance is important (e.g., a serious topic involving a specific person, sports match, or landmark) and we have an image URL from the scraped news (Original Image URL is not 'No image available'), you MUST set "imageStrategy": "reference" to use that image as a reference.
+- Only set "imageStrategy": "generate" (text-only prompt) if the news is about a very general/abstract topic (like general economy, weather, abstract concepts) or if there is no image URL in the news source.
 - For BOTH strategies, write a highly specific, photorealistic prompt in English describing EXACTLY what the image should look like.
 - Detail the exact subjects (e.g., if it's a specific country, person, or object, name them and describe their appearance).
 - AI IMAGE SAFETY (CRITICAL): Image AI models default to the Syrian Regime when generating "Syria". You MUST forcefully override this in your prompt:
