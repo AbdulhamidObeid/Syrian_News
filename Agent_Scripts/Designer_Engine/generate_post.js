@@ -657,13 +657,13 @@ async function generateSinglePost(payloadPath, outputDir = null, payloadObj = nu
                 if (bento) bento.style.maxHeight = '48%';
             }
 
-            // Headline scaling: shrink if height > 2.5 lines limit
+            // Headline scaling: shrink if height > 2 lines limit (detect line-clamp/overflow)
             const headlineEl = document.getElementById('main-headline');
             if (headlineEl) {
-                const lineHeight = parseInt(window.getComputedStyle(headlineEl).lineHeight);
                 let fontSize = 60; // default text-[60px]
                 headlineEl.style.fontSize = fontSize + 'px';
-                while (headlineEl.offsetHeight > lineHeight * 2.5 && fontSize > 36) {
+                // scrollHeight > offsetHeight detects if the text is overflowing/truncated
+                while (headlineEl.scrollHeight > headlineEl.offsetHeight && fontSize > 36) {
                     fontSize -= 2;
                     headlineEl.style.fontSize = fontSize + 'px';
                 }
@@ -703,13 +703,12 @@ async function generateSinglePost(payloadPath, outputDir = null, payloadObj = nu
                 // Set to default first
                 bulletTexts.forEach(el => el.style.fontSize = defaultFontSize + 'px');
 
-                const MAX_HEIGHT = 970;
-                // Shrink dynamically if it overflows vertically
-                while (textContainer.scrollHeight > MAX_HEIGHT && currentSize > absoluteMinSize) {
+                // Shrink dynamically if it overflows the bento container max-height
+                while (bentoParent.scrollHeight > bentoParent.offsetHeight && currentSize > absoluteMinSize) {
                     currentSize--;
                     bulletTexts.forEach(el => el.style.fontSize = currentSize + 'px');
                 }
-                overflowed = textContainer.scrollHeight > MAX_HEIGHT;
+                overflowed = bentoParent.scrollHeight > bentoParent.offsetHeight;
             }
             return {
                 success: !overflowed,

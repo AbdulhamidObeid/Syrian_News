@@ -202,6 +202,10 @@ ${copywritingGuidelines}
 Your task is to take the selected news article details and rewrite it into a structured copy payload for our designer engine.
 Output must follow the designated bento layout rules (T1/T2 headlines, point limits, and Standard Arabic styling).
 
+CRITICAL HEADLINE WORD COUNT CONSTRAINT (STRICT 2-LINE MAX):
+- For T1 headlines (headlineStyle: "T1"), the headline MUST be on a single line (line1) and contain a maximum of 4 to 5 words.
+- For T2 headlines (headlineStyle: "T2"), you MUST split the headline across line1 and line2. The TOTAL word count across BOTH lines combined MUST NOT exceed 10 to 12 words (e.g. 5-6 words per line). This is a strict visual limit. If a headline has too many words, it will wrap to 3 lines (which is strictly forbidden) or be truncated with dots. Keep it concise, punchy, and under this limit.
+
 CRITICAL LAYOUT DECISION RULE:
 The number of points you generate directly determines the visual layout template the Designer will use for single-image posts:
 - 1 point -> '1-box' layout (Use for very short, single-focus news)
@@ -393,8 +397,18 @@ function validateCopywriterPayload(payload) {
     // T1 headline constraint: 3-4 words
     if (payload.headlineStyle === 'T1' && payload.headline && payload.headline.line1) {
         const words = payload.headline.line1.trim().split(/\s+/);
-        if (words.length > 4) {
-            console.warn(`⚠️ Warning: T1 Headline has ${words.length} words (max is 3-4): "${payload.headline.line1}"`);
+        if (words.length > 5) {
+            console.warn(`⚠️ Warning: T1 Headline has ${words.length} words (max is 4-5): "${payload.headline.line1}"`);
+        }
+    }
+
+    // T2 headline constraint: combined max 10-12 words
+    if (payload.headlineStyle === 'T2' && payload.headline) {
+        const line1Words = (payload.headline.line1 || '').trim().split(/\s+/).filter(Boolean).length;
+        const line2Words = (payload.headline.line2 || '').trim().split(/\s+/).filter(Boolean).length;
+        const totalWords = line1Words + line2Words;
+        if (totalWords > 12) {
+            console.warn(`⚠️ Warning: T2 Headline has ${totalWords} words (max is 12). Line 1: ${line1Words}, Line 2: ${line2Words}. Headline: "${payload.headline.line1} - ${payload.headline.line2}"`);
         }
     }
 
