@@ -220,7 +220,9 @@ When "isCarousel" is true, omit root-level "points", "headline", and "imagePromp
 
 CRITICAL IMAGE STRATEGY RULE (APPLIES TO BOTH SINGLE POSTS AND CAROUSELS):
 - If the news is about a specific person, a specific event, a specific object, or anything specific whose visual context or resemblance is important (e.g., a serious topic involving a specific person, sports match, or landmark) and we have an image URL from the scraped news (Original Image URL is not 'No image available'), you MUST set "imageStrategy": "reference" to use that image as a reference.
-- Only set "imageStrategy": "generate" (text-only prompt) if the news is about a very general/abstract topic (like general economy, weather, abstract concepts) or if there is no image URL in the news source.
+  * If you set "imageStrategy": "reference", the "imagePrompt" MUST describe the actual scene and composition of the reference image (e.g., if the reference image is a signing ceremony, the prompt must describe politicians signing an agreement).
+  * If you want to depict a different, more general or illustrative scene that does not match the reference image (e.g., depicting a generic post office counter instead of the specific signing ceremony), you MUST set "imageStrategy": "generate" to ignore the reference image.
+- Only set "imageStrategy": "generate" (text-only prompt) if the news is about a very general/abstract topic (like general economy, weather, abstract concepts), if there is no image URL in the news source, or if the original image is irrelevant/mismatched to the scene you want to depict.
 - For BOTH strategies, write a highly specific, photorealistic prompt in English describing EXACTLY what the image should look like.
 - Detail the exact subjects (e.g., if it's a specific country, person, or object, name them and describe their appearance).
 - AI IMAGE SAFETY (CRITICAL): Image AI models default to the Syrian Regime when generating "Syria". You MUST forcefully override this in your prompt:
