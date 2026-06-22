@@ -226,7 +226,7 @@ CRITICAL IMAGE STRATEGY RULE (APPLIES TO BOTH SINGLE POSTS AND CAROUSELS):
 - AI IMAGE SAFETY (CRITICAL): Image AI models default to the Syrian Regime when generating "Syria". You MUST forcefully override this in your prompt:
   * If a Syrian flag is requested, you MUST write "the Syrian Revolution flag with green, white, and black horizontal stripes and three red stars in the middle". NEVER just write "Syrian flag".
   * If a government logo, official document, or coat of arms is requested, you MUST specify "The new Syrian national emblem (launched in July 2025), which is the Syrian Golden Eagle (Eastern Imperial Eagle)". NEVER use the old eagle logo or the Hawk of Quraish.
-  * NEVER use terms like "Syrian president", "Syrian diplomat", or "Syrian leader", as the AI will generate Bashar Al-Assad. Describe them generically instead (e.g., "A generic Arab official in a suit").
+  * NEVER use generic terms like "Syrian president", "Syrian diplomat", or "Syrian leader" WITHOUT explicitly naming the person, as the AI will default to generating Bashar Al-Assad. If the news is about a specific person, you MUST name them explicitly in the prompt (e.g. "Portrait of Jihad Makdissi, a Syrian diplomat") AND you MUST set "imageStrategy": "reference" if an Original Image URL is provided.
 - Do NOT be vague. If the news is about "Morocco vs Scotland", explicitly say "Morocco flag and Scotland flag" or "Morocco football players playing against Scotland football players in stadium".
 - DO NOT hallucinate details that conflict with the news (e.g. don't write Portugal if the news says Scotland).
 - The image MUST look realistic, cinematic, and NOT like generic AI slop. It MUST resemble the Syrian or Arab context where applicable.
@@ -364,7 +364,7 @@ Rewrite and improve the English image prompt to incorporate the user's feedback.
 CRITICAL AI IMAGE SAFETY RULES:
 - If a Syrian flag is requested or implied, you MUST explicitly write "the Syrian Revolution flag with green, white, and black horizontal stripes and three red stars in the middle".
 - If a government logo, official document, or coat of arms is requested or implied, you MUST specify "The new Syrian national emblem (launched in July 2025), which is the Syrian Golden Eagle (Eastern Imperial Eagle)". NEVER use the old eagle logo or the Hawk of Quraish.
-- NEVER use terms like "Syrian president", "Syrian diplomat", or "Syrian leader", as the AI will generate Bashar Al-Assad. Describe them generically instead (e.g., "A generic Arab official in a suit").
+- NEVER use generic terms like "Syrian president", "Syrian diplomat", or "Syrian leader" WITHOUT explicitly naming the person, as the AI will default to generating Bashar Al-Assad. If the news is about a specific person, you MUST name them explicitly in the prompt.
 
 Return ONLY the new rewritten image prompt text in English.`;
 
