@@ -657,17 +657,7 @@ async function generateSinglePost(payloadPath, outputDir = null, payloadObj = nu
                 if (bento) bento.style.maxHeight = '48%';
             }
 
-            // Headline scaling: shrink if height > 2 lines limit (detect line-clamp/overflow)
-            const headlineEl = document.getElementById('main-headline');
-            if (headlineEl) {
-                let fontSize = 60; // default text-[60px]
-                headlineEl.style.fontSize = fontSize + 'px';
-                // scrollHeight > offsetHeight detects if the text is overflowing/truncated
-                while (headlineEl.scrollHeight > headlineEl.offsetHeight && fontSize > 36) {
-                    fontSize -= 2;
-                    headlineEl.style.fontSize = fontSize + 'px';
-                }
-            }
+            // Headline scaling: Reverted to previous fixed behavior as requested. Default styling applies.
 
             // Bento font sizes rules
             let defaultFontSize = 28;
