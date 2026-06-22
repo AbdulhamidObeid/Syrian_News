@@ -1,5 +1,7 @@
 require('dotenv').config();
 const { Telegraf, Markup } = require('telegraf');
+const fs = require('fs');
+const path = require('path');
 
 const token = process.env.TELEGRAM_BOT_TOKEN;
 const adminId = parseInt(process.env.TELEGRAM_ADMIN_ID, 10);
@@ -54,21 +56,98 @@ function registerBoostCommand(handler) {
     _boostHandler = handler;
     // Register the /postnow command so it appears in Telegram’s "/" shortcut menu
     bot.telegram.setMyCommands([
-        { command: 'postnow', description: '🚀 Override publish — pick best story & send for approval now' },
+        { command: 'postnow', description: '🚀 Override publish — select a story to publish now' },
     ]).catch(() => {});
 }
 
-bot.command('postnow', async (ctx) => {
+function getPostTopic(post) {
+    if (!post || !post.payload) return 'No Topic';
+    let headline = post.payload.headline;
+    if (!headline && post.payload.slides) {
+        const hook = post.payload.slides.find(s => s.type === 'hook');
+        if (hook) headline = hook.headline;
+    }
+    if (headline) {
+        const l1 = headline.line1 || '';
+        const l2 = headline.line2 || '';
+        return `${l1} ${l2}`.trim();
+    }
+    return post.payload.subHeadline || 'No Topic';
+}
+
+async function listPostsForPostNow(ctx) {
     if (!_boostHandler) {
         return ctx.reply('⚠️ Override publish not initialised yet. Try again in a moment.');
     }
-    await ctx.reply(`🚀 <b>Override Publish triggered!</b>\n\nPicking the best story from the library and sending it through the pipeline. This bypasses all quota and timing rules. I'll send you the post for approval shortly.`, { parse_mode: 'HTML' });
     
-    // Trigger in the background to prevent Telegraf middleware timeout (90s limit)
-    _boostHandler(ctx).catch(err => {
+    try {
+        const MEMORY_PATH = path.join(__dirname, '../../memory.json');
+        if (!fs.existsSync(MEMORY_PATH)) {
+            return ctx.reply('💭 Memory library is empty right now — no stories available to post now.');
+        }
+        
+        const memory = JSON.parse(fs.readFileSync(MEMORY_PATH, 'utf8'));
+        const availablePosts = memory.filter(m => !m.isUrgent);
+        
+        if (availablePosts.length === 0) {
+            return ctx.reply('💭 Memory library is empty right now — no stories available to post now.');
+        }
+        
+        // Sort by score descending
+        availablePosts.sort((a, b) => b.score - a.score);
+        
+        // Slice to top 10 posts
+        const topPosts = availablePosts.slice(0, 10);
+        
+        // Present a list of topics with inline buttons
+        await ctx.reply(`📋 <b>Select a post from the top ${topPosts.length} in the library to publish now:</b>\n(This will bypass daily quota and publish immediately after your approval)`, { parse_mode: 'HTML' });
+        
+        // Create inline keyboard buttons
+        const buttons = topPosts.map(post => {
+            const topic = getPostTopic(post);
+            const score = post.score || 0;
+            // Limit topic display length to prevent UI issues
+            const displayTopic = topic.length > 35 ? topic.substring(0, 35) + '...' : topic;
+            return [Markup.button.callback(`⭐ ${score} | ${displayTopic}`, `postnow_select_${post.originalId}`)];
+        });
+        
+        // Add a "Cancel" button at the bottom
+        buttons.push([Markup.button.callback('❌ Cancel', 'postnow_cancel')]);
+        
+        await ctx.reply('👇 Choose a story:', Markup.inlineKeyboard(buttons));
+    } catch (err) {
+        console.error('Error listing posts for postnow:', err);
+        ctx.reply(`❌ Failed to load library: ${err.message}`);
+    }
+}
+
+bot.command('postnow', async (ctx) => {
+    await listPostsForPostNow(ctx);
+});
+
+bot.action(/postnow_select_(.+)/, async (ctx) => {
+    const postId = ctx.match[1];
+    
+    // Clear the message buttons so they can't click again
+    try { await ctx.editMessageReplyMarkup({ inline_keyboard: [] }); } catch(e) {}
+    
+    await ctx.reply(`🚀 Starting generation for selected post...`);
+    
+    if (!_boostHandler) {
+        return ctx.reply('⚠️ Override publish handler is not registered yet.');
+    }
+    
+    // Trigger in the background to prevent Telegraf middleware timeout
+    _boostHandler(ctx, postId).catch(err => {
         console.error('❌ Boost handler error:', err);
         ctx.reply(`❌ Override publish failed: ${err.message}`);
     });
+});
+
+bot.action('postnow_cancel', async (ctx) => {
+    try { await ctx.editMessageReplyMarkup({ inline_keyboard: [] }); } catch(e) {}
+    try { await ctx.answerCbQuery('Cancelled.'); } catch(e) {}
+    await ctx.reply('❌ Post selection cancelled.');
 });
 
 // Handle text messages (used for providing feedback when modifying)
@@ -77,16 +156,7 @@ bot.on('text', async (ctx) => {
 
     // ---- Persistent keyboard button: "🚀 Post Now" ----
     if (text === '🚀 Post Now') {
-        if (!_boostHandler) {
-            return ctx.reply('⚠️ Override publish not ready yet. Try again in a moment.');
-        }
-        await ctx.reply('🚀 Picking the best story from the library and running it through the pipeline. I\'ll send you the post for approval shortly...');
-        
-        // Trigger in the background to prevent Telegraf middleware timeout (90s limit)
-        _boostHandler(ctx).catch(err => {
-            console.error('❌ Boost handler error:', err);
-            ctx.reply(`❌ Override publish failed: ${err.message}`);
-        });
+        await listPostsForPostNow(ctx);
         return;
     }
 

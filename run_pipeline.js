@@ -436,13 +436,13 @@ async function runCycle() {
         // Sort memory by score descending
         memory.sort((a, b) => b.score - a.score);
 
-        // 🧠 Smart Memory Cap — keep only the top N articles to prevent unbounded growth - DISABLED: Keep all curated stories until published
-        // const maxMemSize = scheduleConfig.max_memory_size || 30;
-        // if (memory.length > maxMemSize) {
-        //     const trimmed = memory.length - maxMemSize;
-        //     memory = memory.slice(0, maxMemSize);
-        //     console.log(`✂️  Memory trimmed: removed ${trimmed} lower-scored articles (cap: ${maxMemSize}). Best content preserved.`);
-        // }
+        // 🧠 Smart Memory Cap — keep only the top N articles to prevent unbounded growth
+        const maxMemSize = scheduleConfig.max_memory_size || 30;
+        if (memory.length > maxMemSize) {
+            const trimmed = memory.length - maxMemSize;
+            memory = memory.slice(0, maxMemSize);
+            console.log(`✂️  Memory trimmed: removed ${trimmed} lower-scored articles (cap: ${maxMemSize}). Best content preserved.`);
+        }
 
         saveJson(MEMORY_PATH, memory);
 
@@ -526,8 +526,8 @@ startBot(); // start telegram bot listening
 // ---- Register /postnow Override Publish ----
 let isProcessingBoost = false;
 
-registerBoostCommand(async (ctx) => {
-    console.log(`\n🛎️ Override Publish requested! Checking locks...`);
+registerBoostCommand(async (ctx, postId) => {
+    console.log(`\n🛎️ Override Publish requested for Post ID: ${postId}! Checking locks...`);
     if (isProcessingBoost || isProcessingAnyPost) {
         console.log(`⚠️ Locked! isProcessingBoost=${isProcessingBoost}, isProcessingAnyPost=${isProcessingAnyPost}`);
         return ctx.reply('⚠️ Please wait! The engine is currently generating another post. Running them together will mix up the images.');
@@ -538,14 +538,14 @@ registerBoostCommand(async (ctx) => {
     try {
         let memory = loadJson(MEMORY_PATH);
 
-        // Find the best non-urgent story in the library
-        const overridePost = memory.find(m => !m.isUrgent);
+        // Find the selected story in the library
+        const overridePost = memory.find(m => String(m.originalId) === String(postId));
         if (!overridePost) {
-            return ctx.reply('💭 Memory library is empty right now — no stories available to override-publish. Wait for the next Scout cycle.');
+            return ctx.reply('💭 Selected story is no longer in the library. Please try again.');
         }
 
-        console.log(`\n🚀 OVERRIDE PUBLISH triggered via /postnow`);
-        console.log(`📌 Using best story: ${overridePost.originalId} (Score: ${overridePost.score})`);
+        console.log(`\n🚀 OVERRIDE PUBLISH triggered via /postnow for Post ID: ${postId}`);
+        console.log(`📌 Using story: ${overridePost.originalId} (Score: ${overridePost.score})`);
 
         // Process it — countQuota=false so it doesn't burn a quota slot
         const published = await processPost(overridePost, false);
