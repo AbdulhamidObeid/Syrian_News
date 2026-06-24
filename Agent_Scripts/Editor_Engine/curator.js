@@ -526,7 +526,9 @@ async function runCurator(rawFeedPath, outputDir, activeTopics = []) {
                 payload: payload,
                 originalItem: {
                     title: item.title || '',
-                    description: item.description || item.content || ''
+                    description: item.description || item.content || '',
+                    imageUrl: item.imageUrl || '',
+                    link: item.link || ''
                 }
             });
             

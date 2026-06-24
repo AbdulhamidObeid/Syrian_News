@@ -12,6 +12,7 @@
 const Parser = require('rss-parser');
 const fs = require('fs');
 const path = require('path');
+const axios = require('axios');
 
 const CONFIG_PATH = path.join(__dirname, '../../Config/sources_config.json');
 const OUTPUT_FEED_PATH = path.join(__dirname, 'feed.json');
@@ -67,6 +68,29 @@ function extractImageUrl(item) {
     return null;
 }
 
+/**
+ * Fetches the web page at url and attempts to extract the og:image meta tag.
+ */
+async function fetchOgImage(url) {
+    try {
+        const response = await axios.get(url, {
+            headers: {
+                'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'
+            },
+            timeout: 8000
+        });
+        const html = response.data;
+        const ogMatch = html.match(/<meta[^>]+property=["']og:image["'][^>]+content=["']([^"']+)["']/i) ||
+                        html.match(/<meta[^>]+content=["']([^"']+)["'][^>]+property=["']og:image["']/i);
+        if (ogMatch && ogMatch[1]) {
+            return ogMatch[1].trim();
+        }
+    } catch (e) {
+        console.log(`⚠️ Failed to fetch og:image for ${url}:`, e.message);
+    }
+    return null;
+}
+
 async function runScout() {
     console.log("📡 [Scout Engine] Booting up...");
 
@@ -113,7 +137,10 @@ async function runScout() {
                     for (const item of items) {
                         // Check duplication
                         if (!history.includes(item.link)) {
-                            const imageUrl = extractImageUrl(item);
+                            let imageUrl = extractImageUrl(item);
+                            if (!imageUrl && item.link) {
+                                imageUrl = await fetchOgImage(item.link);
+                            }
                             
                             fetchedArticles.push({
                                 category: category,
