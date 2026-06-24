@@ -81,7 +81,7 @@ GROWTH PHASE SCORING RUBRIC (we are a new account aggressively building audience
 5. Visual Bento Potential (15%): Can the core details be neatly arranged into 1 to 4 clean standalone bullet points for our branded template?
 ${avoidanceInstruction}
 
-BONUS: If the topic is about the FIFA World Cup 2026, football/soccer, or the Syrian national team, add +2 to the score (major global event = high engagement).
+BONUS / SPORTS SCORING (CRITICAL): Only score World Cup/football news highly (>= 7.5) and select it if it directly reports match results (e.g., final scores, winners, group qualification/elimination status). All other general sports news, pre-match expectations, training details, team logistics, or fan comments must be scored low (< 5.0) and set 'selected': false. Important news about Syria (daily life, economy, local events, reconstruction) must always be prioritized and scored much higher than sports.
 
 URGENCY CHECK: If the title or content contains any of these keywords: عاجل, مرسوم, قرار رئاسي, انفجار, عقوبات, زلزال, breaking, خبر عاجل
 Then mark "isUrgent": true. Urgent news always gets selected regardless of score.
@@ -221,18 +221,17 @@ For Carousels (isCarousel: true):
 - There MUST be at least 3 body slides (total minimum of 5 slides including hook and CTA).
 - Slide N (the last slide): type "cta", with "ctaText" containing ONLY a generic two-word phrase like "التفاصيل والمعلومات".
 When "isCarousel" is true, omit root-level "points", "headline", and "imagePrompt".
-
 CRITICAL IMAGE STRATEGY RULE (APPLIES TO BOTH SINGLE POSTS AND CAROUSELS):
 - If the news is about a specific person, a specific event, a specific object, or anything specific whose visual context or resemblance is important (e.g., a serious topic involving a specific person, sports match, or landmark) and we have an image URL from the scraped news (Original Image URL is not 'No image available'), you MUST set "imageStrategy": "reference" to use that image as a reference.
-  * If you set "imageStrategy": "reference", the "imagePrompt" MUST describe the actual scene and composition of the reference image (e.g., if the reference image is a signing ceremony, the prompt must describe politicians signing an agreement).
+  * If you set "imageStrategy": "reference", the "imagePrompt" MUST NOT describe the news article details or write a new custom scene. Instead, you MUST write a prompt in a proper prompt way to recreate the reference image, formatted exactly as: "A high-quality, realistic photo of [main topic/subject of the reference image], recreating the exact same reference image with all its details, same features, and subjects, shot from a slightly different camera angle, with no watermarks."
   * If you want to depict a different, more general or illustrative scene that does not match the reference image (e.g., depicting a generic post office counter instead of the specific signing ceremony), you MUST set "imageStrategy": "generate" to ignore the reference image.
 - Only set "imageStrategy": "generate" (text-only prompt) if the news is about a very general/abstract topic (like general economy, weather, abstract concepts), if there is no image URL in the news source, or if the original image is irrelevant/mismatched to the scene you want to depict.
-- For BOTH strategies, write a highly specific, photorealistic prompt in English describing EXACTLY what the image should look like.
-- Detail the exact subjects (e.g., if it's a specific country, person, or object, name them and describe their appearance).
-- AI IMAGE SAFETY (CRITICAL): Image AI models default to the Syrian Regime when generating "Syria". You MUST forcefully override this in your prompt:
-  * If a Syrian flag is requested, you MUST write "the Syrian Revolution flag with green, white, and black horizontal stripes and three red stars in the middle". NEVER just write "Syrian flag".
-  * If a government logo, official document, or coat of arms is requested, you MUST specify "The new Syrian national emblem (launched in July 2025), which is the Syrian Golden Eagle (Eastern Imperial Eagle)". NEVER use the old eagle logo or the Hawk of Quraish.
+- For BOTH strategies, write a photorealistic prompt in English describing what the image should look like.
+- AI IMAGE SAFETY & SYMBOLISM RULES (CRITICAL):
+  * Do NOT inject or add flags, logos, emblems, maps, or other political/national symbols into the prompt unless they are explicitly mentioned/requested in the news text. Most real-world scenes (like a street, a market, a petrol station) do not have flags or official emblems. Keep the scene realistic and clutter-free.
+  * If (and ONLY if) a Syrian flag is explicitly requested or central to the news context, you MUST write "the Syrian Revolution flag with green, white, and black horizontal stripes and three red stars in the middle". NEVER write "Syrian flag" without this description.
   * NEVER use generic terms like "Syrian president", "Syrian diplomat", or "Syrian leader" WITHOUT explicitly naming the person, as the AI will default to generating Bashar Al-Assad. If the news is about a specific person, you MUST name them explicitly in the prompt (e.g. "Portrait of Jihad Makdissi, a Syrian diplomat") AND you MUST set "imageStrategy": "reference" if an Original Image URL is provided.
+
 - Do NOT be vague. If the news is about "Morocco vs Scotland", explicitly say "Morocco flag and Scotland flag" or "Morocco football players playing against Scotland football players in stadium".
 - DO NOT hallucinate details that conflict with the news (e.g. don't write Portugal if the news says Scotland).
 - The image MUST look realistic, cinematic, and NOT like generic AI slop. It MUST resemble the Syrian or Arab context where applicable.
@@ -378,17 +377,53 @@ async function refineImagePrompt(previousPayload, feedback) {
     const modelName = editorConfig.fast_model || 'gemini-2.5-flash';
     const model = genAI.getGenerativeModel({ model: modelName });
     
-    const prompt = `You are a creative director. We have an image prompt for an AI image generator:
-"${previousPayload.imagePrompt || (previousPayload.slides && previousPayload.slides[0] && previousPayload.slides[0].imagePrompt) || ''}"
+    const payload = previousPayload || {};
+    const previousPrompt = payload.imagePrompt || (payload.slides && payload.slides[0] && payload.slides[0].imagePrompt) || '';
+    const subHeadline = payload.subHeadline || '';
+    const headlineText = payload.headline 
+        ? `${payload.headline.line1 || ''} ${payload.headline.line2 || ''}`.trim()
+        : '';
+    const pointsText = Array.isArray(payload.points)
+        ? payload.points.join('\n')
+        : '';
+    const prompt = `You are a creative director. We have an image prompt representing a news item for an AI image generator.
 
-The user wants to modify the generated image with this feedback:
+=== News Context ===
+Category/Topic: ${subHeadline}
+Headline: ${headlineText}
+Key Points:
+${pointsText}
+
+=== Previous Image Prompt ===
+"${previousPrompt}"
+
+=== User Modification Feedback ===
 "${feedback}"
 
-Rewrite and improve the English image prompt to incorporate the user's feedback. Keep the core subject, style, and context intact, but adjust the details as requested.
-CRITICAL AI IMAGE SAFETY RULES:
-- If a Syrian flag is requested or implied, you MUST explicitly write "the Syrian Revolution flag with green, white, and black horizontal stripes and three red stars in the middle".
-- If a government logo, official document, or coat of arms is requested or implied, you MUST specify "The new Syrian national emblem (launched in July 2025), which is the Syrian Golden Eagle (Eastern Imperial Eagle)". NEVER use the old eagle logo or the Hawk of Quraish.
-- NEVER use generic terms like "Syrian president", "Syrian diplomat", or "Syrian leader" WITHOUT explicitly naming the person, as the AI will default to generating Bashar Al-Assad. If the news is about a specific person, you MUST name them explicitly in the prompt.
+=== Instructions ===
+Rewrite the English image prompt to incorporate the user's feedback.
+
+Be smart and analyze the relationship between the previous image prompt and the user's feedback:
+1. **Scene/Location/Environment Replacement**:
+   - If the user's feedback requests a change in the location, setting, or environment (e.g. from an office/meeting room to a petrol station, or from a street to an indoor room), you MUST completely REPLACE the old setting/location with the new one.
+   - Do NOT blend or mix incompatible environments (e.g., do NOT keep meeting room furniture, office walls, or indoor office features if the new location is a petrol station or a street).
+   - Ensure the new environment is clean, logical, and fully depicted without remnants of the previous location.
+2. **Composition & Object Focus**:
+   - If the feedback requests focus on a specific object or close-up composition (e.g., "a fuel pump nozzle", "a close-up of a product", "specific person's hands"), describe EXACTLY that close-up composition.
+   - Do NOT add unnecessary background clutter (such as large buildings, wide landscapes, maps, flags, desks) that distracts from the requested object focus unless explicitly requested.
+3. **Subject & Topic Consistency**:
+   - Preserve the main human subject(s) or entities (e.g. a specific diplomat, worker, or vehicle) and the core journalistic topic, but transplant them entirely into the new setting.
+4. **Detail Adjustment**:
+   - If the feedback only requests minor details of the current scene (e.g. adding a flag, changing clothes, adjusting lighting, or changing the time of day), keep the current scene structure and apply the specific modification.
+5. **Style & Quality**:
+   - Maintain a highly realistic, photorealistic, high-quality style. Avoid watermarks, text overlay, or artificial elements.
+
+CRITICAL AI IMAGE SAFETY & SYMBOLISM RULES:
+- Do NOT inject or add flags, logos, emblems, maps, or other political/national symbols into the prompt unless they are explicitly mentioned/requested in the user's feedback or the news context.
+- Never assume that mentioning "Syria" or a Syrian city/location implies that a flag, coat of arms, or emblem should be present. Keep the scene realistic and clutter-free.
+- If (and ONLY if) a Syrian flag is explicitly requested or implied by the feedback, you MUST write "the Syrian Revolution flag with green, white, and black horizontal stripes and three red stars in the middle". NEVER write "Syrian flag".
+- If (and ONLY if) a government logo, official document, or coat of arms is explicitly requested or implied by the feedback, you MUST specify "The new Syrian national emblem (launched in July 2025), which is the Syrian Golden Eagle (Eastern Imperial Eagle)". NEVER use the old eagle logo or the Hawk of Quraish.
+- NEVER use generic terms like "Syrian president", "Syrian diplomat", or "Syrian leader" WITHOUT explicitly naming the person. If the news is about a specific person, you MUST name them explicitly in the prompt.
 
 Return ONLY the new rewritten image prompt text in English.`;
 

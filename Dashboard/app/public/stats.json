@@ -1,16 +1,16 @@
 {
-  "lastUpdated": "2026-06-21T17:24:33.269Z",
+  "lastUpdated": "2026-06-24T14:23:50.606Z",
   "platforms": {
     "facebook": {
-      "followers": 1,
+      "followers": 2,
       "connected": true
     },
     "instagram": {
-      "followers": 8,
+      "followers": 11,
       "connected": true
     },
     "telegram": {
-      "followers": 2,
+      "followers": 3,
       "connected": true
     },
     "x": {
@@ -19,25 +19,25 @@
     }
   },
   "kpis": {
-    "totalAudience": 11,
-    "postsPublished": 30,
-    "storyLibrary": 30,
-    "postsToday": 3,
+    "totalAudience": 16,
+    "postsPublished": 83,
+    "storyLibrary": 26,
+    "postsToday": 2,
     "weeklyPostCounts": {
-      "2026-06-15": 0,
-      "2026-06-16": 0,
-      "2026-06-17": 0,
       "2026-06-18": 8,
       "2026-06-19": 5,
       "2026-06-20": 13,
-      "2026-06-21": 3
+      "2026-06-21": 4,
+      "2026-06-22": 7,
+      "2026-06-23": 9,
+      "2026-06-24": 2
     }
   },
   "platformInsights": {
     "facebook": {
-      "weeklyViews": 2,
+      "weeklyViews": 3,
       "weeklyEngaged": 0,
-      "weeklyNewFollows": 0,
+      "weeklyNewFollows": 1,
       "postsLikes": 0,
       "postsComments": 0,
       "postsShares": 0,
@@ -45,8 +45,8 @@
     },
     "instagram": {
       "weeklyReach": 0,
-      "totalInteractions": 33,
-      "likes": 33,
+      "totalInteractions": 16,
+      "likes": 16,
       "comments": 0,
       "saves": 0,
       "shares": 0,
@@ -62,17 +62,17 @@
       "note": ""
     },
     "telegram": {
-      "members": 2,
+      "members": 3,
       "available": true,
       "note": "Message-level views require Bot polling"
     }
   },
   "topPosts": [
     {
-      "id": "1139516419249724_122108189691359008",
-      "message": "يترقب عشاق كرة القدم المواجهة المرتقبة بين منتخبي مصر ونيوزيلندا فجر يوم الاثنين ضمن منافسات كأس العالم 2026. هل تتوقعون فوز المنتخب المصري ",
-      "thumbnail": "https://scontent.fruh6-2.fna.fbcdn.net/v/t39.30808-6/729080397_122108189679359008_4095423558229261017_n.jpg?stp=dst-jpg_p720x720_tt6&_nc_cat=111&ccb=1-7&_nc_sid=127cfc&_nc_ohc=Pt_RMG8OFc4Q7kNvwHzORr9&_nc_oc=Adrip7AO4fXNuy_iuo4ffQTwaQT21Ir8GsDwGLcQsa6FNj6H_jRZrbbbw9Evf-lOC_tJKcUGgVN0jpFXssd-WBaq&_nc_zt=23&_nc_ht=scontent.fruh6-2.fna&edm=APyxFHYEAAAA&_nc_gid=a27lwYA9FZsHlhoPb48aDQ&_nc_tpa=Q5bMBQF5m4nqni9369QXDlyqbTaPPmIt_f8KAaVavqNZLpD1CA7MsTL4Emo739KTTHaKTc7GCKb_UYgp2A&oh=00_Af8oqsYF8_Lt1p8-O9lu1Nln0FLz7FIFzv_qutfqBIYt4g&oe=6A3DE3F7",
-      "createdAt": "2026-06-21T15:36:20+0000",
+      "id": "1139516419249724_122109682473359008",
+      "message": "أطلقت مديرية صحة حمص بالتعاون مع الجمعية الطبية السورية الأمريكية (SAMS) حملة طبية مجانية في مستشفى حمص الوطني، تشمل إجراءات التنظير الهضمي ",
+      "thumbnail": "https://scontent.fruh5-1.fna.fbcdn.net/v/t39.30808-6/729953709_122109682461359008_8719301620803472646_n.jpg?stp=dst-jpg_p720x720_tt6&_nc_cat=102&ccb=1-7&_nc_sid=127cfc&_nc_ohc=qrBXP8qJdZ0Q7kNvwH7yXop&_nc_oc=Adr-rEnQItWOpHFvpsb4fKx_4GZW3pxFyPqNl8I-Vy7ZClXHNVX0gYUSi9Qkfayy3CQzW-EOVenPpfnUJqz2uyZz&_nc_zt=23&_nc_ht=scontent.fruh5-1.fna&edm=APyxFHYEAAAA&_nc_gid=8qVnq9oTqzCNjfIxrY5wkw&_nc_tpa=Q5bMBQFxDXSLOknNins__2N2ZdsqAh8czwVxUMsx5-fkbnEVwKLbFee8mrLH1iZVdLXFQGm0v1z1wV_09Q&oh=00_Af8SYGNaxeYRPNl2TTGj57hT071XirI09HF7CpRRCjuN4g&oe=6A41AFEC",
+      "createdAt": "2026-06-24T12:55:11+0000",
       "likes": 0,
       "comments": 0,
       "shares": 0,
@@ -80,10 +80,10 @@
       "platform": "facebook"
     },
     {
-      "id": "1139516419249724_122108164905359008",
-      "message": "أعلنت الهيئة العامة للطيران المدني عن قرب إطلاق رحلات جوية مباشرة تربط بين دمشق وأمستردام مطلع شهر يوليو القادم، في خطوة تهدف لتعزيز الربط ا",
-      "thumbnail": "https://scontent.fruh6-2.fna.fbcdn.net/v/t39.30808-6/727395667_122108164893359008_8722318730689978727_n.jpg?stp=dst-jpg_p720x720_tt6&_nc_cat=100&ccb=1-7&_nc_sid=127cfc&_nc_ohc=XtNtPFJEJr4Q7kNvwGpmJmz&_nc_oc=AdoOduZSgfnM0GqEWPNcBlbY-hmfW_qlG_CRPqBKlvLeG7bRr8-_ET3Z7N2wzQUmUnvPMaV9fGxDq3aAhy1AXDHN&_nc_zt=23&_nc_ht=scontent.fruh6-2.fna&edm=APyxFHYEAAAA&_nc_gid=a27lwYA9FZsHlhoPb48aDQ&_nc_tpa=Q5bMBQHI_i7ijn2l7Ir83qL_JQK2mUhvx3PEEC6kDQ4Jw6b5PkjzkuhEy7m8nRWAgulyEAAWS42xphw1cA&oh=00_Af_msDnMb4Ln_ym_op6QFg8k9ObxTKeFhlhMLc8WRPcJ3A&oe=6A3E0885",
-      "createdAt": "2026-06-21T14:30:32+0000",
+      "id": "1139516419249724_122109681543359008",
+      "message": "سجلت فرق الدفاع المدني السوري إصابة 14 شخصاً خلال الـ 24 ساعة الماضية نتيجة حوادث سير وحرائق متفرقة في عدة مناطق. نذكر الجميع بضرورة توخي ال",
+      "thumbnail": "https://scontent.fruh6-1.fna.fbcdn.net/v/t39.30808-6/730558922_122109681531359008_4433199155031666030_n.jpg?stp=dst-jpg_p720x720_tt6&_nc_cat=104&ccb=1-7&_nc_sid=127cfc&_nc_ohc=2KnJTedELLYQ7kNvwH8_ajH&_nc_oc=AdqhvV66233uW5y_gTKf2__T-WRiGxmfLmcRkmfS21LX8ttSD1Gk8u196RdrVSZ2jszcxb-f1r_hrwbIX6TzKHgE&_nc_zt=23&_nc_ht=scontent.fruh6-1.fna&edm=APyxFHYEAAAA&_nc_gid=8qVnq9oTqzCNjfIxrY5wkw&_nc_tpa=Q5bMBQEZXUgIAM_CW8JjSN1lgOQTBK38ZmG567VTfAK7ep5_t5DHh6yfFxa5_xSStgCBF4BgoZT-eG4-nQ&oh=00_Af_JPoSg0P4f6qoUnHO-jama97AUbn5hb8xwChPu4HT0ZQ&oe=6A41BC44",
+      "createdAt": "2026-06-24T12:51:45+0000",
       "likes": 0,
       "comments": 0,
       "shares": 0,
@@ -91,10 +91,10 @@
       "platform": "facebook"
     },
     {
-      "id": "1139516419249724_122108147655359008",
-      "message": "تصريحات لافتة للرئيس الأمريكي دونالد ترامب حول مستقبل ملف حزب الله اللبناني ودور سوريا في المرحلة المقبلة. كيف تقرأون هذه التوجهات الجديدة ف",
-      "thumbnail": "https://scontent.fruh5-1.fna.fbcdn.net/v/t39.30808-6/727236129_122108147631359008_2237192437425182091_n.jpg?stp=dst-jpg_p720x720_tt6&_nc_cat=102&ccb=1-7&_nc_sid=127cfc&_nc_ohc=tYz1UlCMIBgQ7kNvwFQz0JV&_nc_oc=Ado5az_1Zsi_PyhtpzXRiJ8qAPG6F4UFHFNyXtX07KxJj3M-g9ZM2YRjCINd0Odm89_Z-6iGsOI8i6LFT8BsXHp7&_nc_zt=23&_nc_ht=scontent.fruh5-1.fna&edm=APyxFHYEAAAA&_nc_gid=a27lwYA9FZsHlhoPb48aDQ&_nc_tpa=Q5bMBQEcOzJ5TS-FSGLOYzdhJkEIK2_XCSOcbBa-izZ_ty2q5nVnsnoV2b8an4bt-CQEtynHanyhu7rhNQ&oh=00_Af89UFfj8WtQ4UAmrKpqf8QqlLTx_GbtWYuokBe7gb74tw&oe=6A3E0A7E",
-      "createdAt": "2026-06-21T14:07:18+0000",
+      "id": "1139516419249724_122109628623359008",
+      "message": "في إطار اتفاقية التعاون القضائي الموقعة بين البلدين، سلمت السلطات اللبنانية اليوم دفعة جديدة تضم 128 محكوماً سورياً إلى دمشق. كيف تقرأون تأث",
+      "thumbnail": "https://scontent.fruh5-1.fna.fbcdn.net/v/t39.30808-6/730748983_122109628611359008_5893778555155687604_n.jpg?stp=dst-jpg_p720x720_tt6&_nc_cat=108&ccb=1-7&_nc_sid=127cfc&_nc_ohc=DoSNKgrCrv8Q7kNvwHu5yXT&_nc_oc=AdpMUEAilLmyB3TxAjOygo4_c_S89FyOlZQx_aD2YTDaw04TWpTNldLAGZpBys8Ta0q1LuVGA0EkuRIHi7oSp0pV&_nc_zt=23&_nc_ht=scontent.fruh5-1.fna&edm=APyxFHYEAAAA&_nc_gid=8qVnq9oTqzCNjfIxrY5wkw&_nc_tpa=Q5bMBQEnZDAYzTx6CctuExqEXHXjS8JkfMZork5sZNE1KGCtdENR4ELnYmTfpn5VXFwAvSocDAEz5e1GkQ&oh=00_Af_Atqfw5XTKEXMg8pgJ_d5oMQVz3TgRPq0YgqCWWM6Hig&oe=6A41B6BD",
+      "createdAt": "2026-06-24T10:28:00+0000",
       "likes": 0,
       "comments": 0,
       "shares": 0,
@@ -102,10 +102,10 @@
       "platform": "facebook"
     },
     {
-      "id": "1139516419249724_122107958481359008",
-      "message": "تغييرات جذرية في نظام التأهل لكأس العالم 2026 تثير جدلاً واسعاً في الأوساط الرياضية العالمية. كيف سيؤثر هذا النظام الجديد على فرص المنتخبات ",
-      "thumbnail": "https://scontent.fruh6-2.fna.fbcdn.net/v/t39.30808-6/727940811_122107958223359008_2614942726900469160_n.jpg?stp=dst-jpg_p720x720_tt6&_nc_cat=103&ccb=1-7&_nc_sid=127cfc&_nc_ohc=YuB203Q3CisQ7kNvwHYwRSv&_nc_oc=Adq-WsGh62kSVe-4xLmq48LoOyhvBMQvjn6yDGX3pVKir1lhovZ8AfZ5EttE_K5nHzOuIvi-nVa-OCYXgKjt4iTX&_nc_zt=23&_nc_ht=scontent.fruh6-2.fna&edm=APyxFHYEAAAA&_nc_gid=a27lwYA9FZsHlhoPb48aDQ&_nc_tpa=Q5bMBQH8kSmRI-v9tH_6i6_P8jcdX_2Sq-K3txmVxFJwS_cdCMHnmO7xXZpscvu4-zWrV2zJVZfCwrZehw&oh=00_Af_-n_JoPc0hkEVfc8f_TlKwsmaD99jAqpeb9Pcap2vjtA&oe=6A3DD71E",
-      "createdAt": "2026-06-21T07:21:05+0000",
+      "id": "1139516419249724_122109541671359008",
+      "message": "شهدت تداولات اليوم الأربعاء 24 يونيو 2026 تحسناً في سعر صرف الليرة السورية مقابل الدولار، بالتزامن مع انخفاض في أسعار الذهب محلياً. كيف تقرأ",
+      "thumbnail": "https://scontent.fruh5-1.fna.fbcdn.net/v/t39.30808-6/731147170_122109541659359008_2864922837394488605_n.jpg?stp=dst-jpg_p720x720_tt6&_nc_cat=108&ccb=1-7&_nc_sid=127cfc&_nc_ohc=Uz-u4aX7Z-IQ7kNvwFfTXVZ&_nc_oc=Adrr4GyEddjXsRijM860YkjN8nhiBJe3oTVU-NQQLGMqgZBO3UFxl0tcaYSpnKMVhIDbJlvvIw1iQw__yoqkjaIq&_nc_zt=23&_nc_ht=scontent.fruh5-1.fna&edm=APyxFHYEAAAA&_nc_gid=8qVnq9oTqzCNjfIxrY5wkw&_nc_tpa=Q5bMBQGAgXrUaClaodLqdQ4KRCmtgx3PZitEH7_I6TfypjmpypZ8GEMgTL64jZGvX6oDcasjWmQzUeAaEA&oh=00_Af-aEjKIB1sFOdTiReOqfGYZO5shIF-u6GQbQWfllj09tw&oe=6A41D3C1",
+      "createdAt": "2026-06-24T07:37:19+0000",
       "likes": 0,
       "comments": 0,
       "shares": 0,
@@ -113,10 +113,10 @@
       "platform": "facebook"
     },
     {
-      "id": "1139516419249724_122107542393359008",
-      "message": "استشهد مصور قناة الجزيرة مباشر، الصحفي أحمد وشاح، اليوم السبت إثر غارة جوية إسرائيلية استهدفت وسط قطاع غزة. ننعى ببالغ الحزن والأسى زميلاً ج",
-      "thumbnail": "https://scontent.fruh6-1.fna.fbcdn.net/v/t39.30808-6/728334909_122107542375359008_8423792554136341681_n.jpg?stp=dst-jpg_p720x720_tt6&_nc_cat=101&ccb=1-7&_nc_sid=127cfc&_nc_ohc=etXHB3xt5uAQ7kNvwHVQXCn&_nc_oc=AdqTrAtz5Vte8AFJYx13uT2FSWxmd9RMy-056ihzTFZzOJBxrFO3RDpCv0y7_BRYQvvKVlQ0xEm-2YfqJyZoYh-M&_nc_zt=23&_nc_ht=scontent.fruh6-1.fna&edm=APyxFHYEAAAA&_nc_gid=a27lwYA9FZsHlhoPb48aDQ&_nc_tpa=Q5bMBQFNFb4PyklugPsQvOUyQbPgWI7UMPHm92pmy62plOhnd2vWShvgn8GOgfea7iYttjWCVjcxsq-gaA&oh=00_Af_UrZ-II-mTroDleKEYZOhKLYmwGij-0ynwG-wji30G9g&oe=6A3E0B08",
-      "createdAt": "2026-06-20T19:11:59+0000",
+      "id": "1139516419249724_122109331845359008",
+      "message": "خسائر فادحة في المحاصيل الزراعية بريف القامشلي نتيجة حرائق واسعة التهمت آلاف الدونمات من القمح والشعير. كيف يمكن تعزيز إجراءات السلامة لحماي",
+      "thumbnail": "https://scontent.fruh6-2.fna.fbcdn.net/v/t39.30808-6/728449483_122109331827359008_1429620155194390759_n.jpg?stp=dst-jpg_p720x720_tt6&_nc_cat=103&ccb=1-7&_nc_sid=127cfc&_nc_ohc=FdmKkbNj5fkQ7kNvwFSoyDF&_nc_oc=AdpG-LIPCOAqMlX2Z3zX-E-kkmglGlqcUXGnZrlCYqqG0LkPrIMYdBJWvZ9RFHETXumr0MPMbkVNnynfEb2TviEm&_nc_zt=23&_nc_ht=scontent.fruh6-2.fna&edm=APyxFHYEAAAA&_nc_gid=8qVnq9oTqzCNjfIxrY5wkw&_nc_tpa=Q5bMBQFnjkc3hxD9K23KnYMJRre91K7eSTccZHNTbu2sMhdIMjCGHG8pZOcss65ReF6YwSmyp8QY9jXCCg&oh=00_Af9eucbIt-KeQpLHM7SxEl7DC9CfgzIOQp4FgQyBvI4Hhg&oe=6A41A414",
+      "createdAt": "2026-06-23T18:58:12+0000",
       "likes": 0,
       "comments": 0,
       "shares": 0,
@@ -159,7 +159,7 @@
     }
   ],
   "pipeline": {
-    "lastRun": "2026-06-21T17:24:42.730Z",
+    "lastRun": "2026-06-24T14:24:00.809Z",
     "status": "operational"
   }
 }

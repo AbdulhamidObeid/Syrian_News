@@ -181,6 +181,39 @@ function cleanupPostFiles(postId) {
     }
 }
 
+function syncCopyInputFolder(activeMemory) {
+    try {
+        if (!fs.existsSync(COPY_INPUT_DIR)) return;
+        const activeFiles = new Set(activeMemory.map(item => `post_${item.originalId}.json`));
+        const files = fs.readdirSync(COPY_INPUT_DIR);
+        const now = Date.now();
+        const ttlMs = 24 * 60 * 60 * 1000;
+        
+        for (const file of files) {
+            if (file.startsWith('post_') && file.endsWith('.json')) {
+                // Keep active post files
+                if (activeFiles.has(file)) continue;
+
+                // Handle routine files (keep only if created in last 24h)
+                if (file.startsWith('post_routine_')) {
+                    const stats = fs.statSync(path.join(COPY_INPUT_DIR, file));
+                    if ((now - stats.mtimeMs) < ttlMs) {
+                        continue;
+                    }
+                }
+
+                // Delete orphaned file
+                try {
+                    fs.unlinkSync(path.join(COPY_INPUT_DIR, file));
+                    console.log(`🧹 Deleted orphaned input file: ${file}`);
+                } catch (e) {}
+            }
+        }
+    } catch (e) {
+        console.error(`⚠️ Error synchronizing copy_input folder:`, e.message);
+    }
+}
+
 let isProcessingAnyPost = false;
 
 // ---- CORE PROCESSING ----
@@ -402,9 +435,27 @@ async function runCycle() {
         let memory = loadJson(MEMORY_PATH);
         const history = loadJson(HISTORY_PATH);
 
-        // 1. Cleanup Memory (> 24 hours old) - DISABLED: Keep all curated stories until published
-        // const ttlMs = (scheduleConfig.news_memory_ttl_hours || 24) * 60 * 60 * 1000;
-        // memory = memory.filter(m => (Date.now() - m.fetchedAt) < ttlMs);
+        // 1. Cleanup Memory (> 24 hours old)
+        const ttlMs = (scheduleConfig.news_memory_ttl_hours || 24) * 60 * 60 * 1000;
+        const now = Date.now();
+        const activeMemory = [];
+        const expiredMemory = [];
+        for (const item of memory) {
+            if ((now - item.fetchedAt) < ttlMs) {
+                activeMemory.push(item);
+            } else {
+                expiredMemory.push(item);
+            }
+        }
+        memory = activeMemory;
+        if (expiredMemory.length > 0) {
+            console.log(`🧹 Cleaning up ${expiredMemory.length} expired posts (> 24 hours old)...`);
+            for (const item of expiredMemory) {
+                cleanupPostFiles(item.originalId);
+            }
+        }
+        syncCopyInputFolder(memory);
+
 
         // 2. Run Scout — pull fresh news
         console.log("📡 Triggering Scout Engine...");
@@ -438,13 +489,8 @@ async function runCycle() {
         // Sort memory by score descending
         memory.sort((a, b) => b.score - a.score);
 
-        // 🧠 Smart Memory Cap — keep only the top N articles to prevent unbounded growth
-        const maxMemSize = scheduleConfig.max_memory_size || 30;
-        if (memory.length > maxMemSize) {
-            const trimmed = memory.length - maxMemSize;
-            memory = memory.slice(0, maxMemSize);
-            console.log(`✂️  Memory trimmed: removed ${trimmed} lower-scored articles (cap: ${maxMemSize}). Best content preserved.`);
-        }
+        // Sync copy_input folder to ensure it matches memory perfectly
+        syncCopyInputFolder(memory);
 
         saveJson(MEMORY_PATH, memory);
 
