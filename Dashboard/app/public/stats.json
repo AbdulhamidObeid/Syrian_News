@@ -1,16 +1,16 @@
 {
-  "lastUpdated": "2026-06-24T14:43:58.051Z",
+  "lastUpdated": "2026-06-27T13:29:12.789Z",
   "platforms": {
     "facebook": {
-      "followers": 2,
+      "followers": 7,
       "connected": true
     },
     "instagram": {
-      "followers": 11,
+      "followers": 21,
       "connected": true
     },
     "telegram": {
-      "followers": 3,
+      "followers": 6,
       "connected": true
     },
     "x": {
@@ -19,25 +19,25 @@
     }
   },
   "kpis": {
-    "totalAudience": 16,
-    "postsPublished": 83,
-    "storyLibrary": 29,
-    "postsToday": 2,
+    "totalAudience": 34,
+    "postsPublished": 141,
+    "storyLibrary": 110,
+    "postsToday": 1,
     "weeklyPostCounts": {
-      "2026-06-18": 8,
-      "2026-06-19": 5,
-      "2026-06-20": 13,
       "2026-06-21": 4,
       "2026-06-22": 7,
       "2026-06-23": 9,
-      "2026-06-24": 2
+      "2026-06-24": 4,
+      "2026-06-25": 9,
+      "2026-06-26": 9,
+      "2026-06-27": 1
     }
   },
   "platformInsights": {
     "facebook": {
-      "weeklyViews": 3,
-      "weeklyEngaged": 0,
-      "weeklyNewFollows": 1,
+      "weeklyViews": 48,
+      "weeklyEngaged": 3,
+      "weeklyNewFollows": 5,
       "postsLikes": 0,
       "postsComments": 0,
       "postsShares": 0,
@@ -45,11 +45,11 @@
     },
     "instagram": {
       "weeklyReach": 0,
-      "totalInteractions": 16,
-      "likes": 16,
+      "totalInteractions": 104,
+      "likes": 56,
       "comments": 0,
       "saves": 0,
-      "shares": 0,
+      "shares": 24,
       "profileViews": 0,
       "available": true
     },
@@ -62,17 +62,17 @@
       "note": ""
     },
     "telegram": {
-      "members": 3,
+      "members": 6,
       "available": true,
       "note": "Message-level views require Bot polling"
     }
   },
   "topPosts": [
     {
-      "id": "1139516419249724_122109682473359008",
-      "message": "أطلقت مديرية صحة حمص بالتعاون مع الجمعية الطبية السورية الأمريكية (SAMS) حملة طبية مجانية في مستشفى حمص الوطني، تشمل إجراءات التنظير الهضمي ",
-      "thumbnail": "https://scontent.fruh5-1.fna.fbcdn.net/v/t39.30808-6/729953709_122109682461359008_8719301620803472646_n.jpg?stp=dst-jpg_p720x720_tt6&_nc_cat=102&ccb=1-7&_nc_sid=127cfc&_nc_ohc=qrBXP8qJdZ0Q7kNvwH7yXop&_nc_oc=Adr-rEnQItWOpHFvpsb4fKx_4GZW3pxFyPqNl8I-Vy7ZClXHNVX0gYUSi9Qkfayy3CQzW-EOVenPpfnUJqz2uyZz&_nc_zt=23&_nc_ht=scontent.fruh5-1.fna&edm=APyxFHYEAAAA&_nc_gid=1tanlzgg-eM8iOZpvI9NgQ&_nc_tpa=Q5bMBQEEsxYitu3VFM2rPfMNtXGN45BLJreqyeEC7fgFUCjFmxiNel0wReX2yppnximq8dL6sjPEL_swLA&oh=00_Af9Lx8WLntNz7ToKEFY3sInwSj8o7ol8a12P0QaK8AAr_A&oe=6A41AFEC",
-      "createdAt": "2026-06-24T12:55:11+0000",
+      "id": "1139516419249724_122111115783359008",
+      "message": "رغم انخفاض سعر صرف الدولار وتراجع تكاليف الشحن عالمياً، لا تزال الأسعار في الأسواق السورية تحافظ على مستوياتها المرتفعة. ما هي الأسباب الحقي",
+      "thumbnail": "https://scontent.fruh6-1.fna.fbcdn.net/v/t39.30808-6/730040827_122111115585359008_4531315066057423298_n.jpg?stp=dst-jpg_p720x720_tt6&_nc_cat=105&ccb=1-7&_nc_sid=127cfc&_nc_ohc=F8u4cguKQpYQ7kNvwFQjl-Q&_nc_oc=Ado_hykmCARuxD5iCaLXdqtxPR3rfJ5dyiTTm4MkQ-7EVjqS5QJAN1To7xFm5VZXrxqd58X9htVNyNCxOg1TOjkj&_nc_zt=23&_nc_ht=scontent.fruh6-1.fna&edm=APyxFHYEAAAA&_nc_gid=zmo4oUSvRA8lwaMzzOKqFg&_nc_tpa=Q5bMBQF3fUQXPhna3EzdGjPfv3ORUYrnD0ojw8V4peg2lGHXbsUcFuPQTtj_QG_7eRMO6yoJaiTGBDWxkw&oh=00_Af_ANDrJZ2Pwj_EoEvjmMAZ2cCho8L6Xa4Rs_RVCEgtLKw&oe=6A45A802",
+      "createdAt": "2026-06-27T10:45:24+0000",
       "likes": 0,
       "comments": 0,
       "shares": 0,
@@ -80,10 +80,10 @@
       "platform": "facebook"
     },
     {
-      "id": "1139516419249724_122109681543359008",
-      "message": "سجلت فرق الدفاع المدني السوري إصابة 14 شخصاً خلال الـ 24 ساعة الماضية نتيجة حوادث سير وحرائق متفرقة في عدة مناطق. نذكر الجميع بضرورة توخي ال",
-      "thumbnail": "https://scontent.fruh6-1.fna.fbcdn.net/v/t39.30808-6/730558922_122109681531359008_4433199155031666030_n.jpg?stp=dst-jpg_p720x720_tt6&_nc_cat=104&ccb=1-7&_nc_sid=127cfc&_nc_ohc=2KnJTedELLYQ7kNvwH8_ajH&_nc_oc=AdqhvV66233uW5y_gTKf2__T-WRiGxmfLmcRkmfS21LX8ttSD1Gk8u196RdrVSZ2jszcxb-f1r_hrwbIX6TzKHgE&_nc_zt=23&_nc_ht=scontent.fruh6-1.fna&edm=APyxFHYEAAAA&_nc_gid=1tanlzgg-eM8iOZpvI9NgQ&_nc_tpa=Q5bMBQFEjrsDulm4raJTMJjD64ek-UaE5pO1wuZxG7hssDi9rO7bGoEgQ-_dV8wuBn7DsFEHJd-EAbBw7A&oh=00_Af8rD_cagia0Aj3ABaC1vcQnxk-jzs9cmZEIA1xutYtAbg&oe=6A41BC44",
-      "createdAt": "2026-06-24T12:51:45+0000",
+      "id": "1139516419249724_122110864473359008",
+      "message": "تتوقع الأرصاد الجوية أجواء صيفية حارة نسبياً في سوريا، مع درجات حرارة حول معدلاتها الطبيعية. تشهد المناطق الشرقية طقساً حاراً، بينما تظهر غي",
+      "thumbnail": "https://scontent.fruh5-1.fna.fbcdn.net/v/t39.30808-6/730748903_122110864461359008_1738858917991774279_n.jpg?stp=dst-jpg_p720x720_tt6&_nc_cat=107&ccb=1-7&_nc_sid=127cfc&_nc_ohc=jqgi9mLXyOQQ7kNvwEHqlph&_nc_oc=Adql_ZyqregymcfDNdiBaPLx3nefGCKhuwPVCbg5XPH4nkIcha40LD73G8XbllTrhTZLUrNsfLaA_Q_UugIZNe_v&_nc_zt=23&_nc_ht=scontent.fruh5-1.fna&edm=APyxFHYEAAAA&_nc_gid=zmo4oUSvRA8lwaMzzOKqFg&_nc_tpa=Q5bMBQEGC7ksG1sicD452u5pjt8LECHsC0W5Or_ZbNogeADntWARxFFSuamim2q8jSrufIzMoYuZO-YA6A&oh=00_Af9mbYXXlng_S71pARbad882Pop8CshB7bT6mAMqFzbGnA&oe=6A459DC5",
+      "createdAt": "2026-06-26T20:54:52+0000",
       "likes": 0,
       "comments": 0,
       "shares": 0,
@@ -91,10 +91,10 @@
       "platform": "facebook"
     },
     {
-      "id": "1139516419249724_122109628623359008",
-      "message": "في إطار اتفاقية التعاون القضائي الموقعة بين البلدين، سلمت السلطات اللبنانية اليوم دفعة جديدة تضم 128 محكوماً سورياً إلى دمشق. كيف تقرأون تأث",
-      "thumbnail": "https://scontent.fruh5-1.fna.fbcdn.net/v/t39.30808-6/730748983_122109628611359008_5893778555155687604_n.jpg?stp=dst-jpg_p720x720_tt6&_nc_cat=108&ccb=1-7&_nc_sid=127cfc&_nc_ohc=DoSNKgrCrv8Q7kNvwHu5yXT&_nc_oc=AdpMUEAilLmyB3TxAjOygo4_c_S89FyOlZQx_aD2YTDaw04TWpTNldLAGZpBys8Ta0q1LuVGA0EkuRIHi7oSp0pV&_nc_zt=23&_nc_ht=scontent.fruh5-1.fna&edm=APyxFHYEAAAA&_nc_gid=1tanlzgg-eM8iOZpvI9NgQ&_nc_tpa=Q5bMBQHdyvpzUbHVZZbp4_9HW_aLnVkF2e1mFlowpKHCnDZglrsJH51spzhmCE_rBXHt6jofQ1EW9Sd1Bg&oh=00_Af8NRZsAzQAckpbJm645ojoSrVlUlBpQrrPmcEEu4MGILA&oe=6A41B6BD",
-      "createdAt": "2026-06-24T10:28:00+0000",
+      "id": "1139516419249724_122110850709359008",
+      "message": "تعاون جديد بين مؤسسة مياه دمشق ومنظمة أوكسفام يثمر عن مشروع مائي حيوي في مدينة الكسوة بريف دمشق، يهدف إلى تحسين واقع التزويد المائي عبر استث",
+      "thumbnail": "https://scontent.fruh6-2.fna.fbcdn.net/v/t39.30808-6/731495880_122110850685359008_347696961214356678_n.jpg?stp=dst-jpg_p720x720_tt6&_nc_cat=111&ccb=1-7&_nc_sid=127cfc&_nc_ohc=YHPFa4I9Z8cQ7kNvwGbcGVV&_nc_oc=Adq-jOI-dCuX9t2so5qaIR91eVLyfiwtFklHHDpQCx7Xf8GRZEB-Q9pdfbGxYThoogIRoBulxwSvj8otAduCNdbW&_nc_zt=23&_nc_ht=scontent.fruh6-2.fna&edm=APyxFHYEAAAA&_nc_gid=zmo4oUSvRA8lwaMzzOKqFg&_nc_tpa=Q5bMBQGbUKwIx-zHsiPPlHAkrCcA3azpc-KZ_kHC1ven9lM6IwMiczMvsyw7FtTqkLIr0a2sUXb8aOk8qg&oh=00_Af9tmhBS7-kIVFVk5n_ZQL-l4bV0lc8c0BMT_2ZlL5Fiig&oe=6A459846",
+      "createdAt": "2026-06-26T19:47:17+0000",
       "likes": 0,
       "comments": 0,
       "shares": 0,
@@ -102,10 +102,10 @@
       "platform": "facebook"
     },
     {
-      "id": "1139516419249724_122109541671359008",
-      "message": "شهدت تداولات اليوم الأربعاء 24 يونيو 2026 تحسناً في سعر صرف الليرة السورية مقابل الدولار، بالتزامن مع انخفاض في أسعار الذهب محلياً. كيف تقرأ",
-      "thumbnail": "https://scontent.fruh5-1.fna.fbcdn.net/v/t39.30808-6/731147170_122109541659359008_2864922837394488605_n.jpg?stp=dst-jpg_p720x720_tt6&_nc_cat=108&ccb=1-7&_nc_sid=127cfc&_nc_ohc=Uz-u4aX7Z-IQ7kNvwFfTXVZ&_nc_oc=Adrr4GyEddjXsRijM860YkjN8nhiBJe3oTVU-NQQLGMqgZBO3UFxl0tcaYSpnKMVhIDbJlvvIw1iQw__yoqkjaIq&_nc_zt=23&_nc_ht=scontent.fruh5-1.fna&edm=APyxFHYEAAAA&_nc_gid=1tanlzgg-eM8iOZpvI9NgQ&_nc_tpa=Q5bMBQEFXxftLItFdr2ZPBQ5uTsKe7EbkP2a_Vcw_DI0bAoO3JNhnDF47qSgxmyFOuUOaA0v_cdzB04naA&oh=00_Af9jLRTvxuisnpDgep0dnSjS-2mPSLdnAXPjsed_qfVnVw&oe=6A41D3C1",
-      "createdAt": "2026-06-24T07:37:19+0000",
+      "id": "1139516419249724_122110835493359008",
+      "message": "أكد الاجتماع الوزاري المشترك بين دول مجلس التعاون الخليجي والولايات المتحدة الالتزام بسيادة سوريا ووحدة أراضيها، مع التشديد على التعاون لموا",
+      "thumbnail": "https://scontent.fruh6-2.fna.fbcdn.net/v/t39.30808-6/730776867_122110835481359008_4881484095213398788_n.jpg?stp=dst-jpg_p720x720_tt6&_nc_cat=111&ccb=1-7&_nc_sid=127cfc&_nc_ohc=JZgCDCcRLjUQ7kNvwHj3K8x&_nc_oc=Adq4nhHcZZLERg7MPQWw1v4B5Ra-9UWf7cs-seH268k-GyVTId2yrS89df9OSwAYOSSZRP9C3BJhtyQ56k8iP5vP&_nc_zt=23&_nc_ht=scontent.fruh6-2.fna&edm=APyxFHYEAAAA&_nc_gid=zmo4oUSvRA8lwaMzzOKqFg&_nc_tpa=Q5bMBQFBJv-yKWD4Cbvt857dLQsUwhDEaaxqDFddjuWdiC-LLvV58IBFxabwUvUN6yaYTGjCXPLcVf9_lQ&oh=00_Af84BwHuHxlNJVc2TTZIb7CPwY-A35do_vIh1wFeO5gT0Q&oe=6A45AD4E",
+      "createdAt": "2026-06-26T18:53:23+0000",
       "likes": 0,
       "comments": 0,
       "shares": 0,
@@ -113,10 +113,10 @@
       "platform": "facebook"
     },
     {
-      "id": "1139516419249724_122109331845359008",
-      "message": "خسائر فادحة في المحاصيل الزراعية بريف القامشلي نتيجة حرائق واسعة التهمت آلاف الدونمات من القمح والشعير. كيف يمكن تعزيز إجراءات السلامة لحماي",
-      "thumbnail": "https://scontent.fruh6-2.fna.fbcdn.net/v/t39.30808-6/728449483_122109331827359008_1429620155194390759_n.jpg?stp=dst-jpg_p720x720_tt6&_nc_cat=103&ccb=1-7&_nc_sid=127cfc&_nc_ohc=FdmKkbNj5fkQ7kNvwFSoyDF&_nc_oc=AdpG-LIPCOAqMlX2Z3zX-E-kkmglGlqcUXGnZrlCYqqG0LkPrIMYdBJWvZ9RFHETXumr0MPMbkVNnynfEb2TviEm&_nc_zt=23&_nc_ht=scontent.fruh6-2.fna&edm=APyxFHYEAAAA&_nc_gid=1tanlzgg-eM8iOZpvI9NgQ&_nc_tpa=Q5bMBQEkQlZB941ORkK-12HFg4oXCvheTxW7uyV1nr0Op6SdVMp3wSm6UA5y5misjvmb6b-P47lee1Tv5w&oh=00_Af_MwM9k4gplcT3RM9w1j6JI4Ghgg304YHx04oqLAEMFOw&oe=6A41A414",
-      "createdAt": "2026-06-23T18:58:12+0000",
+      "id": "1139516419249724_122110831935359008",
+      "message": "بعد انقطاع دام 15 عاماً، تم الإعلان عن إعادة تفعيل خدمات السجل المدني في منطقة عفرين بريف حلب الشمالي لتسهيل المعاملات الرسمية للمواطنين. كي",
+      "thumbnail": "https://scontent.fruh5-1.fna.fbcdn.net/v/t39.30808-6/730776865_122110831923359008_4262109593204538639_n.jpg?stp=dst-jpg_p720x720_tt6&_nc_cat=107&ccb=1-7&_nc_sid=127cfc&_nc_ohc=s1I_p3V_sw4Q7kNvwHAyc7_&_nc_oc=Adp140R2s4m-R-h1nG4NcYq87zdZ9iZTcOrQlmZMaWTNzs0wOsH8yli66PE5PJqgWC9tH4_2T6GbWOzZmxAhAbIf&_nc_zt=23&_nc_ht=scontent.fruh5-1.fna&edm=APyxFHYEAAAA&_nc_gid=zmo4oUSvRA8lwaMzzOKqFg&_nc_tpa=Q5bMBQGc092BU3UG4Jq_cd_h_NFNSA3p4pJLWqitxixQhZURle1Npws8SSfbIHQaViNSRTGor23fvrnKyg&oh=00_Af8nHFjrDvS0ZwxI7Z8mPCdlITYeWs506ifXSjL4v7mtEA&oe=6A45B306",
+      "createdAt": "2026-06-26T18:38:57+0000",
       "likes": 0,
       "comments": 0,
       "shares": 0,
@@ -159,7 +159,7 @@
     }
   ],
   "pipeline": {
-    "lastRun": "2026-06-24T14:44:07.991Z",
+    "lastRun": "2026-06-27T13:29:22.793Z",
     "status": "operational"
   }
 }

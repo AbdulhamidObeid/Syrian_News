@@ -2,6 +2,7 @@ const fs = require('fs');
 const axios = require('axios');
 const FormData = require('form-data');
 const path = require('path');
+const { execSync } = require('child_process');
 require('dotenv').config({ path: path.join(__dirname, '../../.env') });
 
 async function delay(ms) {
@@ -92,7 +93,40 @@ function isRateLimitError(e) {
     return false;
 }
 
-
+/**
+ * Generates an MP4 video from an array of images.
+ * Uses 4 seconds per slide.
+ */
+function generateVideoFromImages(imagePaths, postId) {
+    console.log(`\n🎬 Generating Video for Post ID: ${postId}...`);
+    const tempDir = path.join(__dirname, 'temp_video');
+    if (!fs.existsSync(tempDir)) fs.mkdirSync(tempDir);
+    
+    const outputVideoPath = path.join(tempDir, `video_${postId}.mp4`);
+    const listFilePath = path.join(tempDir, `list_${postId}.txt`);
+    
+    try {
+        let listContent = "";
+        for (const img of imagePaths) {
+            listContent += `file '${img}'\nduration 4\n`;
+        }
+        // Last image must be repeated without duration for concat demuxer
+        if (imagePaths.length > 0) {
+            listContent += `file '${imagePaths[imagePaths.length - 1]}'\n`;
+        }
+        fs.writeFileSync(listFilePath, listContent);
+        
+        execSync(`ffmpeg -y -f concat -safe 0 -i "${listFilePath}" -c:v libx264 -pix_fmt yuv420p -r 30 -vf scale=1080:1350 "${outputVideoPath}"`, { stdio: 'ignore' });
+        console.log(`✅ Video generated successfully: ${outputVideoPath}`);
+        
+        try { fs.unlinkSync(listFilePath); } catch (e) {}
+        
+        return outputVideoPath;
+    } catch (e) {
+        console.error("❌ Failed to generate video:", e.message);
+        return null;
+    }
+}
 
 /**
  * Publishes the post across X (Twitter), Facebook, and Instagram.
@@ -105,31 +139,46 @@ async function publishPost(imagePath, captionLong, captionShort, postId, sendErr
     captionShort = captionShort.replace(/\\n/g, '\n');
     const imageArray = typeof imagePath === 'string' ? imagePath.split(',') : imagePath;
 
+    // Generate video from images
+    const videoPath = generateVideoFromImages(imageArray, postId);
+
     // --- ZERNIO HOSTING FOR APIS (Facebook/IG/X) ---
-    const uploadedUrls = [];
+    const uploadedImageUrls = [];
+    let uploadedVideoUrl = null;
     let zernioSuccess = false;
     while (!zernioSuccess) {
         try {
-            console.log(`Uploading ${imageArray.length} image(s) to Zernio for hosting...`);
+            console.log(`Uploading media to Zernio for hosting...`);
             const zernioKey = process.env.ZERNIO_API_KEY;
             if (!zernioKey) throw new Error("ZERNIO_API_KEY is not defined in environment/.env");
             
-            uploadedUrls.length = 0; // Clear any partial uploads
+            uploadedImageUrls.length = 0; // Clear any partial uploads
             for (const img of imageArray) {
                 const mediaForm = new FormData();
                 mediaForm.append('files', fs.createReadStream(img));
                 const res = await axios.post('https://zernio.com/api/v1/media', mediaForm, {
                     headers: { ...mediaForm.getHeaders(), 'Authorization': `Bearer ${zernioKey}` }
                 });
-                uploadedUrls.push(res.data.files[0].url);
+                uploadedImageUrls.push(res.data.files[0].url);
             }
-            console.log(`  ✅ Uploaded ${uploadedUrls.length} image(s) to Zernio.`);
+            console.log(`  ✅ Uploaded ${uploadedImageUrls.length} image(s) to Zernio.`);
+
+            if (videoPath && fs.existsSync(videoPath)) {
+                const videoForm = new FormData();
+                videoForm.append('files', fs.createReadStream(videoPath));
+                const resVideo = await axios.post('https://zernio.com/api/v1/media', videoForm, {
+                    headers: { ...videoForm.getHeaders(), 'Authorization': `Bearer ${zernioKey}` }
+                });
+                uploadedVideoUrl = resVideo.data.files[0].url;
+                console.log(`  ✅ Uploaded Video to Zernio.`);
+            }
+
             zernioSuccess = true;
         } catch (e) {
             console.error('❌ Zernio upload failed:', e.message);
             if (sendErrorAlertFn) {
                 const alertRes = await sendErrorAlertFn(
-                    `Zernio Image Upload failed: ${e.message}`, 
+                    `Zernio Media Upload failed: ${e.message}`, 
                     postId, 
                     "Check your internet connection, disk space, or Zernio API Key in .env. Click Retry to upload again, or Skip to skip all APIs."
                 );
@@ -145,7 +194,7 @@ async function publishPost(imagePath, captionLong, captionShort, postId, sendErr
 
     // --- X (TWITTER) ---
     console.log('\n--- Posting to X (Twitter) ---');
-    if (uploadedUrls.length > 0) {
+    if (uploadedImageUrls.length > 0) {
         let xSuccess = false;
         while (!xSuccess) {
             try {
@@ -156,7 +205,7 @@ async function publishPost(imagePath, captionLong, captionShort, postId, sendErr
                 }
                 const res = await axios.post('https://api.buffer.com', {
                     query: `mutation createPost($input: CreatePostInput!) { createPost(input: $input) { ... on PostActionSuccess { post { id } } } }`,
-                    variables: { input: { channelId: bufferChannelId, schedulingType: 'automatic', mode: 'shareNow', text: captionShort, assets: uploadedUrls.map(url => ({ image: { url } })) } }
+                    variables: { input: { channelId: bufferChannelId, schedulingType: 'automatic', mode: 'shareNow', text: captionShort, assets: uploadedImageUrls.map(url => ({ image: { url } })) } }
                 }, { headers: { 'Authorization': `Bearer ${bufferToken}`, 'Content-Type': 'application/json' } });
                 
                 if (res.data.errors) throw new Error(JSON.stringify(res.data.errors));
@@ -186,15 +235,22 @@ async function publishPost(imagePath, captionLong, captionShort, postId, sendErr
     const fbToken = process.env.FACEBOOK_PAGE_ACCESS_TOKEN;
     const fbPageId = process.env.FACEBOOK_PAGE_ID;
     
-    if (fbToken && fbPageId && uploadedUrls.length > 0) {
+    if (fbToken && fbPageId) {
         let fbSuccess = false;
         while (!fbSuccess) {
             try {
-                if (uploadedUrls.length === 1) {
-                    await axios.post(`https://graph.facebook.com/v20.0/${fbPageId}/photos`, { url: uploadedUrls[0], message: captionLong, access_token: fbToken });
-                } else {
+                if (uploadedVideoUrl) {
+                    console.log("Uploading as Facebook Video/Reel...");
+                    await axios.post(`https://graph.facebook.com/v20.0/${fbPageId}/videos`, { 
+                        file_url: uploadedVideoUrl, 
+                        description: captionLong, 
+                        access_token: fbToken 
+                    });
+                } else if (uploadedImageUrls.length === 1) {
+                    await axios.post(`https://graph.facebook.com/v20.0/${fbPageId}/photos`, { url: uploadedImageUrls[0], message: captionLong, access_token: fbToken });
+                } else if (uploadedImageUrls.length > 1) {
                     const mediaIds = [];
-                    for (const url of uploadedUrls) {
+                    for (const url of uploadedImageUrls) {
                         const r = await axios.post(`https://graph.facebook.com/v20.0/${fbPageId}/photos`, { url, published: false, access_token: fbToken });
                         mediaIds.push(r.data.id);
                     }
@@ -243,7 +299,7 @@ async function publishPost(imagePath, captionLong, captionShort, postId, sendErr
 
     // --- INSTAGRAM ---
     console.log('\n--- Posting to Instagram ---');
-    if (fbToken && fbPageId && uploadedUrls.length > 0) {
+    if (fbToken && fbPageId) {
         let igId = cachedIgId;
         let igSuccess = false;
         while (!igSuccess) {
@@ -257,14 +313,39 @@ async function publishPost(imagePath, captionLong, captionShort, postId, sendErr
                 }
                 
                 if (igId) {
-                    if (uploadedUrls.length === 1) {
-                        const r1 = await axios.post(`https://graph.facebook.com/v20.0/${igId}/media`, { image_url: uploadedUrls[0], caption: captionLong, access_token: fbToken });
+                    if (uploadedVideoUrl) {
+                        console.log("Uploading as Instagram Reel...");
+                        const r1 = await axios.post(`https://graph.facebook.com/v20.0/${igId}/media`, { 
+                            video_url: uploadedVideoUrl, 
+                            media_type: 'REELS',
+                            caption: captionLong, 
+                            access_token: fbToken 
+                        });
+                        
+                        let isReady = false;
+                        let attempts = 0;
+                        while (!isReady && attempts < 15) {
+                            console.log('⏳ Waiting 10 seconds for Instagram to process the Reel...');
+                            await delay(10000);
+                            const statusRes = await axios.get(`https://graph.facebook.com/v20.0/${r1.data.id}?fields=status_code&access_token=${fbToken}`);
+                            const status = statusRes.data.status_code;
+                            if (status === 'FINISHED') {
+                                isReady = true;
+                            } else if (status === 'ERROR') {
+                                throw new Error("Instagram Reel processing returned ERROR status.");
+                            }
+                            attempts++;
+                        }
+                        
+                        await axios.post(`https://graph.facebook.com/v20.0/${igId}/media_publish`, { creation_id: r1.data.id, access_token: fbToken });
+                    } else if (uploadedImageUrls.length === 1) {
+                        const r1 = await axios.post(`https://graph.facebook.com/v20.0/${igId}/media`, { image_url: uploadedImageUrls[0], caption: captionLong, access_token: fbToken });
                         console.log('⏳ Waiting 5 seconds for Instagram to download and process the image container...');
                         await delay(5000);
                         await axios.post(`https://graph.facebook.com/v20.0/${igId}/media_publish`, { creation_id: r1.data.id, access_token: fbToken });
                     } else {
                         const itemIds = [];
-                        for (const url of uploadedUrls) {
+                        for (const url of uploadedImageUrls) {
                             const r = await axios.post(`https://graph.facebook.com/v20.0/${igId}/media`, { image_url: url, is_carousel_item: true, access_token: fbToken });
                             itemIds.push(r.data.id);
                             await delay(2000); // 2s spacing delay to prevent hitting Graph API rate limits

@@ -110,7 +110,7 @@ async function runRoutineScout() {
     const fuelPrices = await getFuelPrices();
     
     const payload = {
-        contentType: "green",
+        contentType: "white",
         isCarousel: true,
         subHeadline: "النشرة اليومية",
         imageStrategy: "generate",

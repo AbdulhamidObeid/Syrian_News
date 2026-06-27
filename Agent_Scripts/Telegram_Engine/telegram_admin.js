@@ -172,6 +172,27 @@ bot.on('text', async (ctx) => {
             pendingApprovals.delete(postId);
             ctx.reply(`🎨 Designer feedback received! Refining image prompt and regenerating...`);
             return;
+        } else if (state.status === 'awaiting_feedback_reject') {
+            state.resolve({ action: 'reject', reason: text });
+            pendingApprovals.delete(postId);
+            ctx.reply(`❌ Rejection reason saved for Nightly Evaluator. Post discarded.`);
+            
+            try {
+                const REJECTIONS_PATH = path.join(__dirname, '../../rejections.json');
+                let rejections = [];
+                if (fs.existsSync(REJECTIONS_PATH)) {
+                    rejections = JSON.parse(fs.readFileSync(REJECTIONS_PATH, 'utf8'));
+                }
+                rejections.push({
+                    postId,
+                    reason: text,
+                    timestamp: new Date().toISOString()
+                });
+                fs.writeFileSync(REJECTIONS_PATH, JSON.stringify(rejections, null, 2));
+            } catch (err) {
+                console.error("Failed to save rejection reason:", err.message);
+            }
+            return;
         }
     }
 });
@@ -201,12 +222,10 @@ bot.action(/reject_(.+)/, async (ctx) => {
     const state = pendingApprovals.get(postId);
     
     if (state) {
-        try { await ctx.answerCbQuery('❌ Post Rejected!'); } catch(e) {}
+        state.status = 'awaiting_feedback_reject';
         try { await ctx.editMessageReplyMarkup({ inline_keyboard: [] }); } catch(e) {}
-        try { await ctx.reply(`❌ Post Rejected! It has been discarded.`); } catch(e) {}
-        
-        state.resolve({ action: 'reject' });
-        pendingApprovals.delete(postId);
+        try { await ctx.answerCbQuery(); } catch(e) {}
+        ctx.reply(`❌ Post Rejected. Please type the reason for rejection so the Nightly Evaluator can learn from it:`);
     } else {
         try { await ctx.answerCbQuery('This post is no longer pending.'); } catch(e) {}
     }

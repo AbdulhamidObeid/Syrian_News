@@ -110,8 +110,15 @@ function canPostNow(scheduleConfig) {
 
     // Check daily cap
     if (todayLog.count >= rules.max_posts_per_day) {
-        console.log(`🛑 Daily cap reached (${todayLog.count}/${rules.max_posts_per_day}). No more posts today.`);
-        return false;
+        // OVERFLOW QUOTA LOGIC: If the best post in memory is extremely vital (score >= 9.0), allow it to bypass the daily cap.
+        const mem = loadJson(path.join(__dirname, 'memory.json'));
+        const bestMemPost = mem.find(m => !m.isUrgent);
+        if (bestMemPost && bestMemPost.score >= 9.0) {
+            console.log(`🚀 Overflow Quota Granted! Vital news (Score: ${bestMemPost.score}) is bypassing the daily cap of ${rules.max_posts_per_day}.`);
+        } else {
+            console.log(`🛑 Daily cap reached (${todayLog.count}/${rules.max_posts_per_day}). No more posts today.`);
+            return false;
+        }
     }
 
     // Check minimum gap
@@ -467,9 +474,21 @@ async function runCycle() {
             !history.includes(item.id)
         );
 
-        if (newFeed.length > 0) {
+        const URGENT_KEYWORDS = ["عاجل", "مرسوم", "قرار رئاسي", "انفجار", "عقوبات", "زلزال", "توغل", "قصف", "غارة", "غارات", "اشتباك", "اشتباكات", "اغتيال", "استهداف", "أمني", "أمنية", "عسكري", "صاروخ", "صواريخ", "مسيرة", "مسيرات", "breaking", "خبر عاجل"];
+        const hasUrgentKeyword = newFeed.some(item => URGENT_KEYWORDS.some(kw => (item.title && item.title.includes(kw)) || (item.description && item.description.includes(kw))));
+        
+        let postLog = loadPostLog();
+        const lastCuratorRunAt = postLog.lastCuratorRunAt || 0;
+        const oneHourMs = 60 * 60 * 1000;
+        const shouldRunCurator = (Date.now() - lastCuratorRunAt >= oneHourMs) || hasUrgentKeyword;
+
+        if (newFeed.length > 0 && shouldRunCurator) {
             saveJson(TEMP_FEED_PATH, newFeed);
             console.log(`\n✍️ Triggering Editor Engine for ${newFeed.length} new articles...`);
+            
+            postLog = loadPostLog();
+            postLog.lastCuratorRunAt = Date.now();
+            savePostLog(postLog);
             
             // Build a list of active and recently published topics to prevent semantic duplication
             let recentTopics = fs.existsSync(RECENT_TOPICS_PATH) ? loadJson(RECENT_TOPICS_PATH) : [];
@@ -482,6 +501,8 @@ async function runCycle() {
                 c.fetchedAt = Date.now();
                 memory.push(c);
             }
+        } else if (newFeed.length > 0 && !shouldRunCurator) {
+            console.log(`⏳ Batching ${newFeed.length} new articles for the next hourly curation run (saves RPD).`);
         } else {
             console.log("😴 No new articles found by Scout.");
         }
@@ -542,7 +563,24 @@ async function runCycle() {
             }
         }
 
-        // 5. AGGRESSIVE POSTING — Post the best available content if allowed
+        // 5. Check Nightly Evaluator
+        const currentHourMin = getDamascusTime();
+        if (isTimeWithinWindow(currentHourMin, "23:30", 10)) {
+            const evalId = `eval_${getTodayDateStr()}`;
+            let currentHistory = loadJson(HISTORY_PATH);
+            if (!currentHistory.includes(evalId)) {
+                currentHistory.push(evalId);
+                saveJson(HISTORY_PATH, currentHistory);
+                console.log("🌙 Triggering Nightly Evaluator...");
+                try {
+                    execSync(`node ${path.join(__dirname, 'Agent_Scripts/Nightly_Evaluator/nightly_evaluator.js')}`, { stdio: 'inherit' });
+                } catch(e) {
+                    console.error("❌ Nightly Evaluator failed:", e.message);
+                }
+            }
+        }
+
+        // 6. AGGRESSIVE POSTING — Post the best available content if allowed
         if (isApprovalPending()) {
             console.log(`⏳ Admin approval is currently pending for a previous post. Halting non-urgent posts until resolved.`);
         } else if (canPostNow(scheduleConfig)) {

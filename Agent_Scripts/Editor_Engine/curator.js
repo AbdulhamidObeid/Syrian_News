@@ -74,16 +74,16 @@ Restrictions: ${brandConfig.tone_of_voice.restrictions.join(', ')}
 Your task is to evaluate a list of raw news items and score each from 1 to 10 for whether we should publish it on our channels today.
 
 GROWTH PHASE SCORING RUBRIC (we are a new account aggressively building audience):
-1. Shareability & Virality (25%): Will people share this? Does it spark emotion, debate, or curiosity? Would someone tag a friend? Topics that affect many people score higher.
-2. Daily Utility & Impact (20%): Does it affect daily Syrian life (currency, gold/fuel rates, weather, jobs, electricity, internet, reconstruction)?
-3. Audience Relevance (20%): Is it relevant to Syrians inside Syria AND the global diaspora? Local + diaspora appeal scores highest.
-4. Social Media Appeal (20%): Will this generate comments, saves, and engagement? Questions, debates, surprising facts, and relatable struggles score high. Dry government meetings score low.
-5. Visual Bento Potential (15%): Can the core details be neatly arranged into 1 to 4 clean standalone bullet points for our branded template?
+1. Shareability & Virality (25%): Will people share this? Focus on IMPORTANT things, appealing news, Syrian achievements, and positive viral trending topics.
+2. Daily Utility & Impact (20%): Does it affect daily Syrian life (currency, gold/fuel rates, weather, jobs, electricity)?
+3. Audience Relevance (20%): Is it relevant to Syrians inside Syria AND the global diaspora?
+4. Social Media Appeal (20%): Will this generate comments, saves, and engagement? Avoid boring/generic government meetings.
+5. Visual Bento Potential (15%): Can the core details be neatly arranged into 1 to 4 clean bullet points for our branded template? Make use of ALL color categories (Green, Black for analysis, White for data, Urgent for breaking).
 ${avoidanceInstruction}
 
-BONUS / SPORTS SCORING (CRITICAL): Only score World Cup/football news highly (>= 7.5) and select it if it directly reports match results (e.g., final scores, winners, group qualification/elimination status). All other general sports news, pre-match expectations, training details, team logistics, or fan comments must be scored low (< 5.0) and set 'selected': false. Important news about Syria (daily life, economy, local events, reconstruction) must always be prioritized and scored much higher than sports.
+BONUS / SPORTS / GLOBAL SCORING (CRITICAL): World Cup results are IMPORTANT (especially if an Arabic team is playing, but all results are good). You MUST score World Cup results highly. Also, score worldwide similar events highly if they are important and appeal to Syrians. Do NOT ignore global trending events if they matter to the audience.
 
-URGENCY CHECK: If the title or content contains any of these keywords: عاجل, مرسوم, قرار رئاسي, انفجار, عقوبات, زلزال, breaking, خبر عاجل
+URGENCY CHECK: If the title or content contains any of these keywords: عاجل, مرسوم, قرار رئاسي, انفجار, عقوبات, زلزال, توغل, قصف, غارة, غارات, اشتباك, اشتباكات, اغتيال, استهداف, أمني, أمنية, عسكري, صاروخ, صواريخ, مسيرة, مسيرات, breaking, خبر عاجل
 Then mark "isUrgent": true. Urgent news always gets selected regardless of score.
 
 Selection Threshold: Only items with a score >= ${editorConfig.scoring_threshold} should be selected (unless urgent).
@@ -223,7 +223,7 @@ For Carousels (isCarousel: true):
 When "isCarousel" is true, omit root-level "points", "headline", and "imagePrompt".
 CRITICAL IMAGE STRATEGY RULE (APPLIES TO BOTH SINGLE POSTS AND CAROUSELS):
 - If the news is about a specific person, a specific event, a specific object, or anything specific whose visual context or resemblance is important (e.g., a serious topic involving a specific person, sports match, or landmark) and we have an image URL from the scraped news (Original Image URL is not 'No image available'), you MUST set "imageStrategy": "reference" to use that image as a reference.
-  * If you set "imageStrategy": "reference", the "imagePrompt" MUST NOT describe the news article details or write a new custom scene. Instead, you MUST write a prompt in a proper prompt way to recreate the reference image, formatted exactly as: "A high-quality, realistic photo of [main topic/subject of the reference image], recreating the exact same reference image with all its details, same features, and subjects, shot from a slightly different camera angle, with no watermarks."
+  * If you set "imageStrategy": "reference", the "imagePrompt" MUST NOT describe the news article details or write a new custom scene. Instead, you MUST write a prompt to recreate the reference image, formatted exactly as: "A high-quality, realistic photo of [main topic], recreating the reference image from a DIFFERENT ANGLE (to avoid copyright), REMOVE ALL WATERMARKS AND TEXT, keep EXACTLY THE SAME DETAILS AND SUBJECTS, extremely high quality."
   * If you want to depict a different, more general or illustrative scene that does not match the reference image (e.g., depicting a generic post office counter instead of the specific signing ceremony), you MUST set "imageStrategy": "generate" to ignore the reference image.
 - Only set "imageStrategy": "generate" (text-only prompt) if the news is about a very general/abstract topic (like general economy, weather, abstract concepts), if there is no image URL in the news source, or if the original image is irrelevant/mismatched to the scene you want to depict.
 - For BOTH strategies, write a photorealistic prompt in English describing what the image should look like.
@@ -238,13 +238,13 @@ CRITICAL IMAGE STRATEGY RULE (APPLIES TO BOTH SINGLE POSTS AND CAROUSELS):
 
 CRITICAL CAPTION & HASHTAG RULE (DUAL OUTPUT):
 You MUST generate TWO distinct captions:
-1. "socialMediaCaptionLong": For Facebook and Instagram. This must be informative, engaging, include a question for engagement, and span 2 to 3 sentences. You MUST use a newline character '\\n' to separate the main text from the hashtags. Include the mandatory hashtags "${brandConfig.brand.hashtags.join(' ')}" PLUS 3 to 5 additional highly relevant hashtags to maximize exposure.
+1. "socialMediaCaptionLong": For Facebook and Instagram. This must be highly intriguing, fun to read, detailed, and structured to capture attention and maximize dwell time. End with a strong hook or question for engagement. You MUST use a newline character '\\n' to separate the main text from the hashtags. Include the mandatory hashtags "${brandConfig.brand.hashtags.join(' ')}" PLUS up to 20 additional highly targeted, trending hashtags to maximize SEO and Instagram Reels exposure (mix broad terms like #سوريا with niche and viral terms).
 2. "socialMediaCaptionShort": For X (Twitter). This must be extremely concise, straight to the point, and strictly under 240 characters total. Use a newline '\\n' before hashtags. Include the mandatory hashtags "${brandConfig.brand.hashtags.join(' ')}" PLUS only 1 or 2 extra highly relevant hashtags.
 
 Example format for Long:
-"This is an informative, engaging caption about the news... What do you think about this issue?
+"This is an incredibly intriguing, detailed caption about the news... What do you think about this issue?
 \\n
-#Mandatory #Hashtags #Relevant1 #Relevant2 #Relevant3 #Relevant4"`;
+#Mandatory #Hashtags #Trending1 #Niche2 #Viral3 #Syria ..."`;
 
     const model = genAI.getGenerativeModel({ 
         model: modelName,
@@ -256,6 +256,13 @@ Rewrite the following article details:
 Title: ${selectedItem.title}
 Content: ${selectedItem.description || selectedItem.content || ''}
 Original Image URL: ${selectedItem.imageUrl || 'No image available'}
+Is Urgent / Breaking News (Phase 1 Flag): ${selectedItem.isUrgent ? 'Yes' : 'No'}
+
+CRITICAL Content-Type Selection Rule:
+- You MUST set "contentType" to "urgent" if "Is Urgent / Breaking News" is "Yes", or if the Title or Content contains "عاجل" or represents security/military alerts (such as "خبر أمني", "توغل", "قصف", "غارة", "غارات", "اشتباكات", "اغتيال", "استهداف", "عسكري") or high-priority breaking news.
+- You MUST set "contentType" to "white" if the news consists of tables, listings, weather, currency, gold, or daily utility.
+- You MUST set "contentType" to "black" if the news is an opinion, deep analysis, column, or profile of a person/public figure.
+- Otherwise, set "contentType" to "green" for general news.
 `;
 
     try {
@@ -338,6 +345,13 @@ Feedback: "${feedback}"
 Original Article Context (refer to this if asked to rewrite or shorten content/headlines):
 Title: ${selectedItem.title || ''}
 Content: ${selectedItem.description || selectedItem.content || ''}
+Is Urgent / Breaking News (Phase 1 Flag): ${selectedItem.isUrgent ? 'Yes' : 'No'}
+
+CRITICAL Content-Type Selection Rule:
+- You MUST set "contentType" to "urgent" if "Is Urgent / Breaking News" is "Yes", or if the Title or Content contains "عاجل" or represents security/military alerts (such as "خبر أمني", "توغل", "قصف", "غارة", "غارات", "اشتباكات", "اغتيال", "استهداف", "عسكري") or high-priority breaking news.
+- You MUST set "contentType" to "white" if the news consists of tables, listings, weather, currency, gold, or daily utility.
+- You MUST set "contentType" to "black" if the news is an opinion, deep analysis, column, or profile of a person/public figure.
+- Otherwise, set "contentType" to "green" for general news.
 `;
 
     try {
@@ -374,7 +388,7 @@ Content: ${selectedItem.description || selectedItem.content || ''}
  */
 async function refineImagePrompt(previousPayload, feedback) {
     console.log(`\n--- Phase 2c: Image Prompt Refinement ---`);
-    const modelName = editorConfig.fast_model || 'gemini-2.5-flash';
+    const modelName = editorConfig.heavy_model || 'gemini-2.5-pro'; // Use heavier model for better prompt intelligence
     const model = genAI.getGenerativeModel({ model: modelName });
     
     const payload = previousPayload || {};
@@ -386,7 +400,7 @@ async function refineImagePrompt(previousPayload, feedback) {
     const pointsText = Array.isArray(payload.points)
         ? payload.points.join('\n')
         : '';
-    const prompt = `You are a creative director. We have an image prompt representing a news item for an AI image generator.
+    const prompt = `You are a strict and highly intelligent creative director. We need a new English image prompt for an AI image generator based on user feedback.
 
 === News Context ===
 Category/Topic: ${subHeadline}
@@ -394,41 +408,30 @@ Headline: ${headlineText}
 Key Points:
 ${pointsText}
 
-=== Previous Image Prompt ===
+=== Previous Prompt ===
 "${previousPrompt}"
 
 === User Modification Feedback ===
 "${feedback}"
 
 === Instructions ===
-Rewrite the English image prompt to incorporate the user's feedback.
+The user was not satisfied with the previous prompt and provided specific feedback. You must generate a COMPLETELY NEW English image prompt that perfectly fulfills their request.
 
-Be smart and analyze the relationship between the previous image prompt and the user's feedback:
-1. **Scene/Location/Environment Replacement**:
-   - If the user's feedback requests a change in the location, setting, or environment (e.g. from an office/meeting room to a petrol station, or from a street to an indoor room), you MUST completely REPLACE the old setting/location with the new one.
-   - Do NOT blend or mix incompatible environments (e.g., do NOT keep meeting room furniture, office walls, or indoor office features if the new location is a petrol station or a street).
-   - Ensure the new environment is clean, logical, and fully depicted without remnants of the previous location.
-2. **Composition & Object Focus**:
-   - If the feedback requests focus on a specific object or close-up composition (e.g., "a fuel pump nozzle", "a close-up of a product", "specific person's hands"), describe EXACTLY that close-up composition.
-   - Do NOT add unnecessary background clutter (such as large buildings, wide landscapes, maps, flags, desks) that distracts from the requested object focus unless explicitly requested.
-3. **Subject & Topic Consistency**:
-   - Preserve the main human subject(s) or entities (e.g. a specific diplomat, worker, or vehicle) and the core journalistic topic, but transplant them entirely into the new setting.
-4. **Detail Adjustment**:
-   - If the feedback only requests minor details of the current scene (e.g. adding a flag, changing clothes, adjusting lighting, or changing the time of day), keep the current scene structure and apply the specific modification.
-5. **Style & Quality**:
-   - Maintain a highly realistic, photorealistic, high-quality style. Avoid watermarks, text overlay, or artificial elements.
-
-CRITICAL AI IMAGE SAFETY & SYMBOLISM RULES:
-- Do NOT inject or add flags, logos, emblems, maps, or other political/national symbols into the prompt unless they are explicitly mentioned/requested in the user's feedback or the news context.
-- Never assume that mentioning "Syria" or a Syrian city/location implies that a flag, coat of arms, or emblem should be present. Keep the scene realistic and clutter-free.
-- If (and ONLY if) a Syrian flag is explicitly requested or implied by the feedback, you MUST write "the Syrian Revolution flag with green, white, and black horizontal stripes and three red stars in the middle". NEVER write "Syrian flag".
-- If (and ONLY if) a government logo, official document, or coat of arms is explicitly requested or implied by the feedback, you MUST specify "The new Syrian national emblem (launched in July 2025), which is the Syrian Golden Eagle (Eastern Imperial Eagle)". NEVER use the old eagle logo or the Hawk of Quraish.
-- NEVER use generic terms like "Syrian president", "Syrian diplomat", or "Syrian leader" WITHOUT explicitly naming the person. If the news is about a specific person, you MUST name them explicitly in the prompt.
-
-Return ONLY the new rewritten image prompt text in English.`;
+CRITICAL RULES:
+1. STRICT ADHERENCE: Do NOT simply mix or blend the user's feedback with the old prompt in a messy way. Read what they want, understand what they didn't like, and write a perfect, cohesive new prompt from scratch.
+2. REFERENCE IMAGE RULES: If the user mentions a reference image or the news uses a specific image reference strategy, you MUST include instructions to:
+   - Use a slightly different camera angle (do NOT match the angle perfectly, to avoid copyright).
+   - Keep the exact same core details and subjects.
+   - Be extremely high quality and photorealistic.
+   - Strictly NO watermarks, logos, or text on the image.
+3. NO HALLUCINATION: Do not hallucinate random objects, flags, or elements that the user did not ask for. Keep it clean and focused.
+4. SYRIAN CONTEXT SAFETY:
+   - If a Syrian flag is explicitly requested, it must be exactly "the Syrian Revolution flag with green, white, and black horizontal stripes and three red stars in the middle".
+   - Never use "Syrian president" or "Syrian leader" without explicitly naming them.
+5. NO APOLOGIES: Output ONLY the final image prompt in English. No introductory text, no quotes around the prompt, just the raw prompt.`;
 
     const response = await model.generateContent(prompt);
-    return response.response.text().trim();
+    return response.response.text().trim().replace(/^["']|["']$/g, '');
 }
 
 /**
