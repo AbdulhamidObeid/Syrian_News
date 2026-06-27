@@ -260,7 +260,7 @@ async def refine_image(input_path: str, output_path: str):
         previous_prompt = previous_payload.get("slides")[0].get("imagePrompt", "")
         
     sub_headline = previous_payload.get("subHeadline", "")
-    headline_obj = previous_payload.get("headline", {})
+    headline_obj = previous_payload.get("headline") or {}
     headline_text = f"{headline_obj.get('line1', '')} {headline_obj.get('line2', '')}".strip()
     points_list = previous_payload.get("points", [])
     points_text = "\n".join(points_list) if isinstance(points_list, list) else ""
