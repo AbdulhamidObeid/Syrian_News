@@ -116,7 +116,7 @@ function generateVideoFromImages(imagePaths, postId) {
         }
         fs.writeFileSync(listFilePath, listContent);
         
-        execSync(`ffmpeg -y -f concat -safe 0 -i "${listFilePath}" -c:v libx264 -pix_fmt yuv420p -r 30 -vf scale=1080:1350 "${outputVideoPath}"`, { stdio: 'ignore' });
+        execSync(`ffmpeg -y -f concat -safe 0 -i "${listFilePath}" -c:v libx264 -crf 15 -preset slow -pix_fmt yuv420p -r 30 -vf scale=1080:1350 "${outputVideoPath}"`, { stdio: 'ignore' });
         console.log(`✅ Video generated successfully: ${outputVideoPath}`);
         
         try { fs.unlinkSync(listFilePath); } catch (e) {}

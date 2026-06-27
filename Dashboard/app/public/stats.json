@@ -1,5 +1,5 @@
 {
-  "lastUpdated": "2026-06-27T14:15:27.103Z",
+  "lastUpdated": "2026-06-27T14:45:27.230Z",
   "platforms": {
     "facebook": {
       "followers": 7,
@@ -20,7 +20,7 @@
   },
   "kpis": {
     "totalAudience": 34,
-    "postsPublished": 142,
+    "postsPublished": 144,
     "storyLibrary": 105,
     "postsToday": 1,
     "weeklyPostCounts": {
@@ -69,9 +69,20 @@
   },
   "topPosts": [
     {
+      "id": "1139516419249724_122111199177359008",
+      "message": "أعلنت السلطات التركية عن تسهيلات جديدة للاجئين السوريين تتعلق بإجراءات العمل، بهدف تنظيم سوق العمل ودعم التوظيف المسجل. كيف ترى تأثير هذه ال",
+      "thumbnail": "https://scontent.fruh6-1.fna.fbcdn.net/v/t15.5256-10/733187235_2092579977999995_8232284441505687819_n.jpg?_nc_cat=105&ccb=1-7&_nc_sid=5fad0e&_nc_ohc=nv9TKOLAim0Q7kNvwGOcDDB&_nc_oc=AdqHPS37B_sq1rVD7FvuEBO2ieOK_P9loZOqK4RQpEjU5Sz4mKqb6rjWHiradLIj_xInbiS2n9xOBU263F_-YJok&_nc_zt=23&_nc_ht=scontent.fruh6-1.fna&edm=APyxFHYEAAAA&_nc_gid=Sc-BuihtAhH1RfdttxO3hw&_nc_tpa=Q5bMBQGJh4mDrfpSXanjnBuDe2uGl1hZQiXsx25QdZTw1HRf_Wkg_yCIaMCGBdjfhhN8OekXPc8E2E0Rtw&oh=00_Af-oHLmthV7V34H-icOQzM-yD-lbGlwaMqR9w-wa8muE3g&oe=6A459D4E",
+      "createdAt": "2026-06-27T14:44:12+0000",
+      "likes": 0,
+      "comments": 0,
+      "shares": 0,
+      "reach": 0,
+      "platform": "facebook"
+    },
+    {
       "id": "1139516419249724_122111115783359008",
       "message": "رغم انخفاض سعر صرف الدولار وتراجع تكاليف الشحن عالمياً، لا تزال الأسعار في الأسواق السورية تحافظ على مستوياتها المرتفعة. ما هي الأسباب الحقي",
-      "thumbnail": "https://scontent.fruh6-1.fna.fbcdn.net/v/t39.30808-6/730040827_122111115585359008_4531315066057423298_n.jpg?stp=dst-jpg_p720x720_tt6&_nc_cat=105&ccb=1-7&_nc_sid=127cfc&_nc_ohc=F8u4cguKQpYQ7kNvwFQjl-Q&_nc_oc=Ado_hykmCARuxD5iCaLXdqtxPR3rfJ5dyiTTm4MkQ-7EVjqS5QJAN1To7xFm5VZXrxqd58X9htVNyNCxOg1TOjkj&_nc_zt=23&_nc_ht=scontent.fruh6-1.fna&edm=APyxFHYEAAAA&_nc_gid=LfTf82pzPqyE8NDvZeXEqA&_nc_tpa=Q5bMBQGOMDJ9SWMHFz0X7wFEQ8luLng7LOMv1jtB3J59IooLmXm-pr4EgkuEfA6Ykfxb-K8wZoYKYxfknQ&oh=00_Af8SDDyKqzf1J_ruCjQQX0A9-bgSpIs9aeFpZCrNffnfQg&oe=6A45A802",
+      "thumbnail": "https://scontent.fruh6-1.fna.fbcdn.net/v/t39.30808-6/730040827_122111115585359008_4531315066057423298_n.jpg?stp=dst-jpg_p720x720_tt6&_nc_cat=105&ccb=1-7&_nc_sid=127cfc&_nc_ohc=F8u4cguKQpYQ7kNvwFQjl-Q&_nc_oc=Ado_hykmCARuxD5iCaLXdqtxPR3rfJ5dyiTTm4MkQ-7EVjqS5QJAN1To7xFm5VZXrxqd58X9htVNyNCxOg1TOjkj&_nc_zt=23&_nc_ht=scontent.fruh6-1.fna&edm=APyxFHYEAAAA&_nc_gid=Sc-BuihtAhH1RfdttxO3hw&_nc_tpa=Q5bMBQGEgAc7dDYEiGejYuo2Xyc2DDAm_X800j9knIMbqgA2pDdspiW29DtpnyTz4tgPHfIplJcr6BbTvg&oh=00_Af-2HrEPGJ9YuGJxZB18OXEPIWB-FmaJjUADzRK2XBJ74Q&oe=6A45A802",
       "createdAt": "2026-06-27T10:45:24+0000",
       "likes": 0,
       "comments": 0,
@@ -82,7 +93,7 @@
     {
       "id": "1139516419249724_122110864473359008",
       "message": "تتوقع الأرصاد الجوية أجواء صيفية حارة نسبياً في سوريا، مع درجات حرارة حول معدلاتها الطبيعية. تشهد المناطق الشرقية طقساً حاراً، بينما تظهر غي",
-      "thumbnail": "https://scontent.fruh5-1.fna.fbcdn.net/v/t39.30808-6/730748903_122110864461359008_1738858917991774279_n.jpg?stp=dst-jpg_p720x720_tt6&_nc_cat=107&ccb=1-7&_nc_sid=127cfc&_nc_ohc=jqgi9mLXyOQQ7kNvwEHqlph&_nc_oc=Adql_ZyqregymcfDNdiBaPLx3nefGCKhuwPVCbg5XPH4nkIcha40LD73G8XbllTrhTZLUrNsfLaA_Q_UugIZNe_v&_nc_zt=23&_nc_ht=scontent.fruh5-1.fna&edm=APyxFHYEAAAA&_nc_gid=LfTf82pzPqyE8NDvZeXEqA&_nc_tpa=Q5bMBQG3RkESXSXMnK0R4FUpVcDNNpTMsF4Lt-a8p1Zl2qbdrlR904RIC-0CA3ynjzrIrGOV71hs8UIw6g&oh=00_Af8HNC7KOVttwkNLDHvbXQNs50pvl_NUNwq4MA6koLXWgw&oe=6A459DC5",
+      "thumbnail": "https://scontent.fruh5-1.fna.fbcdn.net/v/t39.30808-6/730748903_122110864461359008_1738858917991774279_n.jpg?stp=dst-jpg_p720x720_tt6&_nc_cat=107&ccb=1-7&_nc_sid=127cfc&_nc_ohc=jqgi9mLXyOQQ7kNvwEHqlph&_nc_oc=Adql_ZyqregymcfDNdiBaPLx3nefGCKhuwPVCbg5XPH4nkIcha40LD73G8XbllTrhTZLUrNsfLaA_Q_UugIZNe_v&_nc_zt=23&_nc_ht=scontent.fruh5-1.fna&edm=APyxFHYEAAAA&_nc_gid=Sc-BuihtAhH1RfdttxO3hw&_nc_tpa=Q5bMBQFYXISjn7KrmQ4nRyeycBomBuw9HWCq0QNCfSvxaljlYoWu7dAltkumxYRTDY0m2y9I3y9YYfnOzQ&oh=00_Af_66S4sgsBlOpRPXK5CbsYEbxieNGvpliqYHLW9peu6-A&oe=6A459DC5",
       "createdAt": "2026-06-26T20:54:52+0000",
       "likes": 0,
       "comments": 0,
@@ -93,7 +104,7 @@
     {
       "id": "1139516419249724_122110850709359008",
       "message": "تعاون جديد بين مؤسسة مياه دمشق ومنظمة أوكسفام يثمر عن مشروع مائي حيوي في مدينة الكسوة بريف دمشق، يهدف إلى تحسين واقع التزويد المائي عبر استث",
-      "thumbnail": "https://scontent.fruh6-2.fna.fbcdn.net/v/t39.30808-6/731495880_122110850685359008_347696961214356678_n.jpg?stp=dst-jpg_p720x720_tt6&_nc_cat=111&ccb=1-7&_nc_sid=127cfc&_nc_ohc=YHPFa4I9Z8cQ7kNvwGbcGVV&_nc_oc=Adq-jOI-dCuX9t2so5qaIR91eVLyfiwtFklHHDpQCx7Xf8GRZEB-Q9pdfbGxYThoogIRoBulxwSvj8otAduCNdbW&_nc_zt=23&_nc_ht=scontent.fruh6-2.fna&edm=APyxFHYEAAAA&_nc_gid=LfTf82pzPqyE8NDvZeXEqA&_nc_tpa=Q5bMBQHcJyHd3uUX-nW56aMqHjmWEWrekCdSzsh5k0Av7m15tgQE72trfCvrciW5HSvx1tnYibS4DYhZxA&oh=00_Af8Fn_728VkKWwkoLrei1UeuQsqdOIY2_FGd1gJje4aQcg&oe=6A459846",
+      "thumbnail": "https://scontent.fruh6-2.fna.fbcdn.net/v/t39.30808-6/731495880_122110850685359008_347696961214356678_n.jpg?stp=dst-jpg_p720x720_tt6&_nc_cat=111&ccb=1-7&_nc_sid=127cfc&_nc_ohc=YHPFa4I9Z8cQ7kNvwGbcGVV&_nc_oc=Adq-jOI-dCuX9t2so5qaIR91eVLyfiwtFklHHDpQCx7Xf8GRZEB-Q9pdfbGxYThoogIRoBulxwSvj8otAduCNdbW&_nc_zt=23&_nc_ht=scontent.fruh6-2.fna&edm=APyxFHYEAAAA&_nc_gid=Sc-BuihtAhH1RfdttxO3hw&_nc_tpa=Q5bMBQEAZ1v-SKGIimJVc2LdS5VuZ2aN-PLxuCQfys7jr3OIggHjgWTMzp7CRnm3lzqcwgADD3oURsqObg&oh=00_Af9wXlzGaLXiUcgr-2Zdc9Zj9LMLr-xwz1Bdr-C4Nvf_JA&oe=6A45D086",
       "createdAt": "2026-06-26T19:47:17+0000",
       "likes": 0,
       "comments": 0,
@@ -104,19 +115,8 @@
     {
       "id": "1139516419249724_122110835493359008",
       "message": "أكد الاجتماع الوزاري المشترك بين دول مجلس التعاون الخليجي والولايات المتحدة الالتزام بسيادة سوريا ووحدة أراضيها، مع التشديد على التعاون لموا",
-      "thumbnail": "https://scontent.fruh6-2.fna.fbcdn.net/v/t39.30808-6/730776867_122110835481359008_4881484095213398788_n.jpg?stp=dst-jpg_p720x720_tt6&_nc_cat=111&ccb=1-7&_nc_sid=127cfc&_nc_ohc=JZgCDCcRLjUQ7kNvwHj3K8x&_nc_oc=Adq4nhHcZZLERg7MPQWw1v4B5Ra-9UWf7cs-seH268k-GyVTId2yrS89df9OSwAYOSSZRP9C3BJhtyQ56k8iP5vP&_nc_zt=23&_nc_ht=scontent.fruh6-2.fna&edm=APyxFHYEAAAA&_nc_gid=LfTf82pzPqyE8NDvZeXEqA&_nc_tpa=Q5bMBQFcjvKPX10cVxk8L-tOB6GSpfPJ5EdHtlT_vEgtqLpkLbJFLR0wkuoGUOVxU7dUTxUZ4YN_SYoPkw&oh=00_Af9u7MdSt2sNCTcQjjEV7cx6mmzkSho7rCuSmu1T5b4gaQ&oe=6A45AD4E",
+      "thumbnail": "https://scontent.fruh6-2.fna.fbcdn.net/v/t39.30808-6/730776867_122110835481359008_4881484095213398788_n.jpg?stp=dst-jpg_p720x720_tt6&_nc_cat=111&ccb=1-7&_nc_sid=127cfc&_nc_ohc=JZgCDCcRLjUQ7kNvwHj3K8x&_nc_oc=Adq4nhHcZZLERg7MPQWw1v4B5Ra-9UWf7cs-seH268k-GyVTId2yrS89df9OSwAYOSSZRP9C3BJhtyQ56k8iP5vP&_nc_zt=23&_nc_ht=scontent.fruh6-2.fna&edm=APyxFHYEAAAA&_nc_gid=Sc-BuihtAhH1RfdttxO3hw&_nc_tpa=Q5bMBQGLa27EUGmDNm-vmt3Ig1un4NjBRSyZXAuwA4LAkvRndQOD8EZm2WlCnTWVjFBOPtfigTerYchl3w&oh=00_Af-RSX55hLaW3Daq_e2vK9JU-F6PTByUgT4TyofvyLB_rA&oe=6A45AD4E",
       "createdAt": "2026-06-26T18:53:23+0000",
-      "likes": 0,
-      "comments": 0,
-      "shares": 0,
-      "reach": 0,
-      "platform": "facebook"
-    },
-    {
-      "id": "1139516419249724_122110831935359008",
-      "message": "بعد انقطاع دام 15 عاماً، تم الإعلان عن إعادة تفعيل خدمات السجل المدني في منطقة عفرين بريف حلب الشمالي لتسهيل المعاملات الرسمية للمواطنين. كي",
-      "thumbnail": "https://scontent.fruh5-1.fna.fbcdn.net/v/t39.30808-6/730776865_122110831923359008_4262109593204538639_n.jpg?stp=dst-jpg_p720x720_tt6&_nc_cat=107&ccb=1-7&_nc_sid=127cfc&_nc_ohc=s1I_p3V_sw4Q7kNvwHAyc7_&_nc_oc=Adp140R2s4m-R-h1nG4NcYq87zdZ9iZTcOrQlmZMaWTNzs0wOsH8yli66PE5PJqgWC9tH4_2T6GbWOzZmxAhAbIf&_nc_zt=23&_nc_ht=scontent.fruh5-1.fna&edm=APyxFHYEAAAA&_nc_gid=LfTf82pzPqyE8NDvZeXEqA&_nc_tpa=Q5bMBQF7BZ-7Ugq6zUflucsAcBKzMT1UDuh-c_3g-KFKo_82VZqqGQAO7N2vFGgOw67r6p1N2L0ejxlyrQ&oh=00_Af9fjVpTisCw-rLOn2LzSsBLANqpb_jMtgslRW6bFH9glw&oe=6A45B306",
-      "createdAt": "2026-06-26T18:38:57+0000",
       "likes": 0,
       "comments": 0,
       "shares": 0,
@@ -159,7 +159,7 @@
     }
   ],
   "pipeline": {
-    "lastRun": "2026-06-27T14:15:37.366Z",
+    "lastRun": "2026-06-27T14:45:37.323Z",
     "status": "operational"
   }
 }
