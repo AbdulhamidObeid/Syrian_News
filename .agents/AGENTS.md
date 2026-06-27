@@ -28,3 +28,4 @@ Whenever assisting the human admin with this project, you MUST:
 - **Maintain Aesthetics**: The output is highly visual. Never break the headline character limits or the bullet point constraints defined in the Editor Blueprint.
 - **Prioritize Virality**: Always optimize for features that drive engagement (Instagram Reels format, smart hashtags, compelling hooks).
 - **Syrian Context**: Ensure all Arabic generated is standard and professional, but deeply attuned to the Syrian cultural and political context.
+- **Automated Deployments**: Whenever a crucial fix is done or the code is updated, the agent MUST immediately push to GitHub with clear commit naming, rerun the engine, and explain in detail to the user how it was done without guessing.
