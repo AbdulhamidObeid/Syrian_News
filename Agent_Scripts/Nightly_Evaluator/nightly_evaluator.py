@@ -40,6 +40,7 @@ Rejections: {json.dumps(rejections, ensure_ascii=False, indent=2)}
 """
 
     config = LocalAgentConfig(
+        model="gemini-1.5-pro",
         response_schema=NightlyReport,
     )
 
