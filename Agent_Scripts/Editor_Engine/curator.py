@@ -97,7 +97,7 @@ BE GENEROUS with scoring during growth phase — we need volume. If it's remotel
     prompt = f"Please score the following raw news feed and identify the best items for publication.\n\nRaw News Feed (JSON):\n{json.dumps(raw_items, ensure_ascii=False)}"
 
     config = LocalAgentConfig(
-        model="gemini-1.5-pro",
+        model="gemini-2.0-flash",
         response_schema=ScoringSchema,
     )
     
@@ -179,7 +179,7 @@ CRITICAL Content-Type Selection Rule:
 """
 
     config = LocalAgentConfig(
-        model="gemini-1.5-pro",
+        model="gemini-2.0-flash",
         response_schema=CopywritingSchema,
     )
     
@@ -239,7 +239,7 @@ CRITICAL Content-Type Selection Rule:
 """
 
     config = LocalAgentConfig(
-        model="gemini-1.5-pro",
+        model="gemini-2.0-flash",
         response_schema=CopywritingSchema,
     )
     
@@ -300,7 +300,7 @@ CRITICAL RULES:
 """
     
     config = LocalAgentConfig(
-        model="gemini-1.5-pro",
+        model="gemini-2.0-flash",
         response_schema=ImagePromptSchema,
     )
     
