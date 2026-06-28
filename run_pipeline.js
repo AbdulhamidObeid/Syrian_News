@@ -565,7 +565,7 @@ async function runCycle() {
 
         // 5. Check Nightly Evaluator
         const currentHourMin = getDamascusTime();
-        if (isTimeWithinWindow(currentHourMin, "23:30", 10)) {
+        if (isTimeWithinWindow(currentHourMin, "12:00", 10)) {
             const evalId = `eval_${getTodayDateStr()}`;
             let currentHistory = loadJson(HISTORY_PATH);
             if (!currentHistory.includes(evalId)) {
